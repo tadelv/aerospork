@@ -28,12 +28,12 @@ final class DefaultConfigParityTest: XCTestCase {
         // Report the first differing line rather than dumping two 100-line files at the reader.
         let aLines = a.split(separator: "\n", omittingEmptySubsequences: false)
         let bLines = b.split(separator: "\n", omittingEmptySubsequences: false)
-        let firstDiff = zip(aLines, bLines).enumerated().first { $0.element.0 != $0.element.1 }
-        let detail: String = if let firstDiff {
+        let firstDiffIndex = (0 ..< min(aLines.count, bLines.count)).first { aLines[$0] != bLines[$0] }
+        let detail: String = if let firstDiffIndex {
             """
-            first difference at line \(firstDiff.offset + 1):
-              resources/            \(firstDiff.element.0)
-              docs/config-examples/ \(firstDiff.element.1)
+            first difference at line \(firstDiffIndex + 1):
+              resources/            \(aLines[firstDiffIndex])
+              docs/config-examples/ \(bLines[firstDiffIndex])
             """
         } else {
             "same prefix, different length: \(aLines.count) vs \(bLines.count) lines"
