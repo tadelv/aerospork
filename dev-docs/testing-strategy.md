@@ -16,7 +16,7 @@ and the tooling/skills to build and maintain to keep it honest over time.
 
 ## 1. Where we are today
 
-**Good news — this is not a greenfield.** The upstream AeroSpace test design is
+The upstream AeroSpace test design is
 headless and reusable:
 
 - **Two headless test targets**, `AppBundleTests` and `CommonTests`. No count is quoted here on
@@ -53,8 +53,8 @@ headless and reusable:
    call `layoutWorkspace()`. The math is pure and the answer is already on the node; one
    override unlocks it (§4).
 4. **No live-app integration test exists.** Every test is in-process. `ClientServerTest`
-   only checks the JSON codec — it never binds a socket.
-5. **No window-geometry in the queryable surface** (see §7) — a product gap that limits
+   only checks the JSON codec. It never binds a socket.
+5. **No window-geometry in the queryable surface** (see §7): a product gap that limits
    what e2e can assert without the unstable `debug-windows` output.
 
 ---
@@ -73,10 +73,10 @@ only with real AX/monitors, e2e/manual.
 | **E2E (real windows + virtual displays)** | spawn stock-app windows, tile, assert live rects; multi-monitor via BetterDisplay | self-hosted / dev Mac | nightly / on-demand | real AX quirks, tiling real windows, monitor arrangement, workspace assignment |
 | **Manual** | DisplayLink hardware (`uuid` fingerprint, flap timing), SwiftUI settings smoke, first-run permission UX | one dev Mac w/ dongle | per release | hardware-only fingerprinting, GUI regressions, permission flow |
 
-**CI feasibility (blunt):** ~80% of meaningful tests are headless and belong in CI.
+**CI feasibility:** most meaningful tests are headless and belong in CI.
 The AX/multi-monitor slice needs a real Mac; DisplayLink needs the physical dongle.
 GitHub-*hosted* runners can't even build this until a stable macOS-27 + Xcode-27 image
-ships — until then **CI = a self-hosted Mac on the pinned beta** running `run-tests.sh`.
+ships, until then **CI = a self-hosted Mac on the pinned beta** running `run-tests.sh`.
 
 ---
 
@@ -97,7 +97,7 @@ a running app. Priority = value × cheapness.
 
 | Test | Target | Why |
 |---|---|---|
-| ✅ **MonitorFingerprint.matches(patternData:).** *done, `MonitorFingerprintTest`* | UUID match/mismatch (case-insensitive), two identical DisplayLink panels disambiguated by UUID, name exact/substring, vendor/model/serial, width/height | UUID-first matching is the whole point of the DisplayLink work; pure `struct→Bool`. `model/MonitorFingerprint.swift:107-141` |
+| ✅ **MonitorFingerprint.matches(patternData:).** *done, `MonitorFingerprintTest`* | UUID match/mismatch (case-insensitive), two identical DisplayLink panels disambiguated by UUID, name exact/substring, vendor/model/serial, width/height | UUID-first matching is why the DisplayLink work exists; pure `struct→Bool`. `model/MonitorFingerprint.swift:107-141` |
 | ✅ **Fingerprint config parse.** *done, `ConfigTest.testParseWorkspaceToMonitorFingerprintUuid`* | `parseConfig` of `[workspace-to-monitor-force-assignment]` with `fingerprint = { uuid = ... }`, hex `vendor='0x1234'`, and unknown-key rejection | The new fingerprint path was unasserted (`testParseWorkspaceToMonitorAssignment` covered only errors). `parseWorkspaceToMonitorAssignment.swift:49-118` |
 | **Key carbon/round-trip** | over `Key.allCases`: `toString()` reparses; spot-check `carbonKeyCode` for letters/digits/arrows | The soffes/HotKey → Carbon replacement is untested; a wrong keycode = a silently dead hotkey. `config/Key.swift` |
 
@@ -111,9 +111,9 @@ a running app. Priority = value × cheapness.
 
 ---
 
-## 4. Two small seams that unlock the hard layers
+## 4. Two small seams that make the hard layers testable
 
-These are the highest-leverage source changes — a few lines each, and they open up
+These are the two source changes with the widest effect. A few lines each, and they open up
 whole categories of headless tests.
 
 ### Seam A — layout geometry (≈1–3 lines)
@@ -207,7 +207,7 @@ the signature-change gating in `GlobalObserver.onMonitorConfigurationChanged`.
   DisplayLink USB dock** — virtual displays fire one clean notification, not a burst.
 - The **`displayUUID` match on a real panel** (stable nil vendor/model/serial + persistent
   UUID across reconnect) is hardware-only. Virtual displays *approximate* it (they have a
-  UUID) so the branch can be smoke-tested, but the UUID is runtime-assigned — a test must
+  UUID) so the branch can be smoke-tested, but the UUID is runtime-assigned: a test must
   read it back from `monitor-fingerprint` first, then verify a `uuid=` assignment.
 - Gate hardware tests behind `AEROSPORK_DISPLAYLINK=1` + a preflight that detects the panel;
   otherwise skip with a logged reason. Keep a short manual DisplayLink checklist per release.
@@ -231,7 +231,7 @@ Small, also useful to end users, and they remove the biggest e2e friction:
    embedded in the `monitor-fingerprint` string; a test that builds a `uuid=` assignment
    has to parse it out.
 
-Both are optional but recommended — they convert "parse an unstable debug dump" into
+Both are optional but recommended. They convert "parse an unstable debug dump" into
 "assert a JSON field."
 
 ---
@@ -259,7 +259,7 @@ makes `swift build` **hang with no error**.
 
 - **Add `.github/workflows/ci.yml`** that runs the existing `run-tests.sh` on a
   **self-hosted macOS-27-beta runner** with `DEVELOPER_DIR` pinned in `env:`. Nearly all
-  value, almost no new code — the test body already exists.
+  value, almost no new code: the test body already exists.
 - Keep the toolchain pin in one place so the day a stable macOS-27 + Xcode-27 hosted image
   lands, you flip one value and move to hosted runners.
 - CI runs: static + unit tiers on every PR; the integration tier (`run-e2e.sh`) on merge +
@@ -269,7 +269,7 @@ makes `swift build` **hang with no error**.
 
 ## 10. Tooling / skills to build (catalog)
 
-Ordered by leverage. Ponytail bias: reuse `AxUiElementMock`, `run-tests.sh`, the XCTest
+Ordered by effect per unit of work. Preference throughout: reuse `AxUiElementMock`, `run-tests.sh`, the XCTest
 harness, and the existing scripts (`build-debug-app.sh`,
 `reset-accessibility-permission-for-debug.sh`); add the minimum.
 
@@ -285,7 +285,7 @@ harness, and the existing scripts (`build-debug-app.sh`,
    bundle; if not granted, print exact steps / open the pane and exit non-zero so e2e fails
    loud instead of hanging on a permission dialog. Complements the existing reset script.
    (You cannot auto-grant without MDM or SIP-off; on a dedicated self-hosted mini, grant
-   once — it persists. Document that one-time box setup.)
+   once. It persists. Document that one-time box setup.)
 7. **`with-virtual-display.sh`.** bash wrapper over `betterdisplaycli`. §6. Multi-monitor.
 8. **`capture-axdump.sh`.** bash, `script/`. Dump a focused window's AX tree to the
    `Aero.*` JSON5 schema `AxWindowKindTest` expects, so refreshing a fixture is
@@ -308,7 +308,7 @@ harness, and the existing scripts (`build-debug-app.sh`,
 4. P1 unit tests: ✅ MonitorFingerprint UUID matching + fingerprint config parse (done);
    remaining — Key carbon mapping.
 
-**Phase 2 — unlock geometry & monitors (small seams):**
+**Phase 2, geometry and monitors (small seams):**
 5. Seam A (`TestWindow.setAxFrame` records rect) + layout golden-rect tests.
 6. Seam B (injectable monitors + `Monitor.fingerprint`) + multi-monitor / UUID-resolution
    unit tests. Reset the two leaking globals in setUp.
@@ -324,7 +324,7 @@ harness, and the existing scripts (`build-debug-app.sh`,
 11. Manual DisplayLink checklist (per release); GUI smoke checklist.
 12. Window-fixture spawner app — only if stock apps flake.
 
-**Highest leverage, if you do nothing else:** Phase 1 items 1–3. CI running the tests that
+**If you do nothing else:** Phase 1 items 1–3. CI running the tests that
 already exist, a preflight that kills the silent hang, and automated coverage of the config
 writer that a human currently babysits.
 

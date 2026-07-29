@@ -46,4 +46,4 @@ shipping a licence for code that is not in the binary is misleading.
 | HotKey | Carbon `RegisterEventHotKey` (`Sources/AppBundle/config/HotkeyBinding.swift`) |
 | ISSoundAdditions | CoreAudio (`Sources/AppBundle/util/SystemVolume.swift`) |
 | swift-collections | Plain Swift collections |
-| ANTLR v4 | Not used — the built-in shell-like language it parsed is gone |
+| ANTLR v4 | Not used: the built-in shell-like language it parsed is gone |

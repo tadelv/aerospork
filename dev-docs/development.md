@@ -70,7 +70,7 @@ Application*. The menu entry is hidden unless the signed-in Apple ID is the team
 so a missing entry means the wrong account is selected, not a broken Xcode.
 
 Store a notary credential once. An App Store Connect API key is preferable to an app-specific
-password — one fewer secret, and the same key works across projects:
+password: one fewer secret, and the same key works across projects:
 
 ```bash
 xcrun notarytool store-credentials aerospork-notary \
@@ -80,7 +80,7 @@ export AEROSPORK_NOTARY_PROFILE=aerospork-notary
 ```
 
 Without a Developer ID or without that variable, `build-release.sh` signs, **skips notarization,
-and says so** — a local release still works; only distribution is blocked.
+and says so**: a local release still works; only distribution is blocked.
 
 Verify a finished build with Apple's own preflight, which is stricter than `codesign -v`:
 

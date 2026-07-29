@@ -64,7 +64,7 @@ Debug builds use `~/.aerospork-debug.toml` instead of `~/.aerospork.toml` for co
 - `Sources/Cli/_main.swift`: CLI client that connects to `/tmp/<bundle-id>-<user>.sock` — note the
   bundle id differs per build, so debug and release each have their own socket
   (`/tmp/com.wbs.aerospork.debug-<user>.sock` vs `/tmp/com.wbs.aerospork-<user>.sock`)
-- IPC uses native POSIX `AF_UNIX` sockets with length-prefixed framing (`Sources/Common/util/UnixSocket.swift`) — no third-party socket library
+- IPC uses native POSIX `AF_UNIX` sockets with length-prefixed framing (`Sources/Common/util/UnixSocket.swift`), no third-party socket library
 - Commands are parsed in `Sources/AppBundle/command/parseCommand.swift` and executed on server
 - All commands implement the `Command` protocol
 
@@ -126,19 +126,14 @@ Sources/
 
 **Config Hot-Reload**: `ConfigFileWatcher` watches the active config file (via `DispatchSource`) and reloads on change, so external editor edits and GUI saves apply without a manual `reload-config`. Self-writes from the settings GUI are suppressed for 500ms (`suppressNextSelfWrite`) so a single save doesn't reload twice.
 
-**Settings GUI**: a SwiftUI `Settings` scene (singleton — two windows can't race on the config file), seven tabs. Structured controls **apply live** on a 600ms debounce, per macOS convention; there is no Save button. That is only safe because of the writer invariant above. The Raw TOML tab is the exception — it applies explicitly, since half-typed TOML is invalid most of the time, and it is the guarantee that no config key is unreachable from the GUI.
+**Settings GUI**: a SwiftUI `Settings` scene (singleton: two windows can't race on the config file), seven tabs. Structured controls **apply live** on a 600ms debounce, per macOS convention; there is no Save button. That is only safe because of the writer invariant above. The Raw TOML tab is the exception. It applies explicitly, since half-typed TOML is invalid most of the time, and it is the guarantee that no config key is unreachable from the GUI.
 
-> **Shared chrome invariant — `SettingsChrome.swift` owns the pieces.** The seven tabs were written
-> at seven different times, and the failure mode is always the same: a tab needs a small piece of
-> chrome, doesn't find one, and grows its own. That is how the window ended up with two badges at
-> two paddings (6/2 and 5/1, only one of them with an accessibility label) and three hand-rolled
-> +/- rows. `NumberField`, `SettingsHint`, `SettingsFooter`, `ListActionBar`,
-> `ContentUnavailableViewCompat`, `SectionLabel`, `Badge`, `StatusLabel`, `Banner`, `CodeEditor`
-> and `CopyButton` all live there and are the only versions. Status symbols and tints come from
-> `StatusLabel.Kind` / `Banner.Kind`, never as string literals in a tab — red/green is the most
-> confusable pair on screen, so the symbol pairing is decided once.
-> `UIChromeConsistencyTest` enforces both rules by scanning `ui/` for stray `Capsule()` badges and
-> hardcoded status symbols.
+> **Shared chrome invariant.** `SettingsChrome.swift` holds every shared settings control and is
+> the only copy of each: `NumberField`, `SettingsHint`, `SettingsFooter`, `ListActionBar`,
+> `ContentUnavailableViewCompat`, `SectionLabel`, `Badge`, `StatusLabel`, `Banner`, `CodeEditor`,
+> `CopyButton`. A tab uses what is there rather than growing its own. Status symbols and tints come
+> from `StatusLabel.Kind` / `Banner.Kind`, never string literals in a tab.
+> `UIChromeConsistencyTest` enforces both rules. `dev-docs/architecture.md` explains why they exist.
 
 **MRU Tracking**: Tree nodes track most-recently-used order for focus navigation.
 
@@ -147,7 +142,7 @@ Sources/
 `.claude/skills/aerospork-design/` is an invocable Agent Skill holding the design system: tokens,
 27 web components, three click-through UI kits (settings window, menu bar, CLI), 18 specimen cards,
 and the brand artwork. It was derived *from* `Sources/AppBundle/ui/`, so it documents the shipping
-UI rather than proposing a different one — the Swift is the source of truth, and the web components
+UI rather than proposing a different one: the Swift is the source of truth, and the web components
 are a recreation for mocks and marketing.
 
 Load it (`/aerospork-design`) before designing a new surface. `readme.md` there carries the content
@@ -185,7 +180,7 @@ for the rebuild steps.
 
 ### Performance & Smoothness
 - Layout is synchronous and simple; a fixed 50ms debounce (`RefreshDebouncer`) coalesces bursts of accessibility events into a single refresh
-- `MacApp.setFrame` skips redundant AX writes when a window is already at its target frame — this avoids unnecessary framebuffer churn, which matters over DisplayLink/USB
+- `MacApp.setFrame` skips redundant AX writes when a window is already at its target frame. This avoids unnecessary framebuffer churn, which matters over DisplayLink/USB
 - Screen-configuration changes (`GlobalObserver`) are debounced and rebalanced on monitor-set change, handling DisplayLink's multi-stage connect/flap
 
 ### Logging
@@ -201,7 +196,7 @@ Two channels, and the distinction matters:
 - **`debugLog`** (`Common/util/commonUtil.swift`) — verbose tracing, `@autoclosure` so the message is
   never built when off, gated at runtime on `AEROSPORK_DEBUG_LOG` (**not** `#if DEBUG`: the gate has
   to be runtime, because a build that ships to users can still be compiled with `DEBUG`). Writes at
-  `.debug`, which the unified log does **not** persist — those records exist only for a `log stream`
+  `.debug`, which the unified log does **not** persist. Those records exist only for a `log stream`
   that is already running. Safe anywhere, including hot paths.
 
 `PerfInvariantsTest.testDebugLogDoesNotEvaluateItsMessageWhenGateIsOff` pins the autoclosure;
@@ -244,7 +239,7 @@ Run tests with `./run-tests.sh` which:
 5. Checks for uncommitted generated files
 
 > **Toolchain:** on a beta macOS, the swiftly-pinned toolchain (`.swift-version`) cannot compile
-> this project — the frontend spins at 100% CPU indefinitely on the TOMLKit manifest, writing
+> this project: the frontend spins at 100% CPU indefinitely on the TOMLKit manifest, writing
 > nothing. It is the toolchain, not the SDK: setting `DEVELOPER_DIR` alone does not help, because
 > `script/setup.sh` routes `swift` through `swiftly run swift`. Use the Xcode beta toolchain:
 >

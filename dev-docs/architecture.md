@@ -9,17 +9,17 @@
 - `../Sources`.
   The majority of AeroSpork source code. Managed by SPM `../Package.swift`
 - `../Sources/AppBundle/`.
-  aerospork.app server. Technically, it's a SPM library that is exposed to the `aerosporkApp` executable target.
+  The aerospork.app server. An SPM library, exposed to the `aerosporkApp` executable target.
 - `../Sources/aerosporkApp/`.
   Thin app entry point (`@main`). SPM can't build a macOS App Bundle, so the release build is produced via the
   generated Xcode project. The Xcode project model lives in `../aerospork.xcodeproj/` and is generated from the
   `../project.yml` "skeleton" by `./generate.sh`. Keep as much code as possible in the `AppBundle` library.
 - `../Sources/Cli/`.
-  CLI client. CLI client is built purely using SPM, no Xcode involved (phew!)
+  CLI client. Built purely with SPM; Xcode is not involved.
 - `../Sources/Common/`.
   Shared code between server and client (command-line args parsing, util functions, and the native Unix-socket IPC).
-- `../Sources/AppBundleTests/`.
-  Tests
+- `../Sources/AppBundleTests/` and `../Sources/CommonTests/`.
+  The two test targets. Both are headless.
 - `../docs/`.
   Documentation sources for site and man pages in Asciidoc format https://asciidoc.org/
 
@@ -93,7 +93,7 @@ That file exists because of a specific decay pattern. The tabs were written at d
 each time one needed a small piece of chrome and didn't find it, it grew its own: three hand-rolled
 +/- rows, caveat text in three different places, and two badges at two paddings (6/2 and 5/1) where
 only one set a foreground colour or an accessibility label. `UIChromeConsistencyTest` scans `ui/`
-for stray `Capsule()` badges and hardcoded status symbols so it cannot happen again.
+for stray `Capsule()` badges and hardcoded status symbols, so a new one fails the test.
 
 `StatusLabel.Kind` and `Banner.Kind` own the symbol/tint pairings. Red and green are the most
 confusable pair on screen, so the symbol has to differ too, and that decision is made once rather

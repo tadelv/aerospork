@@ -26,7 +26,7 @@ system was derived from it. What did not match was fixed in the repo, not here:
   (6/2 vs 5/1) and only one carried an accessibility label. Both now share the geometry this system
   specifies, differing only in tone.
 - `CopyButton` now tints its checkmark green on copy, per `components/controls/CopyButton.jsx`. The
-  colour change is the whole confirmation — the product has no toast anywhere.
+  colour change is the whole confirmation: the product has no toast anywhere.
 
 `UIChromeConsistencyTest` pins all of it, including the chip ratio, so the two sides cannot drift
 apart silently.

@@ -3,7 +3,7 @@
 ## Status
 
 **Only the first group below has a controlled measurement behind it.** The rest are defensible on
-first principles — they remove work that provably happens, but their end-to-end effect has *not*
+first principles. They remove work that provably happens, but their end-to-end effect has *not*
 been demonstrated, because the benchmark available was too noisy to resolve it. See
 "Why the benchmark is unreliable".
 
@@ -69,7 +69,7 @@ broke anyone scripting the CLI.
    the minimized container). The fix keeps the parallel prefetch but adds a cheap `willMutate`
    precheck and **re-reads** AX state only for the few windows that are actually about to move, so
    the steady state pays no extra round trips. Per-workspace and per-window cancellation checks are
-   restored too — the `.standard` branch had become fully synchronous, so a cancelled refresh was
+   restored too: the `.standard` branch had become fully synchronous, so a cancelled refresh was
    mutating the whole tree instead of stopping. Index/order pairing was verified correct throughout.
 
 5. **`tree/MacApp.getOrRegister`.** replaced a `while true` / `Task.sleep(100ms)` poll with
@@ -90,11 +90,11 @@ broke anyone scripting the CLI.
      until the AX timeout. `AXUIElementSetMessagingTimeout(1.0)` also caps a wedged app at 1 s
      rather than the 6 s default (120 debounce windows).
    - **The fragile invariant is gone, not documented.** Correctness used to depend on there being
-     *zero* suspension points between `wipPids.insert(pid)` and the continuation append — a single
+     *zero* suspension points between `wipPids.insert(pid)` and the continuation append: a single
      `await Task.yield()` there deadlocked the main actor. It is now non-load-bearing: the
      continuation body re-checks `!wipPids.contains(pid) || Task.isCancelled` and resumes itself.
      `wipPids` is cleared in the same synchronous drain that wakes waiters, so "not in flight"
-     means exactly "already published" — the state a suspension point would have produced.
+     means exactly "already published": the state a suspension point would have produced.
 
 6. **`tree/MacApp`.** the frame no-op guard was extracted to `isFrameSatisfied` and hoisted
    *above* `disableAnimations`, which costs a read plus two writes on the app element. Previously a
@@ -148,9 +148,9 @@ many alternating trials from a warm process, or Instruments.
 
 ## How to measure properly
 
-`OSSignposter` intervals already exist and are the right tool — no new instrumentation needed:
+`OSSignposter` intervals already exist and are the right tool, no new instrumentation needed:
 
-- `util/appBundleUtil.swift` — the signposter, `category: .pointsOfInterest`
+- `util/appBundleUtil.swift`: the signposter, `category: .pointsOfInterest`
 - `layout/refresh.swift` — around `runRefreshSessionBlocking` and `runSession`
 - `util/accessibility.swift` — around **every** AX `get`, `set` and `containingWindowId`, tagged
   with `axTaskLocalAppThreadToken`
@@ -180,7 +180,7 @@ AEROSPORK_DEBUG_LOG=1 /Applications/AeroSporkApp.app/Contents/MacOS/AeroSporkApp
 - **Batching AX attribute reads.** `AXUIElementCopyMultipleAttributeValues` is the right primitive
   and is not used. A previous attempt (`AxBatchFetcher`) was deleted rather than wired in: it was
   broken (`as? CGPoint` on an `AXValue` is always nil) and its `.stopOnError` mode would have been a
-  pessimization — one absent attribute such as `AXFullScreen` falls back to eight individual reads,
+  pessimization: one absent attribute such as `AXFullScreen` falls back to eight individual reads,
   slower than not batching at all. `normalizeLayoutReason` now takes one round trip per window
   rather than two, which captured most of the available win without the batching API.
 - **Regression coverage is structural, not timing-based.** `PerfInvariantsTest` pins the algorithmic
