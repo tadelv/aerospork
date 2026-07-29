@@ -15,7 +15,7 @@ aerospork is an i3-like tiling window manager for macOS written in Swift. It use
 ### Debug Build
 ```bash
 ./build-debug.sh              # Build debug version to .debug/
-./run-debug.sh                # Run aerospork.app debug build
+./run-debug.sh                # Run the debug app (.debug/AeroSpork-Debug.app)
 ./run-cli.sh [args]           # Run aerospork CLI (forwards args to binary)
 ```
 

@@ -163,7 +163,7 @@ For a coarse view without Instruments, run the binary directly with logging enab
 durations the code already computes:
 
 ```bash
-AEROSPORK_DEBUG_LOG=1 /Applications/AeroSporkApp.app/Contents/MacOS/AeroSporkApp 2>&1 \
+AEROSPORK_DEBUG_LOG=1 /Applications/AeroSpork.app/Contents/MacOS/AeroSpork 2>&1 \
   | grep -oE 'SESSION: Completed in [0-9.]+ms'
 ```
 

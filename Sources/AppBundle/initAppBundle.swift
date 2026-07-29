@@ -52,11 +52,11 @@ struct ServerArgs: Sendable {
 }
 
 private let serverHelp = """
-    USAGE: \(CommandLine.arguments.first ?? "aerospork.app/Contents/MacOS/aerospork") [<options>]
+    USAGE: \(CommandLine.arguments.first ?? "AeroSpork.app/Contents/MacOS/aerospork") [<options>]
 
     OPTIONS:
       -h, --help              Print help
-      -v, --version           Print aerospork.app version
+      -v, --version           Print AeroSpork.app version
       --config-path <path>    Config path. It will take priority over ~/.aerospork.toml
                               and ${XDG_CONFIG_HOME}/aerospork/aerospork.toml
     """

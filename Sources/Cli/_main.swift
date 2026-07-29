@@ -81,7 +81,7 @@ func run(_ socket: UnixSocketConnection, _ args: [String], stdin: String) -> Res
             message: """
                 Can't decode the answer from AeroSpork server. The server is probably a different
                 version than this client (client: \(cliClientVersionAndHash)).
-                Restart aerospork.app -- a server restart is required after each update.
+                Restart AeroSpork.app -- a server restart is required after each update.
                 """,
             exitCode: ExitCode.failure,
         ))
@@ -107,7 +107,7 @@ struct Main {
         let socketFile = "/tmp/\(aeroSporkAppId)-\(unixUserName).sock"
         guard let socket = UnixSocketConnection.connect(to: socketFile) else {
             if action == .version { printVersionAndExit(serverVersion: nil) }
-            printStderr("Can't connect to AeroSpork server. Is aerospork.app running?")
+            printStderr("Can't connect to AeroSpork server. Is AeroSpork.app running?")
             exit(ExitCode.serverUnreachable)
         }
         defer { socket.close() }
@@ -141,7 +141,7 @@ func printVersionAndExit(serverVersion: String?) -> Never {
     print(
         """
         AeroSpork CLI client version: \(cliClientVersionAndHash)
-        aerospork.app server version: \(serverVersion ?? "Unknown. The server is not running")
+        AeroSpork.app server version: \(serverVersion ?? "Unknown. The server is not running")
         """,
     )
     exit(ExitCode.success)

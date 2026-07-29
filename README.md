@@ -11,153 +11,132 @@
 
 </div>
 
-AeroSpork tiles your windows in a tree, the way i3 does, with virtual workspaces that switch
-instantly and no need to disable System Integrity Protection. It is configured in TOML, driven from
-the command line, and, unlike most tiling managers, ships a settings GUI for the parts you would
-rather click than memorize.
+AeroSpork is an i3-style tiling window manager for macOS. Windows are leaves of a layout tree,
+workspaces are emulated rather than mapped onto native Spaces, and nothing requires disabling System
+Integrity Protection. It is configured in TOML, driven from a CLI, and ships a settings GUI.
 
-AeroSpork is a fork of [AeroSpace](https://github.com/nikitabobko/AeroSpace) by Nikita Bobko, which
-is where the tree layout model, the workspace emulation and most of the command surface come from.
-Both are MIT licensed; see [`legal/`](legal/) for the full notice and attribution.
+It is a fork of [AeroSpace](https://github.com/nikitabobko/AeroSpace) by Nikita Bobko, which is
+where the tree model, the workspace emulation and most of the command surface come from. Both are
+MIT licensed; see [`legal/`](legal/).
 
 <div align="center">
   <img src="docs/assets/layout-modes.png" alt="Tiles layout beside accordion layout" width="820">
 </div>
 
----
+## Why this fork exists
 
-## Features
+On 2025-07-07 the author opened
+[nikitabobko/AeroSpace#1526](https://github.com/nikitabobko/AeroSpace/pull/1526) ("Major
+Enhancements"): 4,515 added lines across 41 files, proposing two things, hardware-based monitor
+fingerprinting for persistent workspace assignment and a set of performance optimisations. It was
+closed on 2025-07-08, the following day, with no review comment. Other users asked in the thread why
+and received no answer. AeroSpork is the fork that followed.
 
-- **Tree-based tiling:** windows are leaves; containers have an orientation and a layout
-- **Instant workspace switching:** virtual workspaces, no Spaces animation, no SIP changes
-- **Settings GUI:** seven tabs, including a raw TOML editor validated against the real parser
-- **Plain-text TOML config:** dotfiles friendly, hot-reloaded on save
-- **CLI first:** 36 commands, man pages, shell completion for bash/fish/zsh
-- **Multi-monitor by hardware identity:** UUID and EDID, including DisplayLink docks
-- **One dependency:** sockets, hotkeys and volume all use platform APIs
+Those two areas are still what the fork is for: monitor identity that holds up across USB docks and
+identical panels, and a configuration surface that does not require memorizing a schema.
 
----
+## Tech stack
 
-## What's Different from AeroSpace
+| Concern | Implementation |
+|---|---|
+| Language | Swift, 6.0 language mode (`Package.swift`); `.swift-version` pins toolchain 6.4 |
+| Minimum OS | macOS 13.0 (Ventura) |
+| UI | SwiftUI: a `MenuBarExtra` and a `Settings` scene of seven tabs |
+| Third-party dependencies | TOMLKit, and nothing else |
+| CLI/app IPC | POSIX `AF_UNIX` stream socket, length-prefixed framing (`Sources/Common/util/UnixSocket.swift`) |
+| Global hotkeys | Carbon `RegisterEventHotKey` (`config/HotkeyBinding.swift`) |
+| Volume control | CoreAudio (`util/SystemVolume.swift`) |
+| Display identity | CoreGraphics `CGDisplayCreateUUIDFromDisplayID`, `CGDisplayVendorNumber`, `CGDisplayModelNumber`, `CGDisplaySerialNumber` |
+| Window IDs | C shim over the private `_AXUIElementGetWindow` (`Sources/PrivateApi/`) |
+| Build | SwiftPM for the CLI and debug builds; XcodeGen plus `xcodebuild` for the `.app`, since SwiftPM cannot produce a bundle |
 
-The fork exists for two reasons: multi-monitor identity that holds up over USB docks, and a
-configuration experience that does not require memorizing a schema.
+BlueSocket, HotKey, ISSoundAdditions and the ANTLR-generated shell grammar are gone.
+`exec-and-forget` hands its string to `/bin/bash -c`.
 
-The tree layout, virtual workspaces, SIP-free operation, TOML config and the CLI are inherited and
-behave the same in both. Only the differences are listed here:
+```
+Sources/
+├── aerosporkApp/    # app entry point (@main)
+├── AppBundle/       # the window manager: tree/, layout/, command/, config/, model/, mouse/, ui/
+├── Cli/             # command-line client
+├── Common/          # shared with the CLI, incl. the socket implementation
+└── PrivateApi/      # C shim for _AXUIElementGetWindow
+```
+
+## Differences from AeroSpace
+
+The tree model, virtual workspaces, SIP-free operation, TOML config and the CLI are inherited and
+behave the same way. Only the deltas are listed.
 
 | | AeroSpace | AeroSpork |
 |---|:---:|:---:|
 | Monitor matching by hardware UUID / EDID | ❌ &nbsp;name, regex or index only | ✅ |
 | Pin a workspace to a specific DisplayLink panel | ❌ | ✅ |
 | Settings GUI | ❌ &nbsp;"No GUI configuration" | ✅ &nbsp;7 tabs |
-| Signed, notarized & stapled builds | ❌ &nbsp;"Not notarized" | ✅ |
+| Signed, notarized and stapled builds | ❌ &nbsp;"Not notarized" | ✅ |
 | Third-party dependencies | 4 | **1** |
 | Config schema | one syntax | v2 shorthand, older syntax still parses |
 | Command surface | **larger** | smaller |
 | Maturity | **public beta, larger community** | younger fork |
 
-<sub>Upstream columns verified against
-<a href="https://github.com/nikitabobko/AeroSpace">nikitabobko/AeroSpace</a> <code>main</code>. Its README
-lists "No GUI configuration" and "Not notarized" as known limitations, its <code>Package.swift</code>
+<sub>Upstream column verified against
+<a href="https://github.com/nikitabobko/AeroSpace">nikitabobko/AeroSpace</a> <code>main</code>: its README
+lists "No GUI configuration" and "Not notarized" as limitations, its <code>Package.swift</code>
 declares 4 dependencies, and its guide documents monitor patterns as main/secondary/index/regex only.</sub>
 
-Feature parity is explicitly not a goal; the last two rows are the trade. If you want the most
-complete and most battle-tested macOS tiling manager, use AeroSpace.
+**Monitor identity.** A display is matched on, in order of reliability, the stable per-display UUID,
+then EDID vendor/model/serial read from CoreGraphics, then the localized name, then size. DisplayLink
+panels expose no EDID at all, so the UUID is the only key that can distinguish two identical ones.
+Screen reconfiguration is debounced, because a DisplayLink dock connects in several stages.
 
-**Monitors are identified by hardware, not by name.** Upstream matches a display by name, regex or
-position. AeroSpork adds a real fingerprint: vendor / model / serial, plus the stable per-display
-UUID from `CGDisplayCreateUUIDFromDisplayID`. That matters most for DisplayLink docks: a DisplayLink
-panel reports no EDID at all, so the UUID is the *only* key that can tell two identical ones apart.
-Upstream's EDID path also read `IOServiceMatching("IODisplayConnect")`, an IOKit class that does not
-exist on Apple Silicon, so vendor/model/serial came back `nil` for every display; AeroSpork reads
-them from CoreGraphics instead.
+**Config schema.** `mod` plus `workspaces` generates the usual i3 keymap, and `[keys]`, `[monitors]`
+and `[on-window]` replace the longer upstream spellings. An existing config is migrated once on
+first launch, and only when the result is proven to parse to the same effective configuration;
+otherwise the file is left alone. The original is kept beside it as `*.pre-v2`.
 
-**A configuration schema you can hold in your head.** `mod` plus `workspaces` generates the usual
-i3 keymap instead of making you write sixty lines of it, and `[keys]`, `[monitors]` and
-`[on-window]` replace the longer upstream spellings. An existing config is migrated automatically on
-first launch, and only if the migration is *proven* to parse to the same effective configuration,
-otherwise your file is left alone. The original is kept beside it as `*.pre-v2`. The older syntax
-still parses, so nothing forces you to move.
+**Settings GUI.** Seven tabs over a comment-preserving writer that only rewrites the keys you
+changed, so opening Settings and changing nothing leaves the file byte-identical and editing one
+section never rewrites another. A raw TOML tab validates against the same parser the app uses at
+startup, so no config key is unreachable from the GUI.
 
-**A settings GUI.** Upstream is config-file-only. AeroSpork has seven tabs: General, Gaps, Keys,
-Monitors, Events, Window Rules, and a raw TOML editor validated against the same parser the app uses
-at startup. It writes through a comment-preserving editor that only rewrites the keys you actually changed.
-
-**One third-party dependency.** Only TOMLKit remains. Unix-socket IPC is POSIX `AF_UNIX`, global
-hotkeys are Carbon `RegisterEventHotKey`, and volume is CoreAudio, replacing BlueSocket, HotKey and
-ISSoundAdditions. The ANTLR-generated shell language is gone; `exec-and-forget` hands the string to
-`/bin/bash -c`.
-
-**Signed, notarized releases.** Universal (arm64 + x86_64) builds, signed with a Developer ID,
-notarized and stapled, with a Homebrew cask generated from the result.
-
-Smaller things: workspaces are created on demand and released when they empty, rather than being
-materialized for every name a keybinding mentions; redundant Accessibility frame writes are skipped,
-which matters on a DisplayLink link where every write is a framebuffer repaint; and the test suite
-is fully headless, so it runs without windows or Accessibility permission.
+**Performance.** Two structural changes: accessibility events are coalesced by a fixed 50ms debounce
+(`util/RefreshDebouncer.swift`) into a single layout pass, and AX position/size writes are skipped
+for a window already at its target frame, which matters over DisplayLink where every write repaints a
+framebuffer. No speedup percentages are claimed for either; `dev-docs/performance.md` records which
+measurements exist and why the available benchmark could not resolve the rest.
 
 ### Coming from AeroSpace
 
-This is a fork, not a drop-in replacement. Configs and scripts need small edits:
+A fork, not a drop-in replacement. Configs and scripts need small edits.
 
-- **`AEROSPACE_*` environment variables are gone**, not aliased. A script reading
-  `$AEROSPACE_FOCUSED_WORKSPACE` now sees an empty string with no error anywhere. The names are
+- `AEROSPACE_*` environment variables are gone and not aliased. A script reading
+  `$AEROSPACE_FOCUSED_WORKSPACE` gets an empty string with no error. The names are
   `AEROSPORK_FOCUSED_WORKSPACE`, `AEROSPORK_PREV_WORKSPACE`, `AEROSPORK_WINDOW_ID` and
   `AEROSPORK_WORKSPACE`.
-- **`if.during-aerospace-startup` is a hard error**, spelled `if.during-aerospork-startup` here.
-  Unknown keys are fatal, so this one fails loudly and names the line.
-- **Feature parity is a non-goal.** The fork deliberately carries less surface area than upstream.
-
-Everything else behaves as you expect: the tree model, the commands, the layout semantics.
-
----
+- `if.during-aerospace-startup` is spelled `if.during-aerospork-startup`. Unknown keys are fatal, so
+  the old spelling fails at startup and names the line.
+- Feature parity is a non-goal. The fork carries less surface area than upstream.
 
 ## Installation
 
-Download the notarized build from the
-[releases page](https://github.com/wbsmolen/aerospork/releases), move `aerospork.app` to
-`/Applications`, and grant Accessibility permission when prompted.
-
-A Homebrew cask is published at [`wbsmolen/tap`](https://github.com/wbsmolen/homebrew-tap):
+Download the notarized universal (arm64 + x86_64) build from the
+[releases page](https://github.com/wbsmolen/aerospork/releases), move `AeroSpork.app` to
+`/Applications`, and grant Accessibility permission when prompted. A Homebrew cask is published at
+[`wbsmolen/tap`](https://github.com/wbsmolen/homebrew-tap):
 
 ```bash
 brew install --cask wbsmolen/tap/aerospork
 ```
 
 Both repositories are private during early release, so `brew install` currently works only for
-accounts with access; the release zip works for anyone.
+accounts with access. The release zip works for anyone.
 
-### Build from Source
+## Configuration
 
-```bash
-./build-debug.sh            # debug build into .debug/ (uses ~/.aerospork-debug.toml)
-./build-release.sh          # signed release; needs an Apple Development certificate
-```
-
-### Requirements
-
-- macOS 13.0 (Ventura) or later
-- Xcode 26 or newer (CI builds on Swift 6.3; `Package.swift` targets the 6.0 language mode)
-- Accessibility permission
-
----
-
-## Quick Start
-
-### Configuration
-
-AeroSpork reads whichever one of these exists; having both is an error it reports at startup:
-
-- `~/.aerospork.toml`
-- `${XDG_CONFIG_HOME}/aerospork/aerospork.toml` (`XDG_CONFIG_HOME` defaults to `~/.config`)
-
-With no config file at all, the app falls back to a complete default that ships inside the bundle,
-so a fresh install already has a working i3-style keymap. The same file is
-[`docs/config-examples/default-config.toml`](docs/config-examples/default-config.toml). Copy it and
-edit. Saved changes hot-reload; there is no reload command to remember.
-
-A minimal config in full:
+AeroSpork reads whichever of these exists, and reports an error at startup if both do:
+`~/.aerospork.toml` or `${XDG_CONFIG_HOME}/aerospork/aerospork.toml` (`XDG_CONFIG_HOME` defaults to
+`~/.config`). With neither, it falls back to a complete default bundled in the app, also checked in
+as [`docs/config-examples/default-config.toml`](docs/config-examples/default-config.toml). Saved
+changes hot-reload; there is no reload command to remember.
 
 ```toml
 mod = "alt"                 # generates the i3 keymap: alt-h/j/k/l, alt-shift-h/j/k/l, ...
@@ -178,147 +157,64 @@ alt-enter = "exec-and-forget open -na Ghostty"
 "com.apple.mail" = "move-node-to-workspace 3"
 ```
 
-`uuid` is worth preferring over a name: it is the only key that distinguishes two monitors of the
-same model, and the only one a DisplayLink panel has. Run
-`aerospork list-monitors --format '%{monitor-fingerprint}'` to see what to paste.
+Run `aerospork list-monitors --format '%{monitor-fingerprint}'` to get the values to paste into
+`[monitors]`. Open the GUI from the menu bar icon, with **⌘,** while AeroSpork is frontmost, or via
+`aerospork open-settings`, which is also valid in config and so bindable. Structured tabs apply live
+on a 600ms debounce; the raw TOML tab has an explicit Apply, because half-typed TOML is invalid most
+of the time.
 
-### Settings GUI
+## CLI
 
-Open it from the menu bar icon, press **⌘,** while AeroSpork is frontmost, or run
-`aerospork open-settings`, which is also allowed in config, so you can bind it to a key.
-
-| Tab | What it edits |
-|---|---|
-| **General** | start at login, dock/menu-bar icons, default layout and orientation, normalization, key-mapping preset |
-| **Gaps** | inner and outer gaps |
-| **Keys** | bindings per mode, with a key recorder: press the shortcut instead of typing its notation |
-| **Monitors** | connected displays with copyable UUIDs, and workspace-to-monitor pinning |
-| **Events** | `after-startup-command`, the focus-change callbacks, and the `[exec]` environment |
-| **Window Rules** | placement rules for windows as they appear |
-| **Raw TOML** | the whole file, validated live against the real parser |
-
-Structured tabs apply live on a short debounce, as macOS settings normally do; the Raw TOML tab has
-an explicit **Apply**, because half-typed TOML is invalid most of the time.
-
-> **Your config is safe to open in the GUI.** Opening Settings and changing nothing leaves the file
-> byte-identical, and editing one section never rewrites another, so comments, per-monitor gaps and
-> hardware fingerprints the GUI cannot model survive untouched. Where a construct cannot be
-> represented, the editor refuses the change and points you at the Raw TOML tab rather than
-> degrading it.
-
-### CLI
+36 subcommands, with man pages and bash/fish/zsh completion. `exec-and-forget` is documented as a
+37th command but is config-only.
 
 ```bash
 aerospork focus left                        # focus the window to the left
-aerospork workspace 1                       # switch to workspace 1
+aerospork workspace 1                       # switch workspace
 aerospork move-node-to-workspace 2          # move the focused window
 aerospork layout tiles horizontal vertical  # cycle layout
-aerospork list-monitors                     # what displays are connected, and how they are identified
-aerospork --help                            # all 36 commands
+aerospork list-monitors                     # connected displays and how they are identified
+aerospork --help
 ```
 
----
-
-## Architecture
-
-**Tree layout.** Workspaces are roots, containers carry an orientation (horizontal/vertical) and a
-layout (tiles/accordion), and windows are leaves.
-
-**Virtual workspaces.** AeroSpork emulates workspaces by showing and hiding windows rather than
-using native macOS Spaces, which is what makes switching instant and avoids requiring SIP to be
-disabled.
-
-**Monitor identity.** A display is matched on, in order of reliability: the per-display UUID, then
-EDID vendor/model/serial from CoreGraphics, then the localized name, then size. DisplayLink panels
-expose no EDID, so UUID is the only thing that pins a workspace to a specific one. Screen
-reconfiguration is debounced, because a DisplayLink dock connects in several stages.
-
-**Client/server.** The app runs a Unix-socket server; the `aerospork` binary is a thin client.
-Framing is length-prefixed with a size cap, over POSIX `AF_UNIX`. No socket library.
-
-```
-Sources/
-├── aerosporkApp/    # app entry point
-├── AppBundle/       # the window manager
-│   ├── tree/        # workspaces, containers, windows
-│   ├── layout/      # layout calculation
-│   ├── command/     # command implementations
-│   ├── config/      # parsing, migration, writing, hot-reload
-│   ├── model/       # monitors and fingerprinting
-│   ├── mouse/       # move/resize with the mouse
-│   └── ui/          # settings GUI and menu bar (SwiftUI)
-├── Cli/             # command-line client
-├── Common/          # shared code, incl. the socket implementation
-└── PrivateApi/      # C shim for _AXUIElementGetWindow
-```
-
----
-
-## Development
-
-```bash
-./build-debug.sh     # debug build (SwiftPM only, no Xcode)
-./run-tests.sh       # tests, format and lint
-./format.sh          # swiftformat + swiftlint
-./build-docs.sh      # man pages and the docs site
-```
-
-The test suite is headless — a fake window tree and a mocked Accessibility layer — so it needs no
-real windows and no Accessibility permission.
-
-### Design system
-
-[`.claude/skills/aerospork-design/`](.claude/skills/aerospork-design/) holds the design system:
-tokens, the component set, three click-through UI kits (settings window, menu bar, CLI), specimen
-cards and the brand artwork. It is derived from `Sources/AppBundle/ui/`, so it documents the
-shipping interface rather than proposing a different one.
-
-Read it before adding a settings surface. Two rules matter most, and
-`UIChromeConsistencyTest` enforces them: shared controls live in
-[`SettingsChrome.swift`](Sources/AppBundle/ui/SettingsChrome.swift) and a tab never grows its own
-copy, and status symbols come from `StatusLabel.Kind` rather than string literals.
-
-The UI kits are static HTML. Serve them rather than opening `file://`, which blocks the script
-loading they depend on:
-
-```bash
-python3 -m http.server -d .claude/skills/aerospork-design 8000
-```
-
-See [`dev-docs/`](dev-docs/) for architecture notes, the contributor setup including code signing,
-the testing strategy, and performance measurement guidance. `CLAUDE.md` covers repository
-conventions.
-
----
-
-## Troubleshooting
-
-```bash
-aerospork config --config-path      # which config file is actually loaded
-aerospork reload-config --dry-run   # parse without applying, and say why not
-aerospork --version                 # client and server versions; a mismatch is its own bug
-```
-
-If `--config-path` points inside the `.app` bundle, your config failed to load and AeroSpork is
-running built-in defaults. The menu bar and the Settings window both say so explicitly.
-
-AeroSpork logs to the macOS unified log. No log files, nothing to enable:
+Troubleshooting: `aerospork config --config-path` prints the file actually loaded (a path inside the
+`.app` bundle means your config failed to load and built-in defaults are in use),
+`aerospork reload-config --dry-run` parses without applying and says why not, and `aerospork
+--version` reports both client and server. Logs go to the unified log, with no files and nothing to
+enable:
 
 ```bash
 log show --last 1h --predicate 'subsystem == "com.wbs.aerospork"' --style compact
 ```
 
-Use `com.wbs.aerospork.debug` for a debug build, and add `AND category == "config"` to narrow it.
-For a verbose per-refresh trace set `AEROSPORK_DEBUG_LOG=1`; see *Troubleshooting and bug reports*
-in [the guide](docs/guide.adoc) for the full recipe and what to attach to a report.
+Use `com.wbs.aerospork.debug` for a debug build, add `AND category == "config"` to narrow, and set
+`AEROSPORK_DEBUG_LOG=1` for a verbose per-refresh trace. See *Troubleshooting and bug reports* in
+[the guide](docs/guide.adoc) for what to attach to a report.
 
----
+## Development
+
+```bash
+./build-debug.sh     # SwiftPM debug build into .debug/ (uses ~/.aerospork-debug.toml)
+./build-release.sh   # signed release; needs a Developer ID Application certificate
+./run-tests.sh       # tests, format and lint
+./build-docs.sh      # man pages and docs site
+```
+
+The suite is headless, using a fake window tree and a mocked Accessibility layer, so it needs no real
+windows and no Accessibility permission. Building the release `.app` needs Xcode 26 or newer.
+
+[`.claude/skills/aerospork-design/`](.claude/skills/aerospork-design/) holds the design system:
+tokens, components, three click-through UI kits and the brand artwork. It is derived from
+`Sources/AppBundle/ui/`, so the Swift is the source of truth. Read it before adding a settings
+surface. `UIChromeConsistencyTest` enforces the two rules that matter: shared controls live in
+[`SettingsChrome.swift`](Sources/AppBundle/ui/SettingsChrome.swift) and a tab never grows its own
+copy, and status symbols come from `StatusLabel.Kind` rather than string literals.
+
+See [`dev-docs/`](dev-docs/) for architecture notes, contributor setup including code signing,
+testing strategy and performance measurement. `CLAUDE.md` covers repository conventions.
 
 ## License
 
-MIT. AeroSpork is a fork of [AeroSpace](https://github.com/nikitabobko/AeroSpace), also MIT; the
-original copyright is retained alongside the fork's in [`legal/LICENSE.txt`](legal/LICENSE.txt).
-
-## Status
-
-Active development. Features and configuration may still change.
+MIT. The original AeroSpace copyright is retained alongside the fork's in
+[`legal/LICENSE.txt`](legal/LICENSE.txt). Active development; features and configuration may still
+change.

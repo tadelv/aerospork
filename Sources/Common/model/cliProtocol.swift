@@ -11,7 +11,7 @@ public enum ExitCode {
     public static let failure: Int32 = 1
     /// The request was malformed: unknown subcommand, bad flag, undecodable/oversized frame.
     public static let badArgs: Int32 = 2
-    /// Client-side only: aerospork.app isn't running, or the connection died mid-request.
+    /// Client-side only: AeroSpork.app isn't running, or the connection died mid-request.
     public static let serverUnreachable: Int32 = 3
 }
 
@@ -23,9 +23,9 @@ public func versionMismatchWarning(client: String, server: String) -> String? {
     return """
         Warning: AeroSpork client/server versions don't match
             - AeroSpork CLI client version: \(client)
-            - aerospork.app server version: \(server)
+            - AeroSpork.app server version: \(server)
             Possible fixes:
-            - Restart aerospork.app (server restart is required after each update)
+            - Restart AeroSpork.app (server restart is required after each update)
             - Reinstall and restart AeroSpork (corrupted installation)
         """
 }

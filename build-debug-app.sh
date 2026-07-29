@@ -13,7 +13,7 @@ swift build --target AppBundleTests
 rm -rf .debug && mkdir -p .debug
 
 # Create .app bundle structure
-APP_BUNDLE=".debug/AeroSporkApp.app"
+APP_BUNDLE=".debug/AeroSpork-Debug.app"
 mkdir -p "$APP_BUNDLE/Contents/MacOS"
 mkdir -p "$APP_BUNDLE/Contents/Resources"
 
@@ -63,8 +63,8 @@ echo ""
 echo "✅ Debug .app bundle created successfully!"
 echo ""
 echo "To launch:"
-echo "  • Double-click: .debug/AeroSporkApp.app"
-echo "  • Or from Terminal: open .debug/AeroSporkApp.app"
+echo "  • Double-click: .debug/AeroSpork-Debug.app"
+echo "  • Or from Terminal: open .debug/AeroSpork-Debug.app"
 echo ""
 echo "To view logs:"
 echo "  • Open Console.app and filter by 'aerospork' or 'com.wbs.aerospork.debug'"

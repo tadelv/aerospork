@@ -8,7 +8,7 @@ build_version="0.0.0-SNAPSHOT"
 # Must match what build-release.sh actually packs. publish-release.sh calls this script without
 # --app-bundle-dir-name, and the old default ('AeroSpork.app') produced a cask that pointed at a
 # path the zip does not contain -- invisible on case-insensitive APFS, a 404 everywhere else.
-app_bundle_dir_name='aerospork.app'
+app_bundle_dir_name='AeroSpork.app'
 while test $# -gt 0; do
     case $1 in
         --build-version) build_version="$2"; shift 2;;

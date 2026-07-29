@@ -176,7 +176,7 @@ tier). Bash is right — it's process orchestration, not logic.
 ```
 build-debug-app.sh                       # ad-hoc-signed .app so AX/didLaunch behave
 require-ax.sh                            # fail loud if Accessibility not granted (§10.6)
-open .debug/AeroSporkApp.app            # launch the menu-bar agent
+open .debug/AeroSpork-Debug.app            # launch the menu-bar agent
 wait for /tmp/com.wbs.aerospork.debug-$USER.sock
 aerospork enable on
 open -na TextEdit ; open -na TextEdit    # spawn known windows

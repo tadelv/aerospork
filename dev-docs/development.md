@@ -85,7 +85,7 @@ and says so**: a local release still works; only distribution is blocked.
 Verify a finished build with Apple's own preflight, which is stricter than `codesign -v`:
 
 ```bash
-syspolicy_check distribution .release/aerospork.app
+syspolicy_check distribution .release/AeroSpork.app
 ```
 
 ## 3. Entry point scripts
@@ -94,7 +94,7 @@ syspolicy_check distribution .release/aerospork.app
 -   `build-debug.sh` - Build debug build to `.debug` dir by using SPM. (Xcode is not involved)
 -   `run-tests.sh` - Run tests.
 -   `format.sh` - Format the code (swiftformat + swiftlint).
--   `run-debug.sh` - Run aerospork.app debug build.
+-   `run-debug.sh` - Run the debug app (`.debug/AeroSpork-Debug.app`).
 -   `run-cli.sh` - Run `aerospork` in CLI. Arguments are forwarded to `aerospork` binary.
 -   `build-docs.sh` - Build the site and man pages to `.site` and `.man` dirs respectively.
 -   `build-shell-completion.sh` - Build shell completion to `.shell-completion`.

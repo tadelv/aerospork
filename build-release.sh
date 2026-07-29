@@ -71,7 +71,7 @@ xcodebuild -version
 # resolves `-scheme aerospork` against whatever it finds in the working directory, and this
 # directory offers two things by that name: the app target in aerospork.xcodeproj, and the
 # `aerospork` executable product in Package.swift. When it picks the package it builds a bare
-# Mach-O, reports "BUILD SUCCEEDED", and the next line fails on a missing aerospork.app -- after
+# Mach-O, reports "BUILD SUCCEEDED", and the next line fails on a missing AeroSpork.app -- after
 # the full universal build. Naming the project makes the choice deterministic.
 xcodebuild-pretty .release/xcodebuild.log clean build \
     -project aerospork.xcodeproj \
@@ -85,7 +85,7 @@ xcodebuild-pretty .release/xcodebuild.log clean build \
 # to prevent that (script/check-uncommitted-files.sh) exits 0 after merely printing a warning.
 git checkout -- Sources/Common/gitHashGenerated.swift
 
-cp -r ".xcode-build/Build/Products/$xcode_configuration/aerospork.app" .release
+cp -r ".xcode-build/Build/Products/$xcode_configuration/AeroSpork.app" .release
 cp -r "$cli_bin_path/aerospork" .release
 
 ################
@@ -106,13 +106,13 @@ codesign -s "$codesign_identity" --options runtime --timestamp .release/aerospor
 #
 # `Contents/MacOS/` specifically: the bundle validation below rejects nested Mach-O anywhere else,
 # because that is the classic notarization rejection.
-cp .release/aerospork .release/aerospork.app/Contents/MacOS/aerospork-cli
+cp .release/aerospork .release/AeroSpork.app/Contents/MacOS/aerospork-cli
 # --force: the copy already carries the signature from the line above; codesign refuses to
 # re-sign otherwise with "is already signed".
-codesign -s "$codesign_identity" --options runtime --timestamp --force .release/aerospork.app/Contents/MacOS/aerospork-cli
+codesign -s "$codesign_identity" --options runtime --timestamp --force .release/AeroSpork.app/Contents/MacOS/aerospork-cli
 # Re-sign the bundle: adding a file invalidates the enclosing signature and its CodeResources seal.
 codesign -s "$codesign_identity" --options runtime --timestamp --force \
-    --entitlements resources/aerospork.entitlements .release/aerospork.app
+    --entitlements resources/aerospork.entitlements .release/AeroSpork.app
 # --options runtime and --timestamp are not optional extras: notarization REJECTS a binary without
 # the hardened runtime or a secure timestamp. The .app already gets both from ENABLE_HARDENED_RUNTIME
 # in project.yml; the CLI is signed here by hand and was getting neither.
@@ -197,7 +197,7 @@ notarize() {
 # PrivacyInfo.xcprivacy in. Any future resource broke the release build. Check the two things that
 # actually matter instead: everything required is present, and nothing unsigned-executable snuck in.
 required_paths=(
-    Contents/MacOS/aerospork
+    Contents/MacOS/AeroSpork
     Contents/MacOS/aerospork-cli
     Contents/Info.plist
     Contents/PkgInfo
@@ -207,9 +207,9 @@ required_paths=(
     Contents/_CodeSignature/CodeResources
 )
 for required_path in "${required_paths[@]}"; do
-    if ! test -e ".release/aerospork.app/$required_path"; then
+    if ! test -e ".release/AeroSpork.app/$required_path"; then
         echo "!!! Missing from app bundle: $required_path !!!"
-        find .release/aerospork.app
+        find .release/AeroSpork.app
         exit 1
     fi
 done
@@ -217,12 +217,12 @@ done
 # Nested Mach-O code outside Contents/MacOS needs its own signature and is the classic notarization
 # rejection. Extra *data* resources are harmless, so they are not an error.
 while IFS= read -r bundle_file; do
-    case "$bundle_file" in .release/aerospork.app/Contents/MacOS/*) continue ;; esac
+    case "$bundle_file" in .release/AeroSpork.app/Contents/MacOS/*) continue ;; esac
     if file -b "$bundle_file" | grep -q 'Mach-O'; then
         echo "!!! Nested binary outside Contents/MacOS will fail notarization: $bundle_file !!!"
         exit 1
     fi
-done < <(find .release/aerospork.app -type f)
+done < <(find .release/AeroSpork.app -type f)
 
 check-universal-binary() {
     if ! file "$1" | grep --fixed-string -q "Mach-O universal binary with 2 architectures: [x86_64:Mach-O 64-bit executable x86_64] [arm64"; then
@@ -239,18 +239,18 @@ check-contains-hash() {
     fi
 }
 
-check-universal-binary .release/aerospork.app/Contents/MacOS/aerospork
+check-universal-binary .release/AeroSpork.app/Contents/MacOS/AeroSpork
 check-universal-binary .release/aerospork
 
-check-contains-hash .release/aerospork.app/Contents/MacOS/aerospork
+check-contains-hash .release/AeroSpork.app/Contents/MacOS/AeroSpork
 check-contains-hash .release/aerospork
 
-codesign -v .release/aerospork.app
+codesign -v .release/AeroSpork.app
 codesign -v .release/aerospork
 
 # Notarize the .app before it is zipped, so the stapled ticket travels inside the archive and the
 # app validates on a machine that is offline or behind a firewall.
-notarize .release/aerospork.app
+notarize .release/AeroSpork.app
 
 # The standalone .release/aerospork is deliberately NOT notarized separately. It is the same binary
 # that was embedded at Contents/MacOS/aerospork-cli before the .app was notarized, so it is already
@@ -264,13 +264,13 @@ mkdir -p ".release/aerospork-v$build_version/manpage" && cp .man/*.1 ".release/a
 cp -r ./legal ".release/aerospork-v$build_version/legal"
 cp -r ./shell-completion ".release/aerospork-v$build_version/shell-completion"
 cd .release
-    cp -r aerospork.app "aerospork-v$build_version"
+    cp -r AeroSpork.app "aerospork-v$build_version"
     # bin/aerospork is a RELATIVE SYMLINK into the bundle, not a copy. A second copy on disk would
     # be a bare Mach-O with no stapled ticket -- exactly what moving the CLI inside the bundle was
     # meant to avoid. The symlink resolves inside the extracted folder, so a direct download still
     # gets a working ./bin/aerospork.
     mkdir -p "aerospork-v$build_version/bin"
-    ln -sf "../aerospork.app/Contents/MacOS/aerospork-cli" "aerospork-v$build_version/bin/aerospork"
+    ln -sf "../AeroSpork.app/Contents/MacOS/aerospork-cli" "aerospork-v$build_version/bin/aerospork"
     zip -ry "aerospork-v$build_version.zip" "aerospork-v$build_version"
 cd -
 
@@ -280,7 +280,7 @@ cd -
 for cask_name in aerospork aerospork-dev; do
     ./script/build-brew-cask.sh \
         --cask-name "$cask_name" \
-        --app-bundle-dir-name "aerospork.app" \
+        --app-bundle-dir-name "AeroSpork.app" \
         --zip-uri ".release/aerospork-v$build_version.zip" \
         --build-version "$build_version"
 done
