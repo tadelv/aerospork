@@ -53,13 +53,11 @@ targets:
         INFOPLIST_KEY_CFBundleDisplayName: AeroSpork
         # App icon
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        # Sparkle. The feed is served from an Azure Static Web App rather than the repo, so it
-        # stays reachable regardless of the repo's visibility; SUPublicEDKey is the public half of
-        # an EdDSA pair whose private half lives only in the release machine's login keychain.
-        # Sparkle refuses an unsigned or wrongly-signed update, so the key is what makes the
-        # channel safe, not the transport.
-        INFOPLIST_KEY_SUFeedURL: https://agreeable-glacier-0a845c510.7.azurestaticapps.net/appcast.xml
-        INFOPLIST_KEY_SUPublicEDKey: +/aLciv0lm3XT3X1XqxDZs2U6d0jbvL65PsPBCxGObA=
+        # Sparkle's keys are NOT set through INFOPLIST_KEY_*. That prefix only works for keys
+        # Xcode knows about: it emitted CFBundleDisplayName, LSUIElement and friends and dropped
+        # SUFeedURL and SUPublicEDKey silently, leaving a build whose updater could never find a
+        # feed. Third-party keys have to come from a real plist, so they live in
+        # `info.properties` below, which XcodeGen merges into the generated Info.plist.
         # Sparkle ships as an XCFramework and lands in Contents/Frameworks. Without this the
         # framework is linked but not embedded, and the app fails to launch on any machine that
         # does not happen to have it in a search path.
@@ -96,6 +94,19 @@ targets:
           OTHER_CODE_SIGN_FLAGS: --timestamp
           # Belt and braces against get-task-allow coming back.
           CODE_SIGN_INJECT_BASE_ENTITLEMENTS: NO
+    info:
+      path: .aerospork-Info.plist
+      properties:
+        # Sparkle. The feed is served from an Azure Static Web App rather than from the repo, so
+        # it stays reachable regardless of the repo's visibility. SUPublicEDKey is the public half
+        # of an EdDSA pair whose private half never leaves the release machine's login keychain;
+        # Sparkle refuses any update it cannot verify against it, so the key is what makes the
+        # channel safe, not the transport.
+        SUFeedURL: https://agreeable-glacier-0a845c510.7.azurestaticapps.net/appcast.xml
+        SUPublicEDKey: +/aLciv0lm3XT3X1XqxDZs2U6d0jbvL65PsPBCxGObA=
+        # Checking is opt-in on first launch: Sparkle asks once rather than phoning home before
+        # the user has agreed to it.
+        SUEnableAutomaticChecks: false
     entitlements:
       path: resources/aerospork.entitlements
       properties:

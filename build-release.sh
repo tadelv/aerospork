@@ -226,6 +226,7 @@ required_paths=(
     Contents/PkgInfo
     Contents/Resources/default-config.toml
     Contents/Resources/AppIcon.icns
+    Contents/Frameworks/Sparkle.framework
     Contents/Resources/Assets.car
     Contents/_CodeSignature/CodeResources
 )
@@ -268,6 +269,16 @@ check-contains-hash() {
         exit 1
     fi
 }
+
+# Sparkle fails soft. A build with no SUFeedURL simply never finds an update, silently, which is
+# exactly what shipped the first time: INFOPLIST_KEY_SUFeedURL was dropped by Xcode because that
+# prefix only supports keys Apple knows about, and nothing in the build noticed.
+for su_key in SUFeedURL SUPublicEDKey; do
+    if ! /usr/libexec/PlistBuddy -c "Print :$su_key" .release/AeroSpork.app/Contents/Info.plist > /dev/null 2>&1; then
+        echo "!!! $su_key missing from Info.plist: this build can never find an update !!!"
+        exit 1
+    fi
+done
 
 check-universal-binary .release/AeroSpork.app/Contents/MacOS/AeroSpork
 check-universal-binary .release/aerospork
