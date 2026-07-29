@@ -30,7 +30,7 @@ Both are MIT licensed; see [`legal/`](legal/) for the full notice and attributio
 
 - **Tree-based tiling:** windows are leaves; containers have an orientation and a layout
 - **Instant workspace switching:** virtual workspaces, no Spaces animation, no SIP changes
-- **Settings GUI:** seven tabs; opening it and changing nothing leaves your config byte-identical
+- **Settings GUI:** seven tabs, including a raw TOML editor validated against the real parser
 - **Plain-text TOML config:** dotfiles friendly, hot-reloaded on save
 - **CLI first:** 36 commands, man pages, shell completion for bash/fish/zsh
 - **Multi-monitor by hardware identity:** UUID and EDID, including DisplayLink docks
@@ -82,8 +82,7 @@ still parses, so nothing forces you to move.
 
 **A settings GUI.** Upstream is config-file-only. AeroSpork has seven tabs: General, Gaps, Keys,
 Monitors, Events, Window Rules, and a raw TOML editor validated against the same parser the app uses
-at startup. It writes through a comment-preserving editor that only rewrites the keys you actually
-changed, so opening Settings and changing nothing leaves your file byte-identical.
+at startup. It writes through a comment-preserving editor that only rewrites the keys you actually changed.
 
 **One third-party dependency.** Only TOMLKit remains. Unix-socket IPC is POSIX `AF_UNIX`, global
 hotkeys are Carbon `RegisterEventHotKey`, and volume is CoreAudio, replacing BlueSocket, HotKey and
