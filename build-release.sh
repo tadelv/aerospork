@@ -85,7 +85,9 @@ xcodebuild-pretty .release/xcodebuild.log clean build \
 # to prevent that (script/check-uncommitted-files.sh) exits 0 after merely printing a warning.
 git checkout -- Sources/Common/gitHashGenerated.swift
 
-cp -r ".xcode-build/Build/Products/$xcode_configuration/AeroSpork.app" .release
+# -R, not -r: a framework's Versions/Current and top-level stubs are symlinks, and flattening
+# them into regular files makes codesign fail with "bundle format is ambiguous".
+cp -R ".xcode-build/Build/Products/$xcode_configuration/AeroSpork.app" .release
 cp -r "$cli_bin_path/aerospork" .release
 
 ################
@@ -110,11 +112,21 @@ codesign -s "$codesign_identity" --options runtime --timestamp .release/aerospor
 # the app first and then touching anything inside it invalidates the outer signature, which
 # notarization rejects. Sparkle's XPC helpers each need their own signature.
 if test -d .release/AeroSpork.app/Contents/Frameworks; then
-    while IFS= read -r nested; do
+    # Deepest first, so each nested bundle is sealed before the thing that contains it. Sparkle's
+    # helpers live at fixed paths inside the framework, so they are named rather than globbed --
+    # a glob also matched Versions/B/... and signed the same code twice through two paths, which
+    # is how the framework ended up reported as an ambiguous bundle format.
+    sparkle=.release/AeroSpork.app/Contents/Frameworks/Sparkle.framework
+    for nested in \
+        "$sparkle/Versions/Current/XPCServices/Downloader.xpc" \
+        "$sparkle/Versions/Current/XPCServices/Installer.xpc" \
+        "$sparkle/Versions/Current/Updater.app" \
+        "$sparkle/Versions/Current/Autoupdate" \
+        "$sparkle"
+    do
+        test -e "$nested" || continue
         codesign -s "$codesign_identity" --options runtime --timestamp --force "$nested"
-    done < <(find .release/AeroSpork.app/Contents/Frameworks \
-                  \( -name '*.app' -o -name '*.xpc' -o -name 'Autoupdate' -o -name '*.framework' \) \
-                  -maxdepth 3 | sort -r)
+    done
 fi
 
 cp .release/aerospork .release/AeroSpork.app/Contents/MacOS/aerospork-cli
@@ -279,10 +291,10 @@ notarize .release/AeroSpork.app
 ############
 
 mkdir -p ".release/aerospork-v$build_version/manpage" && cp .man/*.1 ".release/aerospork-v$build_version/manpage"
-cp -r ./legal ".release/aerospork-v$build_version/legal"
-cp -r ./shell-completion ".release/aerospork-v$build_version/shell-completion"
+cp -R ./legal ".release/aerospork-v$build_version/legal"
+cp -R ./shell-completion ".release/aerospork-v$build_version/shell-completion"
 cd .release
-    cp -r AeroSpork.app "aerospork-v$build_version"
+    cp -R AeroSpork.app "aerospork-v$build_version"
     # bin/aerospork is a RELATIVE SYMLINK into the bundle, not a copy. A second copy on disk would
     # be a bare Mach-O with no stapled ticket -- exactly what moving the CLI inside the bundle was
     # meant to avoid. The symlink resolves inside the extracted folder, so a direct download still
