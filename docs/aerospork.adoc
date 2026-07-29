@@ -9,13 +9,13 @@ aerospork [-h|--help] [-v|--version] <subcommand> [<subcommand-options>...] [<su
 
 == Description
 
-AeroSpork is an i3-like tiling window manager for macOS
+AeroSpork is an i3-like tiling window manager for macOS.
 
-*aerospork* command line program is used to manipulate AeroSpork and query its state.
+The *aerospork* command line program manipulates AeroSpork and queries its state.
 
-See https://github.com/wbsmolen/AeroSpork/blob/main/docs/commands.adoc for available <subcommand> options
+See https://github.com/wbsmolen/aerospork/blob/main/docs/commands.adoc for the available <subcommand> options
 
-See each <subcommand> individual man page for <subcommand-options> and <subcommand-arguments>
+See each subcommand's own man page for its <subcommand-options> and <subcommand-arguments>
 
 == Options
 

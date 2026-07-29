@@ -22,23 +22,23 @@ aerospork focus-monitor [-h|--help] <monitor-pattern>...
 {manpurpose}
 
 // =========================================================== Options
-include::./util/conditional-options-header.adoc[]
+include::util/conditional-options-header.adoc[]
 
 -h, --help:: Print help
 --wrap-around:: Make it possible to wrap around focus
 
 // =========================================================== Arguments
-include::./util/conditional-arguments-header.adoc[]
+include::util/conditional-arguments-header.adoc[]
 
 (left|down|up|right)::
 Focus monitor in direction relative to the focused monitor
 
 (next|prev)::
-Focus next|prev monitor in order they appear in tray icon
+Focus next|prev monitor in the order they appear in the menu bar icon
 
 <monitor-pattern>...::
 Find the first matching monitor and focus it.
-Multiple monitor patterns is useful for different monitor configurations.
+Multiple monitor patterns are useful for covering different monitor configurations.
 Monitor patterns follow the same format as in `workspace-to-monitor-force-assignment` config option
 
 // end::body[]

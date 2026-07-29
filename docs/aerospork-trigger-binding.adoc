@@ -19,7 +19,7 @@ aerospork trigger-binding [-h|--help] <binding> --mode <mode-id>
 // tag::body[]
 {manpurpose}
 
-You can use aerospork-config command to inspect available bindings: +
+Inspect the available bindings with `aerospork config`: +
 `aerospork config --get mode.main.binding --keys`
 
 // =========================================================== Options
@@ -36,7 +36,7 @@ include::util/conditional-arguments-header.adoc[]
 // =========================================================== Examples
 include::util/conditional-examples-header.adoc[]
 
-* Run alphabetically first binding from config (useless and synthetic example): +
+* Run the alphabetically first binding in the config: +
 `aerospork trigger-binding --mode main "$(aerospork config --get mode.main.binding --keys | head -1)"`
 * Trigger `alt-tab` binding: +
 `aerospork trigger-binding --mode main alt-tab`

@@ -25,21 +25,21 @@ aerospork move-node-to-workspace [-h|--help] [--focus-follows-window] [--fail-if
 `(next|prev)` is identical to `workspace (next|prev)`
 
 // =========================================================== Options
-include::./util/conditional-options-header.adoc[]
+include::util/conditional-options-header.adoc[]
 
 -h, --help:: Print help
 --wrap-around:: Make it possible to jump between first and last workspaces using (next|prev)
---fail-if-noop:: Exit with non-zero code if move window to workspace it already belongs to
+--fail-if-noop:: Exit with a non-zero exit code if the window already belongs to the target workspace
 
 --focus-follows-window::
 Make sure that the window in question receives focus after moving.
 This flag is a shortcut for manually running `aerospork-workspace`/`aerospork-focus` after `move-node-to-workspace` successful execution.
 
 --window-id <window-id>::
-include::./util/window-id-flag-desc.adoc[]
+include::util/window-id-flag-desc.adoc[]
 
 // =========================================================== Arguments
-include::./util/conditional-arguments-header.adoc[]
+include::util/conditional-arguments-header.adoc[]
 
 (next|prev):: Move window to next or prev workspace
 <workspace-name>:: Specifies workspace name where to move window to

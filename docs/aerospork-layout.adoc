@@ -28,12 +28,12 @@ If several arguments are supplied then finds the first argument that doesn't des
 * Toggle floating/tiling mode: `tiling|floating`
 
 // =========================================================== Options
-include::./util/conditional-options-header.adoc[]
+include::util/conditional-options-header.adoc[]
 
 -h, --help:: Print help
 
 --window-id <window-id>::
-include::./util/window-id-flag-desc.adoc[]
+include::util/window-id-flag-desc.adoc[]
 
 // =========================================================== Examples
 include::util/conditional-examples-header.adoc[]

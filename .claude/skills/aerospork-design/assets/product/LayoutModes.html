@@ -1,0 +1,43 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+*{box-sizing:border-box}
+body{margin:0;width:1280px;height:430px;background:#0d0f16;
+  font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;display:flex;gap:40px;padding:32px 40px}
+.panel{flex:1;display:flex;flex-direction:column;gap:12px}
+.cap{color:rgba(255,255,255,.93);font-size:19px;font-weight:600;letter-spacing:-.01em}
+.sub{color:rgba(255,255,255,.45);font-size:13.5px;line-height:1.45;min-height:38px}
+.screen{flex:1;border-radius:12px;background:linear-gradient(165deg,#1b2130,#11141c);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);padding:15px;display:flex;gap:11px;position:relative}
+.col{flex:1;display:flex;flex-direction:column;gap:11px}
+.w{border-radius:8px;background:linear-gradient(180deg,#2b313d,#232833);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.10);position:relative;overflow:hidden}
+.w::before{content:"";position:absolute;top:0;left:0;right:0;height:10px;
+  background:rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.07)}
+.w.on{background:linear-gradient(170deg,#40719f,#2c4f77);
+  box-shadow:inset 0 0 0 1px rgba(140,190,255,.60)}
+.w.on::before{background:rgba(150,195,255,.26);border-bottom-color:rgba(150,195,255,.20)}
+/* accordion: hard offsets + real drop shadow so the stack order is unambiguous */
+.acc{flex:1;position:relative}
+.acc .w{position:absolute;left:0;right:0;height:46%;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.10), 0 -3px 14px rgba(0,0,0,.55)}
+.acc .w.on{box-shadow:inset 0 0 0 1px rgba(140,190,255,.60), 0 -4px 18px rgba(0,0,0,.6)}
+</style></head><body>
+<div class="panel">
+  <div class="cap">Tiles</div>
+  <div class="sub">Every window gets a share of the space. Splitting is recursive, so containers nest.</div>
+  <div class="screen">
+    <div class="col"><div class="w on" style="flex:1"></div></div>
+    <div class="col"><div class="w" style="flex:1"></div><div class="w" style="flex:1"></div></div>
+  </div>
+</div>
+<div class="panel">
+  <div class="cap">Accordion</div>
+  <div class="sub">Windows stack in one slot. Each keeps a strip of the one behind it visible.</div>
+  <div class="screen">
+    <div class="acc">
+      <div class="w" style="top:0"></div>
+      <div class="w" style="top:18%"></div>
+      <div class="w on" style="top:36%"></div>
+    </div>
+  </div>
+</div>
+</body></html>

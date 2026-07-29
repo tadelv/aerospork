@@ -25,20 +25,20 @@ Examples of commands and callbacks:
 * the `on-focus-changed` / `on-focused-workspace-changed` / `on-focused-monitor-changed` callbacks
 
 Values are **redacted by default** for variables whose names look like secrets (matching KEY, TOKEN,
-SECRET, PASSWORD, PASSWD, CREDENTIAL, AUTH or PRIVATE). The match is deliberately over-eager: the
-two failure directions are not symmetric — a needlessly hidden value costs you one flag, a leaked
-credential costs you the credential.
+SECRET, PASSWORD, PASSWD, CREDENTIAL, AUTH or PRIVATE). The match is deliberately over-eager,
+because the two failure directions are not symmetric: a needlessly hidden value costs you one flag,
+a leaked credential costs you the credential.
 
 Redaction is a shoulder-surfing guard for *display only*. The child process still receives the real
 environment, because a script that posts to Slack needs its token. See `man aerospork-exec-and-forget`.
-
-// end::body[]
 
 // =========================================================== Options
 include::util/conditional-options-header.adoc[]
 
 -h, --help:: Print help
 --show-secrets:: Print real values instead of `<redacted>`
+
+// end::body[]
 
 // =========================================================== Footer
 include::util/man-footer.adoc[]

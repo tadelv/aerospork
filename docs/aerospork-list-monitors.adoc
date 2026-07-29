@@ -45,7 +45,7 @@ Incompatible with `--count`
 // =========================================================== Output Format
 include::util/conditional-output-format-header.adoc[]
 
-Output format can be configured with optional `[--format <output-format>]` option.
+The output format is set with the optional `[--format <output-format>]` option.
 `<output-format>` supports https://en.wikipedia.org/wiki/String_interpolation[string interpolation].
 
 If not specified, the default `<output-format>` is: +
@@ -54,39 +54,30 @@ If not specified, the default `<output-format>` is: +
 The following variables can be used inside `<output-format>`:
 
 %{monitor-id}:: 1-based Number. Sequential number of the belonging monitor
-%{monitor-appkit-nsscreen-screens-id}:: 1-based index of the belonging monitor in `NSScreen.screens` array. Useful for integration with other tools that might be using `NSScreen.screens` ordering (like sketchybar).
+%{monitor-appkit-nsscreen-screens-id}:: 1-based Number. Index of the belonging monitor in the `NSScreen.screens` array. Useful for integration with other tools that use `NSScreen.screens` ordering (like sketchybar).
 %{monitor-name}:: String. Name of the belonging monitor
-%{monitor-fingerprint}:: String. Hardware fingerprint of the monitor including vendor, model, serial, and resolution information. Useful for identifying specific physical monitors in docking setups.
+%{monitor-fingerprint}:: String. Hardware fingerprint of the monitor: whichever of vendor, model, serial, name, resolution and UUID the display reports. Use it to identify a specific physical monitor in a docking setup.
 %{monitor-vendor-id}:: String. Vendor ID of the monitor in hexadecimal format (e.g., `0x10AC`). Empty if not available.
 %{monitor-model-id}:: String. Model ID of the monitor in hexadecimal format (e.g., `0xD0C1`). Empty if not available.
 %{monitor-serial-number}:: String. Serial number of the monitor. Empty if not available.
-%{monitor-width}:: Number. Width of the monitor in pixels
-%{monitor-height}:: Number. Height of the monitor in pixels
+%{monitor-width}:: Number. Width of the monitor in points
+%{monitor-height}:: Number. Height of the monitor in points
 
-%{right-padding}:: A special variable which expands with a minimum number of spaces required to form a right padding in the appropriate column
+%{right-padding}:: Expands to the minimum number of spaces required to right-pad the current column
 %{newline}:: Unicode U+000A newline symbol `\n`
 %{tab}:: Unicode U+0009 tab symbol `\t`
 
 // =========================================================== Examples
 include::util/conditional-examples-header.adoc[]
 
-----
-aerospork list-monitors
-----
+* Print all monitors in the default format: +
+`aerospork list-monitors`
 
-Print all monitors with default format.
+* Print monitor fingerprints, to paste into `workspace-to-monitor-force-assignment`: +
+`aerospork list-monitors --format "%{monitor-fingerprint}"`
 
-----
-aerospork list-monitors --format "%{monitor-fingerprint}"
-----
-
-Print monitor fingerprints for use in `workspace-to-monitor-force-assignment` configuration.
-
-----
-aerospork list-monitors --format "%{monitor-name} [%{monitor-vendor-id}:%{monitor-model-id}] %{monitor-width}x%{monitor-height}"
-----
-
-Print monitors with vendor/model IDs and resolution.
+* Print monitors with their vendor/model IDs and size: +
+`aerospork list-monitors --format "%{monitor-name} [%{monitor-vendor-id}:%{monitor-model-id}] %{monitor-width}x%{monitor-height}"`
 
 // end::body[]
 

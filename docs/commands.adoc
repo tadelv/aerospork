@@ -56,11 +56,10 @@ include::aerospork-focus.adoc[tags=body]
 
 == focus-back-and-forth
 ----
-
-include::./aerospork-focus-back-and-forth.adoc[tags=synopsis]
+include::aerospork-focus-back-and-forth.adoc[tags=synopsis]
 ----
-include::./aerospork-focus-back-and-forth.adoc[tags=purpose]
-include::./aerospork-focus-back-and-forth.adoc[tags=body]
+include::aerospork-focus-back-and-forth.adoc[tags=purpose]
+include::aerospork-focus-back-and-forth.adoc[tags=body]
 
 == focus-monitor
 ----
@@ -121,10 +120,10 @@ include::aerospork-move.adoc[tags=body]
 
 == move-mouse
 ----
-include::./aerospork-move-mouse.adoc[tags=synopsis]
+include::aerospork-move-mouse.adoc[tags=synopsis]
 ----
-include::./aerospork-move-mouse.adoc[tags=purpose]
-include::./aerospork-move-mouse.adoc[tags=body]
+include::aerospork-move-mouse.adoc[tags=purpose]
+include::aerospork-move-mouse.adoc[tags=body]
 
 == move-node-to-monitor
 ----
@@ -177,10 +176,10 @@ include::aerospork-split.adoc[tags=body]
 
 == summon-workspace
 ----
-include::./aerospork-summon-workspace.adoc[tags=synopsis]
+include::aerospork-summon-workspace.adoc[tags=synopsis]
 ----
-include::./aerospork-summon-workspace.adoc[tags=purpose]
-include::./aerospork-summon-workspace.adoc[tags=body]
+include::aerospork-summon-workspace.adoc[tags=purpose]
+include::aerospork-summon-workspace.adoc[tags=body]
 
 == trigger-binding
 ----
@@ -191,10 +190,10 @@ include::aerospork-trigger-binding.adoc[tags=body]
 
 == volume
 ----
-include::./aerospork-volume.adoc[tags=synopsis]
+include::aerospork-volume.adoc[tags=synopsis]
 ----
-include::./aerospork-volume.adoc[tags=purpose]
-include::./aerospork-volume.adoc[tags=body]
+include::aerospork-volume.adoc[tags=purpose]
+include::aerospork-volume.adoc[tags=body]
 
 == workspace
 ----
@@ -212,7 +211,7 @@ include::aerospork-workspace-back-and-forth.adoc[tags=body]
 
 == Query commands
 
-Query commands are commands that do not change the state but rather allow the examination of the current state.
+Query commands examine the current state without changing it.
 
 - Query commands are *NOT* available in config +
 (because there is no way to consume the stdout of these commands in config)

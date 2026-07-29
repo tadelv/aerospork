@@ -22,9 +22,10 @@ aerospork config [-h|--help] --config-path
 // tag::body[]
 {manpurpose}
 
-Under the hood, the config is represented as recursive data structure of maps, arrays, strings, and integers.
-What you query is the *effective* config -- what AeroSpork is running right now, after the config file has
-been desugared -- so `--get mode.main.binding` lists the generated bindings as well as the ones you wrote.
+Internally the config is a recursive structure of maps, arrays, strings and integers.
+What you query is the *effective* config: what AeroSpork is running right now, after the config file
+has been desugared. So `--get mode.main.binding` lists the generated bindings as well as the ones you
+wrote.
 
 Printing without `--json` or `--keys` flag is supported only for scalar types (strings and integers) and array of scalar types.
 Printing other complicated objects requires `--json` or `--keys` flag.
@@ -105,13 +106,13 @@ esc = ["reload-config", "mode main"]
 Each entry in `workspaces` additionally generates `mod-<key>` to switch to it and `mod-shift-<key>` to
 move the focused window there, where `<key>` is the first character of the name, lower-cased.
 
-Anything in `[keys]` **overrides** a generated binding with the same key, so the defaults never trap you.
-Remove `mod` and nothing is generated at all.
+Anything in `[keys]` **overrides** a generated binding with the same key, so any generated default can
+be replaced. Remove `mod` and nothing is generated at all.
 
 === Older configs
 
-A config written in the previous schema -- the one with `[mode.main.binding]` and
-`workspace-to-monitor-force-assignment` -- is converted on first launch, and the original is kept next
+A config written in the previous schema (the one with `[mode.main.binding]` and
+`workspace-to-monitor-force-assignment`) is converted on first launch, and the original is kept next
 to it as `<name>.pre-v2`. The conversion is only performed when the converted file provably loads to
 the same configuration; otherwise your file is left exactly as it is.
 

@@ -9,7 +9,7 @@ include::util/man-attributes.adoc[]
 == Synopsis
 [verse]
 // tag::synopsis[]
-exec-and-forget <bash-script>   # config only -- not available in CLI
+exec-and-forget <bash-script>   # config only, not available in CLI
 
 // end::synopsis[]
 
@@ -35,12 +35,12 @@ alt-enter = 'exec-and-forget open -n /System/Applications/Utilities/Terminal.app
 // =========================================================== Environment
 == Environment
 
-The script inherits AeroSpork's full environment, *including any secrets in it* — API tokens,
-credentials, anything exported by your shell profile at launch. This is deliberate: a script that
-posts to Slack needs its token. But it means the config file is trusted input.
+The script inherits AeroSpork's full environment, *including any secrets in it*: API tokens,
+credentials, anything exported by your shell profile at launch. This is deliberate, since a script
+that posts to Slack needs its token. But it means the config file is trusted input.
 
-Treat a `exec-and-forget` line you copied from the internet exactly as you would treat a line you
-were about to paste into your shell.
+Treat an `exec-and-forget` line copied from the internet exactly as you would treat a line you were
+about to paste into your shell.
 
 `aerospork list-exec-env-vars` redacts secret-looking values by default when *displaying* them; that
 is a shoulder-surfing guard only and does not change what the child process receives. Use

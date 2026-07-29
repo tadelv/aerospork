@@ -1,9 +1,9 @@
 = aerospork-workspace-back-and-forth(1)
 include::util/man-attributes.adoc[]
+:manname: aerospork-workspace-back-and-forth
 // tag::purpose[]
 :manpurpose: Switch between the focused workspace and previously focused workspace back and forth
 // end::purpose[]
-:manname: aerospork-workspace-back-and-forth
 
 // =========================================================== Synopsis
 == Synopsis
@@ -25,12 +25,13 @@ Workspaces are name-addressable objects.
 They are created and destroyed on the fly.
 
 Also see: <<focus-back-and-forth, focus-back-and-forth>>
-// end::body[]
 
 // =========================================================== Options
 include::util/conditional-options-header.adoc[]
 
 -h, --help:: Print help
+
+// end::body[]
 
 // =========================================================== Footer
 include::util/man-footer.adoc[]

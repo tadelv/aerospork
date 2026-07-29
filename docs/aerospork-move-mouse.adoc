@@ -1,9 +1,9 @@
 = aerospork-move-mouse(1)
-include::./util/man-attributes.adoc[]
+include::util/man-attributes.adoc[]
+:manname: aerospork-move-mouse
 // tag::purpose[]
 :manpurpose: Move mouse to the requested position
 // end::purpose[]
-:manname: aerospork-move-mouse
 
 // =========================================================== Synopsis
 == Synopsis
@@ -20,7 +20,7 @@ aerospork move-mouse [-h|--help] [--fail-if-noop] <mouse-position>
 {manpurpose}
 
 // =========================================================== Options
-include::./util/conditional-options-header.adoc[]
+include::util/conditional-options-header.adoc[]
 
 -h, --help:: Print help
 
@@ -29,7 +29,7 @@ Exit with non-zero exit code if mouse is already at the requested position.
 The flag is compatible only with `window-lazy-center` and `monitor-lazy-center` arguments.
 
 // =========================================================== Arguments
-include::./util/conditional-arguments-header.adoc[]
+include::util/conditional-arguments-header.adoc[]
 
 <mouse-position>::
 Position to move mouse to.
@@ -40,9 +40,9 @@ Possible values:
 * `window-lazy-center`. Move mouse to the center of the focused window, *unless* it is already within the window boundaries.
 * `window-force-center`. Move mouse to the center of the focused window.
 
-When no window is focused — an empty workspace — both `window-*` values fall back to the focused
-monitor. Centering on "the focused window" has no meaning there, and the alternative is leaving the
-pointer on the monitor you just switched away from. This matters most in
+When no window is focused, which is the case on an empty workspace, both `window-*` values fall back
+to the focused monitor. Centering on "the focused window" has no meaning there, and the alternative
+is leaving the pointer on the monitor you switched away from. This matters most in
 `on-focused-workspace-changed`, where a callback is a list of commands and cannot express the shell
 fallback below.
 
@@ -56,4 +56,4 @@ empty (the fallback is built in; no `||` needed): +
 // end::body[]
 
 // =========================================================== Footer
-include::./util/man-footer.adoc[]
+include::util/man-footer.adoc[]

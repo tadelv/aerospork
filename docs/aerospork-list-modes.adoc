@@ -1,9 +1,9 @@
 = aerospork-list-modes(1)
 include::util/man-attributes.adoc[]
+:manname: aerospork-list-modes
 // tag::purpose[]
 :manpurpose: Print a list of modes currently specified in the configuration
 // end::purpose[]
-:manname: aerospork-list-modes
 
 // =========================================================== Synopsis
 == Synopsis

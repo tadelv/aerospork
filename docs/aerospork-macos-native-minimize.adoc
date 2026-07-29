@@ -20,12 +20,12 @@ aerospork macos-native-minimize [-h|--help] [--window-id <window-id>]
 {manpurpose}
 
 // =========================================================== Options
-include::./util/conditional-options-header.adoc[]
+include::util/conditional-options-header.adoc[]
 
 -h, --help:: Print help
 
 --window-id <window-id>::
-include::./util/window-id-flag-desc.adoc[]
+include::util/window-id-flag-desc.adoc[]
 
 // end::body[]
 

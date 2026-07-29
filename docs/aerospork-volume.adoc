@@ -1,9 +1,9 @@
 = aerospork-volume(1)
 include::util/man-attributes.adoc[]
+:manname: aerospork-volume
 // tag::purpose[]
 :manpurpose: Manipulate volume
 // end::purpose[]
-:manname: aerospork-volume
 
 // =========================================================== Synopsis
 == Synopsis
@@ -22,14 +22,14 @@ aerospork volume [-h|--help] set <number>
 {manpurpose}
 
 // =========================================================== Options
-include::./util/conditional-options-header.adoc[]
+include::util/conditional-options-header.adoc[]
 
 -h, --help:: Print help
 
 // =========================================================== Arguments
-include::./util/conditional-arguments-header.adoc[]
+include::util/conditional-arguments-header.adoc[]
 
-(up|down):: Increase or decrease the volume by one step (6.25%, i.e. 1/16 -- the same step the media keys use)
+(up|down):: Increase or decrease the volume by one step (6.25%, i.e. 1/16, the same step the media keys use)
 (mute-toggle|mute-on|mute-off):: Toggle/On/Off mute
 set <number>:: Set volume to the exact value on scale from 0 to 100
 

@@ -1,9 +1,9 @@
 = aerospork-join-with(1)
 include::util/man-attributes.adoc[]
+:manname: aerospork-join-with
 // tag::purpose[]
 :manpurpose: Put the focused window and the nearest node in the specified direction under a common parent container
 // end::purpose[]
-:manname: aerospork-join-with
 
 // =========================================================== Synopsis
 == Synopsis
@@ -42,7 +42,8 @@ h_tiles
 ----
 
 NOTE: `join-with` is a high-level replacement for i3's https://i3wm.org/docs/userguide.html#_splitting_containers[split command].
-There is an observation that the only reason why you might want to split a node is to put several windows under a common "umbrella" parent. Unlike `split`, `join-with` can be used with xref:guide.adoc#normalization[`enable-normalization-flatten-containers`]
+The reason to split a node is almost always to put several windows under a common parent, which is what `join-with` does directly.
+Unlike `split`, it works with xref:guide.adoc#normalization[`enable-normalization-flatten-containers`] enabled.
 
 // =========================================================== Options
 include::util/conditional-options-header.adoc[]
@@ -50,7 +51,7 @@ include::util/conditional-options-header.adoc[]
 -h, --help:: Print help
 
 --window-id <window-id>::
-include::./util/window-id-flag-desc.adoc[]
+include::util/window-id-flag-desc.adoc[]
 
 // end::body[]
 

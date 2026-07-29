@@ -19,13 +19,13 @@ aerospork reload-config [-h|--help] [--no-gui] [--dry-run]
 // tag::body[]
 {manpurpose}
 
-If the config contains errors they will be printed to stdout, and GUI will open to show the errors.
+If the config contains errors, they are printed to stdout and the GUI opens to show them.
 
 // =========================================================== Options
 include::util/conditional-options-header.adoc[]
 
 -h, --help:: Print help
---no-gui:: Don't open GUI to show error. Only use stdout to report errors
+--no-gui:: Don't open the GUI. Report errors on stdout only
 --dry-run:: Validate the config and show errors (if any) but don't reload the config
 
 include::util/conditional-exit-code-header.adoc[]

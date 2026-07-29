@@ -20,10 +20,10 @@ aerospork open-settings [-h|--help]
 {manpurpose}
 
 Equivalent to choosing *Settings…* from the menu bar icon, or pressing kbd:[Cmd+,] while
-AeroSpork is frontmost. The settings window is a singleton, so running this while it is already
-open just brings it to the front.
+AeroSpork is frontmost. The settings window is a singleton: running this while it is already open
+brings the existing window to the front.
 
-Because this is allowed in config, it can be bound to a key:
+The command is allowed in config, so it can be bound to a key:
 
 [source,toml]
 ----

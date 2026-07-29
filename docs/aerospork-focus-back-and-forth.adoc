@@ -1,9 +1,9 @@
 = aerospork-focus-back-and-forth(1)
 include::util/man-attributes.adoc[]
+:manname: aerospork-focus-back-and-forth
 // tag::purpose[]
 :manpurpose: Switch between the current and previously focused elements back and forth
 // end::purpose[]
-:manname: aerospork-focus-back-and-forth
 
 // =========================================================== Synopsis
 == Synopsis
@@ -31,12 +31,13 @@ aerospork focus-back-and-forth || aerospork workspace-back-and-forth
 ----
 
 Also see: <<workspace-back-and-forth, workspace-back-and-forth>>
-// end::body[]
 
 // =========================================================== Options
 include::util/conditional-options-header.adoc[]
 
 -h, --help:: Print help
+
+// end::body[]
 
 // =========================================================== Footer
 include::util/man-footer.adoc[]

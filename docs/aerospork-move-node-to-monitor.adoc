@@ -23,7 +23,7 @@ aerospork move-node-to-monitor [-h|--help] [--window-id <window-id>] [--focus-fo
 {manpurpose}
 
 // =========================================================== Options
-include::./util/conditional-options-header.adoc[]
+include::util/conditional-options-header.adoc[]
 
 -h, --help:: Print help
 --wrap-around:: Make it possible to wrap around the movement
@@ -33,10 +33,10 @@ Make sure that the window in question receives focus after moving.
 This flag is a shortcut for manually running `aerospork-workspace`/`aerospork-focus` after `move-node-to-monitor` successful execution.
 
 --fail-if-noop::
-Exit with non-zero code if move window to monitor it already belongs to
+Exit with a non-zero exit code if the window already belongs to the target monitor
 
 --window-id <window-id>::
-include::./util/window-id-flag-desc.adoc[]
+include::util/window-id-flag-desc.adoc[]
 
 // =========================================================== Arguments
 include::util/conditional-arguments-header.adoc[]
@@ -45,11 +45,11 @@ include::util/conditional-arguments-header.adoc[]
 Move window to monitor in direction relative to the focused monitor
 
 (next|prev)::
-Move window to next|prev monitor in order they appear in tray icon
+Move window to next|prev monitor in the order they appear in the menu bar icon
 
 <monitor-pattern>...::
 Find the first matching monitor and move the window there.
-Multiple monitor patterns is useful for different monitor configurations.
+Multiple monitor patterns are useful for covering different monitor configurations.
 Monitor patterns follow the same format as in `workspace-to-monitor-force-assignment` config option
 
 // end::body[]

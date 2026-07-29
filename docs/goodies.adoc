@@ -3,9 +3,9 @@ include::util/site-attributes.adoc[]
 
 include::util/header.adoc[]
 
-Do you have a cool automatization, AeroSpork integration, or workflow?
-Feel free to open an issue or pull request to add it to this list!
-The source code of the page can be found in the `./docs` directory.
+Have an automation, integration, or workflow worth sharing?
+Open an issue or pull request to add it to this list.
+The source of this page is in the `./docs` directory.
 
 [#move-by-dragging-any-part-of-the-window]
 == Move windows by dragging any part of the window
@@ -15,14 +15,14 @@ The source code of the page can be found in the `./docs` directory.
 defaults write -g NSWindowShouldDragOnGesture -bool true
 ----
 
-Now, you can move windows by holding `ctrl + cmd` and dragging any part of the window (not necessarily the window title)
+Windows can then be moved by holding `ctrl + cmd` and dragging any part of the window, not only the title bar.
 
 [#highlight-focused-windows-with-colored-borders]
 == Highlight focused windows with colored borders
 
-To highlight the focused window with colored border you can use link:https://github.com/FelixKratz/JankyBorders[JankyBorders].
+link:https://github.com/FelixKratz/JankyBorders[JankyBorders] draws a colored border around the focused window.
 
-You can also use `after-startup-command` to start JankyBorders together with AeroSpork
+`after-startup-command` can start it together with AeroSpork:
 
 [source,toml]
 ----
@@ -38,8 +38,8 @@ after-startup-command = [
 
 A third party Raycast extension exists for upstream AeroSpace: https://www.raycast.com/limonkufu/aerospace
 
-It drives the `aerospace` binary, so it needs the command name changed to `aerospork` to work here.
-If you struggle remembering shortcuts, it's useful to search for commands until they become muscle memory.
+It drives the `aerospace` binary, so the command name has to be changed to `aerospork` to work here.
+It lets you search for commands by name instead of recalling their shortcuts.
 
 [#disable-open-animations]
 == Disable windows opening animations
@@ -54,7 +54,7 @@ defaults write -g NSAutomaticWindowAnimationsEnabled -bool false
 [#use-trackpad-gestures-to-switch-workspaces]
 == Use trackpad gestures to switch workspaces
 
-The following commands focus next or previous workspaces on monitors where the mouse is located
+These commands focus the next or previous workspace on the monitor the mouse is on:
 
 [source,bash]
 ----
@@ -64,22 +64,22 @@ aerospork workspace "$(aerospork list-workspaces --monitor mouse --visible)" && 
 ----
 
 Use the software of your choice to assign trackpad gestures to the respective commands.
-Here are a few third party options in alphabetical order. All of them were written for upstream
-AeroSpace, so they invoke the `aerospace` binary and read `AEROSPACE_*` environment variables --
-both need adjusting for AeroSpork:
+A few third party options, in alphabetical order. All of them were written for upstream AeroSpace, so
+they invoke the `aerospace` binary and read `AEROSPACE_*` environment variables; both need adjusting
+for AeroSpork:
 
 * https://github.com/acsandmann/aerospace-swipe
 * link:https://folivora.ai/[BetterTouchTool] can assign arbitrary commands to trackpad gestures.
 Beware that you might need to specify full path to aerospork executable https://community.folivora.ai/t/how-to-execute-terminal-command-to-switch-workspaces-with-aerospace/35914
 * https://github.com/MediosZ/SwipeAeroSpace
 
-CAUTION: Make sure that you trust project authors before running the distributed binaries.
-Alternatively, inspect the source code, and build it yourself.
+CAUTION: Make sure you trust the project authors before running a distributed binary.
+Otherwise, inspect the source and build it yourself.
 
 [#show-aerospork-workspaces-in-sketchybar]
 == Show AeroSpork workspaces in Sketchybar
 
-You can integrate AeroSpork workspace indicators with link:https://github.com/FelixKratz/SketchyBar[Sketchybar].
+AeroSpork workspace indicators can be driven from link:https://github.com/FelixKratz/SketchyBar[Sketchybar].
 Use these snippets as a starting point.
 
 .~/.aerospork.toml
@@ -133,10 +133,10 @@ fi
 [#open-a-new-window-with-applescript]
 == Open a new window with AppleScript
 
-Invoking Safari/Terminal with a command the obvious way (`exec-and-forget open -a Safari`) results in an outcome that is probably not the intended one.
-Namely, that any workspace already containing an instance of Safari/Terminal is brought in focus.
+`exec-and-forget open -a Safari` does not open a new window.
+It brings into focus whichever workspace already contains a Safari window.
 
-Opening *a new window* of a program that can supports multiple windows (such as Safari or Terminal.app) can be accomplished with an AppleScript inlined in `aerospork.toml` as follows:
+To open *a new window* of a program that supports multiple windows (Safari, Terminal.app), inline an AppleScript in `aerospork.toml`:
 
 - Safari
 +
@@ -162,9 +162,10 @@ end tell'
 ----
 
 [#disable-hide-app]
-== Disable annoying and useless "hide application" shortcut
+== Disable the "hide application" shortcut
 
-If `automatically-unhide-macos-hidden-apps` isn't enough, you can disable `cmd-h` altogether (which will make this hotkey unavailable for apps that might use it for other purposes)
+If `automatically-unhide-macos-hidden-apps` isn't enough, disable `cmd-h` altogether.
+The hotkey then becomes unavailable to apps that use it for something else.
 
 .~/.aerospork.toml
 [source,toml]
@@ -175,10 +176,9 @@ If `automatically-unhide-macos-hidden-apps` isn't enough, you can disable `cmd-h
 ----
 
 [#screenshoot-shortcut]
-== Take screenshots to clipboard using keyboard shortcut
+== Take a screenshot to the clipboard with a keyboard shortcut
 
-You can configure a custom shortcut take a screenshot.
-`screencapture` is a built-in macOS command.
+Bind a shortcut to `screencapture`, a built-in macOS command.
 
 .~/.aerospork.toml
 [source,toml]
@@ -187,7 +187,7 @@ alt-shift-s = 'exec-and-forget screencapture -i -c'
 ----
 
 [#i3-like-config]
-== i3 like config
+== i3-like config
 
 link:config-examples/i3-like-config-example.toml[Download i3-like-config.toml]
 
@@ -197,9 +197,9 @@ include::config-examples/i3-like-config-example.toml[]
 ----
 
 [#popular-apps-ids]
-== List of popular and built-in applications IDs
+== Application IDs of popular and built-in apps
 
-The list is useful to compose custom xref:guide.adoc#on-window-detected-callback[on-window-detected callback].
+Use these to write an xref:guide.adoc#on-window-detected-callback[on-window-detected callback].
 
 [cols="1,3"]
 |===

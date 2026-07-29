@@ -22,16 +22,16 @@ aerospork macos-native-fullscreen [-h|--help] [--window-id <window-id>] [--fail-
 {manpurpose}
 
 // =========================================================== Options
-include::./util/conditional-options-header.adoc[]
+include::util/conditional-options-header.adoc[]
 
 -h, --help:: Print help
 --fail-if-noop:: Exit with non-zero exit code if already fullscreen or already not fullscreen
 
 --window-id <window-id>::
-include::./util/window-id-flag-desc.adoc[]
+include::util/window-id-flag-desc.adoc[]
 
 // =========================================================== Arguments
-include::./util/conditional-arguments-header.adoc[]
+include::util/conditional-arguments-header.adoc[]
 
 on, off::
 `on` means enter fullscreen mode.

@@ -1,9 +1,9 @@
 = aerospork-move(1)
 include::util/man-attributes.adoc[]
+:manname: aerospork-move
 // tag::purpose[]
 :manpurpose: Move the focused window in the given direction
 // end::purpose[]
-:manname: aerospork-move
 
 // =========================================================== Synopsis
 == Synopsis
@@ -17,17 +17,17 @@ aerospork move [-h|--help] [--window-id <window-id>] [--boundaries <boundary>] [
 == Description
 
 // tag::body[]
-Move the focused window in the given direction. See the "Examples" section for more details.
+{manpurpose}. See the "Examples" section for more details.
 
 Deprecated name: `move-through`
 
 // =========================================================== Options
-include::./util/conditional-options-header.adoc[]
+include::util/conditional-options-header.adoc[]
 
 -h, --help:: Print help
 
 --window-id <window-id>::
-include::./util/window-id-flag-desc.adoc[]
+include::util/window-id-flag-desc.adoc[]
 
 --boundaries <boundary>::
 Defines move boundaries. +
@@ -128,9 +128,8 @@ v_tiles
 `v_tiles` is an implicitly created container.
 +
 *Remark*: If `--boundaries` is set to `all-monitors-outer-frame` and there is a monitor in the `up` direction,
-the implicit container isn't be created.
-+
-Instead, `window 2` would be moved to the monitor above the current.
+the implicit container is not created.
+Instead, `window 2` is moved to the monitor above the current one.
 
 // end::body[]
 

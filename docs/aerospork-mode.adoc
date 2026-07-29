@@ -1,9 +1,9 @@
 = aerospork-mode(1)
 include::util/man-attributes.adoc[]
+:manname: aerospork-mode
 // tag::purpose[]
 :manpurpose: Activate the specified binding mode
 // end::purpose[]
-:manname: aerospork-mode
 
 // =========================================================== Synopsis
 == Synopsis
@@ -20,12 +20,13 @@ aerospork mode [-h|--help] <binding-mode>
 {manpurpose}
 
 See xref:guide.adoc#binding-modes[the guide] for documentation about binding modes
-// end::body[]
 
 // =========================================================== Options
 include::util/conditional-options-header.adoc[]
 
 -h, --help:: Print help
+
+// end::body[]
 
 // =========================================================== Footer
 include::util/man-footer.adoc[]
