@@ -19,6 +19,8 @@ import Foundation
     startUnixSocketServer()
     GlobalObserver.initObserver()
     ConfigFileWatcher.start() // hot-reload config on external edits
+    // After the observers are up, so a first-launch update prompt cannot race window adoption.
+    Updater.shared.start()
     runDetached("appStartup") {
         Workspace.garbageCollectUnusedWorkspaces() // init workspaces
         _ = Workspace.all.first?.focusWorkspace()

@@ -106,6 +106,17 @@ codesign -s "$codesign_identity" --options runtime --timestamp .release/aerospor
 #
 # `Contents/MacOS/` specifically: the bundle validation below rejects nested Mach-O anywhere else,
 # because that is the classic notarization rejection.
+# Sign Sparkle's nested code BEFORE the CLI and the outer bundle. Signing is inside-out: sealing
+# the app first and then touching anything inside it invalidates the outer signature, which
+# notarization rejects. Sparkle's XPC helpers each need their own signature.
+if test -d .release/AeroSpork.app/Contents/Frameworks; then
+    while IFS= read -r nested; do
+        codesign -s "$codesign_identity" --options runtime --timestamp --force "$nested"
+    done < <(find .release/AeroSpork.app/Contents/Frameworks \
+                  \( -name '*.app' -o -name '*.xpc' -o -name 'Autoupdate' -o -name '*.framework' \) \
+                  -maxdepth 3 | sort -r)
+fi
+
 cp .release/aerospork .release/AeroSpork.app/Contents/MacOS/aerospork-cli
 # --force: the copy already carries the signature from the line above; codesign refuses to
 # re-sign otherwise with "is already signed".
@@ -214,12 +225,19 @@ for required_path in "${required_paths[@]}"; do
     fi
 done
 
-# Nested Mach-O code outside Contents/MacOS needs its own signature and is the classic notarization
-# rejection. Extra *data* resources are harmless, so they are not an error.
+# Nested Mach-O code outside Contents/MacOS needs its own signature and is the classic
+# notarization rejection. Extra *data* resources are harmless, so they are not an error.
+#
+# Contents/Frameworks is now legitimate: Sparkle ships as an XCFramework and brings its own
+# Autoupdate and Updater.app helpers. So the check is no longer "is there nested code" -- it is
+# "is every piece of nested code independently signed", which is what the notary service actually
+# enforces. An unsigned stray still fails, which is the case the original check was written for.
 while IFS= read -r bundle_file; do
     case "$bundle_file" in .release/AeroSpork.app/Contents/MacOS/*) continue ;; esac
-    if file -b "$bundle_file" | grep -q 'Mach-O'; then
-        echo "!!! Nested binary outside Contents/MacOS will fail notarization: $bundle_file !!!"
+    file -b "$bundle_file" | grep -q 'Mach-O' || continue
+    if ! codesign -v --strict "$bundle_file" > /dev/null 2>&1; then
+        echo "!!! Unsigned nested binary will fail notarization: $bundle_file !!!"
+        codesign -dv "$bundle_file" 2>&1 | head -3
         exit 1
     fi
 done < <(find .release/AeroSpork.app -type f)

@@ -17,9 +17,17 @@ let package = Package(
         .library(name: "AppBundle", targets: ["AppBundle"]),
     ],
     dependencies: [
-        // TOMLKit is the only remaining third-party dependency (config parsing).
-        // Sockets, hotkeys, volume, ordered collections, and shell parsing are now native.
+        // Two third-party dependencies, both pinned exactly.
+        //
+        // TOMLKit parses the config. Sockets, hotkeys, volume, ordered collections and shell
+        // parsing are all native.
         .package(url: "https://github.com/LebJe/TOMLKit", exact: "0.6.0"),
+        // Sparkle delivers in-app updates. The App Store cannot distribute this app (the
+        // Accessibility APIs it is built on do not work sandboxed), so there is no store update
+        // mechanism to inherit, and a window manager that silently goes stale is worse than one
+        // that asks. Ships as a prebuilt XCFramework, hence the extra signing steps in
+        // build-release.sh.
+        .package(url: "https://github.com/sparkle-project/Sparkle", exact: "2.9.4"),
     ],
     // Targets are the basic building blocks of a package, defining a module or a test suite.
     // Targets can depend on other targets in this package and products from dependencies.
@@ -37,6 +45,7 @@ let package = Package(
             name: "AppBundle",
             dependencies: [
                 .product(name: "TOMLKit", package: "TOMLKit"),
+                .product(name: "Sparkle", package: "Sparkle"),
                 .target(name: "Common"),
                 .target(name: "PrivateApi"),
             ],

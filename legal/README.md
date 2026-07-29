@@ -23,6 +23,11 @@ system's `Icon` component. They are a web-only substitution for SF Symbols, whic
 permit redistributing; the shipping app uses SF Symbols by name and bundles none of these.
 See [LICENSE-lucide.txt](./third-party-license/LICENSE-lucide.txt).
 
+**Sparkle** (MIT, with a BSD-licensed bundled copy of bspatch). The in-app update framework,
+embedded in the release build as `Contents/Frameworks/Sparkle.framework`. Updates are verified
+against an EdDSA public key compiled into the app, so a tampered update is refused.
+See [LICENSE-Sparkle.txt](./third-party-license/LICENSE-Sparkle.txt).
+
 **TOMLKit**.
 [TOMLKit GitHub link](https://github.com/LebJe/TOMLKit).
 [TOMLKit MIT license](./third-party-license/LICENSE-TOMLKIT.txt).

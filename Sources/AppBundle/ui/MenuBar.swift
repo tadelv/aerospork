@@ -72,6 +72,11 @@ public func menuBar(viewModel: TrayMenuModel) -> some Scene {
         Divider()
         Button("Settings…") { openSettingsWindow() }
             .keyboardShortcut(",", modifiers: .command)
+        // Only in a build that has a feed to check. Rendering a disabled row in a debug build
+        // would be a permanent dead control, which is what the deleted settings submenu was.
+        if Updater.shared.isEnabled {
+            Button("Check for Updates…") { Updater.shared.checkForUpdates() }
+        }
         Button("Quit \(aeroSporkAppName)") {
             runDetached("menuBarQuit") {
                 defer { terminateApp() }

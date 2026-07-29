@@ -41,7 +41,7 @@ and the PR did not propose it.
 | Language | Swift, 6.0 language mode (`Package.swift`); `.swift-version` pins toolchain 6.4 |
 | Minimum OS | macOS 13.0 (Ventura) |
 | UI | SwiftUI: a `MenuBarExtra` and a `Settings` scene |
-| Third-party dependencies | TOMLKit, and nothing else |
+| Third-party dependencies | TOMLKit (config parsing) and Sparkle (in-app updates) |
 | CLI/app IPC | POSIX `AF_UNIX` stream socket, length-prefixed framing (`Sources/Common/util/UnixSocket.swift`) |
 | Global hotkeys | Carbon `RegisterEventHotKey` (`config/HotkeyBinding.swift`) |
 | Volume control | CoreAudio (`util/SystemVolume.swift`) |
@@ -72,7 +72,7 @@ behave the same way. Only the deltas are listed.
 | Monitor matching by hardware UUID / EDID | ❌ &nbsp;name, regex or number only | ✅ &nbsp;also pins DisplayLink panels |
 | Settings GUI | ❌ &nbsp;"will never provide a GUI for configuration" | ✅ &nbsp;7 tabs |
 | Notarized builds | ❌ | ✅ &nbsp;signed, notarized, stapled |
-| Third-party dependencies | 4 | **1** |
+| Third-party dependencies | 4 | **2** |
 | Config schema | one syntax | v2 shorthand, older syntax still parses |
 | Command surface | **larger** | smaller |
 | Maturity | **public beta, larger community** | younger fork |
