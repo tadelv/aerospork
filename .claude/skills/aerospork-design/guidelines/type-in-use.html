@@ -1,0 +1,17 @@
+<!-- @dsCard group="Type" viewport="700x210" name="Hierarchy in use" subtitle="Section header, control label, unit, footer hint — one settings row group" -->
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Hierarchy</title><link rel="stylesheet" href="../styles.css">
+<style>body{margin:0;padding:14px 16px;background:var(--grouped-bg);font-family:var(--font-system);color:var(--label);box-sizing:border-box}
+.lbl{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--label-tertiary)}
+.mono{font-family:var(--font-mono)}
+.pane{background:var(--grouped-bg);padding:12px;border-radius:8px}
+.h{font-size:13px;font-weight:600;display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.box{background:var(--control-bg);border-radius:8px;box-shadow:0 0 0 .5px var(--separator)}
+.row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;font-size:13px}
+.row+.row{border-top:1px solid var(--separator)}
+.f{font-size:12px;color:var(--label-secondary);line-height:1.45;padding:6px 4px 0}
+.fld{width:58px;height:22px;border:1px solid var(--border-control);border-radius:6px;background:var(--text-bg);text-align:right;font-size:13px;padding:0 6px;box-sizing:border-box;line-height:20px}
+.u{font-size:12px;color:var(--label-secondary);margin-left:6px}</style></head><body><div class="pane"><div class="h">Between windows</div>
+<div class="box"><div class="row"><span>Horizontal</span><span><span class="fld">8</span><span class="u">pt</span></span></div>
+<div class="row"><span>Vertical</span><span><span class="fld">8</span><span class="u">pt</span></span></div></div>
+<div class="f">The top gap is measured below the menu bar, so 0 is flush with the usable area.</div></div></body></html>

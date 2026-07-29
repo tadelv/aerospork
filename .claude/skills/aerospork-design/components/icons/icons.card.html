@@ -1,0 +1,31 @@
+<!-- @dsCard group="Components" viewport="700x240" name="Icons" subtitle="SF Symbol names mapped to Lucide (substitution) — the app's whole glyph set" -->
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Icons</title><link rel="stylesheet" href="../../styles.css">
+<style>body{background:var(--grouped-bg);margin:0;padding:14px 16px;font-family:var(--font-system);color:var(--label)}
+.grid{display:flex;flex-wrap:wrap;gap:18px 26px;align-items:flex-start}
+.col{display:flex;flex-direction:column;gap:8px}
+.lbl{font-size:var(--text-caption);color:var(--label-tertiary);letter-spacing:.05em;text-transform:uppercase}
+.row{display:flex;gap:8px;align-items:center}</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { Icon, SF_TO_LUCIDE } = window.AeroSporkDesignSystem_078bd7;
+const SHOWN = ['gearshape','rectangle.split.3x3','keyboard','display.2','bolt','macwindow.badge.plus','doc.plaintext','power','menubar.rectangle','rectangle.split.3x1','wand.and.stars','info.circle','play.circle','rectangle.on.rectangle','scope','terminal','list.bullet','sidebar.left','arrow.triangle.branch','magnifyingglass','line.3.horizontal.decrease.circle','plus','minus','minus.circle','doc.on.doc','checkmark','checkmark.circle','equal.circle','exclamationmark.triangle.fill','exclamationmark.octagon.fill','xmark.circle.fill','square.grid.2x2','pause.circle.fill','ellipsis.circle'];
+function Card() {
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: '12px 8px' }}>
+      {SHOWN.map((sf) => (
+        <div key={sf} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, textAlign: 'center' }}>
+          <Icon sf={sf} size={19} />
+          <span style={{ fontSize: 9, lineHeight: 1.2, color: 'var(--label-tertiary)', fontFamily: 'var(--font-mono)', wordBreak: 'break-all' }}>{sf}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Card />);
+</script>
+</body></html>

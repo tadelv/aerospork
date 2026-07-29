@@ -1,0 +1,16 @@
+<!-- @dsCard group="Spacing" viewport="700x200" name="Chrome strips" subtitle="Bar padding, hairline dividers and the +/- strip glued to a table" -->
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Chrome</title><link rel="stylesheet" href="../styles.css">
+<style>body{margin:0;padding:14px 16px;background:var(--grouped-bg);font-family:var(--font-system);color:var(--label);box-sizing:border-box}
+.lbl{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--label-tertiary)}
+.mono{font-family:var(--font-mono)}
+.win{border-radius:8px;overflow:hidden;box-shadow:0 0 0 .5px var(--separator);background:var(--control-bg)}
+.bar{background:var(--bar-bg);backdrop-filter:blur(20px);padding:9px 14px;font-size:12px;color:var(--label-secondary);display:flex;gap:8px;align-items:center}
+.bar.top{border-bottom:1px solid var(--separator)}.bar.bot{border-top:1px solid var(--separator)}
+.body{padding:14px;font-size:12px;color:var(--label-tertiary)}
+.act{display:flex;gap:10px;padding:7px 12px 3px;font-size:13px}
+.hint{font-size:12px;color:var(--label-secondary);padding:0 14px 9px;line-height:1.45}
+.g{font-family:var(--font-mono);font-size:9px;color:var(--label-tertiary);padding:6px 2px 0}</style></head><body><div class="win"><div class="bar top">Path bar — 9px / 14px padding, divider on the content side</div>
+<div class="body">Content</div>
+<div class="bar bot" style="display:block;padding:0"><div class="act">＋　−</div><div class="hint">Hardware fingerprints already in your config are preserved.</div></div></div>
+<div class="g">--pad-bar-y 9 · --pad-bar-x 14 · ListActionBar top 7 / bottom 3 with a hint, 7 without</div></body></html>

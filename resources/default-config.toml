@@ -1,0 +1,107 @@
+# AeroSpork — tiling window manager for macOS
+#
+# This file ships inside the app and is used when you have no personal config of your own:
+#   Release build: ~/.aerospork.toml
+#   Debug build:   ~/.aerospork-debug.toml
+#
+# Every key below is optional. Delete one to get its default back; delete the whole file and
+# AeroSpork still works. Changes apply the moment you save.
+#
+# Full reference: `aerospork --help`, or `man aerospork-<command>` for any command.
+
+# ---------------------------------------------------------------------------------------------
+# The two lines most people ever need
+# ---------------------------------------------------------------------------------------------
+
+# Base modifier for the generated bindings listed under [keys] below.
+# Remove this line and nothing is generated at all — you then bind everything yourself.
+mod = "alt"
+
+# Workspaces you want. A range ("1-9"), a list (["dev", "web", "chat"]), or both (["1-9", "dev"]).
+# Each one gets   mod-<key>        -> switch to it
+#                 mod-shift-<key>  -> move the focused window to it
+# where <key> is the first character of the name, lower-cased ("dev" -> mod-d).
+# Workspaces are created when you first switch to one and released when they empty out, so listing
+# nine here costs nothing until you use them.
+workspaces = "1-9"
+
+# ---------------------------------------------------------------------------------------------
+# Gaps
+# ---------------------------------------------------------------------------------------------
+
+[gaps]
+inner = 8    # between windows
+outer = 8    # between windows and the screen edge
+# Per-edge instead:   outer = { top = 32, bottom = 8, left = 8, right = 8 }
+# Per-monitor:        outer = [{ monitor.main = 16 }, 8]
+
+# ---------------------------------------------------------------------------------------------
+# Keys
+# ---------------------------------------------------------------------------------------------
+#
+# These are generated from `mod` and are already active — listed here so you can see them:
+#
+#   mod-h / j / k / l              focus left / down / up / right
+#   mod-shift-h / j / k / l        move window
+#   mod-minus / mod-equal          shrink / grow
+#   mod-slash / mod-comma          tiles / accordion layout
+#   mod-tab                        previous workspace
+#
+# Anything you put in [keys] wins over a generated binding with the same key.
+
+[keys]
+alt-shift-semicolon = "mode service"
+# alt-enter = "exec-and-forget open -na Ghostty"
+
+# A named mode. Enter it with `mode <name>`, leave with `mode main`.
+[keys.service]
+esc = ["reload-config", "mode main"]
+r = ["flatten-workspace-tree", "mode main"]
+f = ["layout floating tiling", "mode main"]
+backspace = ["close-all-windows-but-current", "mode main"]
+
+# ---------------------------------------------------------------------------------------------
+# Monitors
+# ---------------------------------------------------------------------------------------------
+#
+# Pin a workspace to a physical screen. The value can be:
+#   "main" / "secondary"            primary / non-primary
+#   2                               monitor by position, left to right
+#   "LG|DELL"                       case-insensitive regex on the name
+#   { uuid = "..." }                exact panel — survives docking and identical models
+#   { vendor = "0x10AC", model = "0x4276" }
+#
+# Run `aerospork list-monitors --format '%{monitor-fingerprint}'` to see what to put here.
+# Prefer `uuid`: it is the only key that separates two monitors of the same model, and the only
+# one DisplayLink panels have at all.
+
+# [monitors]
+# 1 = "main"
+# 2 = { uuid = "AAAAAAAA-0000-4000-8000-000000000001" }
+
+# ---------------------------------------------------------------------------------------------
+# Window placement
+# ---------------------------------------------------------------------------------------------
+#
+# Where a window goes the moment it appears. Key is an app bundle id.
+# For regex matchers, see the long form: `man aerospork` -> on-window-detected.
+
+# [on-window]
+# "com.apple.mail" = "move-node-to-workspace 3"
+# "com.apple.systempreferences" = "layout floating"
+
+# ---------------------------------------------------------------------------------------------
+# Everything else
+# ---------------------------------------------------------------------------------------------
+
+# start-at-login = false
+# accordion-padding = 30
+# default-root-container-layout = "tiles"       # tiles | accordion
+# default-root-container-orientation = "auto"   # auto | horizontal | vertical
+#
+# Run something after AeroSpork starts:
+# after-startup-command = ["exec-and-forget sketchybar --reload"]
+#
+# Run something when focus moves. `move-mouse window-lazy-center` makes the pointer follow you,
+# including between workspaces on the same monitor:
+# on-focused-workspace-changed = ["move-mouse window-lazy-center"]

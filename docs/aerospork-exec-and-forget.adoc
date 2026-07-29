@@ -1,0 +1,55 @@
+= aerospork-exec-and-forget(1)
+include::util/man-attributes.adoc[]
+:manname: aerospork-exec-and-forget
+// tag::purpose[]
+:manpurpose: Run /bin/bash -c '<bash-script>'
+// end::purpose[]
+
+// =========================================================== Synopsis
+== Synopsis
+[verse]
+// tag::synopsis[]
+exec-and-forget <bash-script>   # config only -- not available in CLI
+
+// end::synopsis[]
+
+// =========================================================== Description
+== Description
+
+// tag::body[]
+Run `/bin/bash -c '<bash-script>'`, and don't wait for the command termination.
+Stdout, stderr and exit code are ignored.
+
+For example, you can use this command to launch applications:
+
+[source,toml]
+----
+alt-enter = 'exec-and-forget open -n /System/Applications/Utilities/Terminal.app'
+----
+
+`<bash-script>` is passed "as is" to bash without any transformations and escaping. `<bash-script>` is treated as suffix of the TOML string, it's not even an argument in classic CLI sense
+
+* The command is available in config
+* The command is *NOT* available in CLI
+
+// =========================================================== Environment
+== Environment
+
+The script inherits AeroSpork's full environment, *including any secrets in it* — API tokens,
+credentials, anything exported by your shell profile at launch. This is deliberate: a script that
+posts to Slack needs its token. But it means the config file is trusted input.
+
+Treat a `exec-and-forget` line you copied from the internet exactly as you would treat a line you
+were about to paste into your shell.
+
+`aerospork list-exec-env-vars` redacts secret-looking values by default when *displaying* them; that
+is a shoulder-surfing guard only and does not change what the child process receives. Use
+`--show-secrets` to see the real values.
+
+Set `[exec] inherit-env-vars = false` to start from an empty environment, and `[exec] env-vars` to
+declare exactly what should be passed through.
+
+// end::body[]
+
+// =========================================================== Footer
+include::util/man-footer.adoc[]

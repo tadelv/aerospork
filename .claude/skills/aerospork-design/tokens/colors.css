@@ -1,0 +1,105 @@
+/* AeroSpork colors.
+   The app is a macOS SwiftUI app: it paints almost entirely in *system* semantic colors
+   (labelColor, .bar, controlAccentColor, .secondary…). These tokens are those semantics,
+   pinned to the values macOS resolves them to, plus the small brand palette that the
+   app icon owns (generate-app-icon.py). */
+
+:root {
+  /* ---- Brand: the app icon palette. The mark is the layout, not a letter. ---- */
+  --brand-plate-top: #1c202c;      /* icon squircle gradient, top */
+  --brand-plate-bottom: #10121a;   /* icon squircle gradient, bottom */
+  --brand-focused: #5e9eff;        /* the focused pane — system-blue family */
+  --brand-dimmed: #4e566a;         /* unfocused panes, deliberately low contrast */
+
+  /* ---- macOS system colors, light appearance ---- */
+  --sys-blue: #007aff;
+  --sys-red: #ff3b30;
+  --sys-orange: #ff9500;
+  --sys-green: #34c759;
+  --sys-yellow: #ffcc00;
+  --sys-gray: #8e8e93;
+
+  --accent: var(--sys-blue);        /* Color.accentColor / controlAccentColor */
+
+  /* Label hierarchy is opacity on black, exactly as AppKit defines it. */
+  --label: rgba(0, 0, 0, 0.85);
+  --label-secondary: rgba(0, 0, 0, 0.5);
+  --label-tertiary: rgba(0, 0, 0, 0.26);
+  --label-quaternary: rgba(0, 0, 0, 0.1);
+  --label-placeholder: rgba(0, 0, 0, 0.25);
+
+  /* Surfaces */
+  --window-bg: #ececec;            /* windowBackgroundColor */
+  --grouped-bg: #f2f2f4;           /* the canvas behind a .formStyle(.grouped) Form */
+  --control-bg: #ffffff;           /* controlBackgroundColor */
+  --text-bg: #ffffff;              /* textBackgroundColor — the raw TOML editor */
+  --bar-bg: rgba(246, 246, 246, 0.82);  /* .background(.bar) — translucent chrome strip */
+  --selection: #0064e1;            /* selectedContentBackgroundColor */
+  --selection-fg: #ffffff;
+
+  /* Fills used for schematic/inert shapes (Color.primary.opacity(...) in the source) */
+  --fill-subtle: rgba(0, 0, 0, 0.045);   /* monitor rows */
+  --fill: rgba(0, 0, 0, 0.06);           /* filter field */
+  --fill-strong: rgba(0, 0, 0, 0.08);    /* "generated" badge capsule */
+
+  --separator: rgba(0, 0, 0, 0.1);
+  --border-control: rgba(0, 0, 0, 0.16);
+
+  /* Semantic aliases — prefer these in components */
+  --text-body: var(--label);
+  --text-muted: var(--label-secondary);
+  --text-faint: var(--label-tertiary);
+  --surface-window: var(--window-bg);
+  --surface-card: var(--control-bg);
+  --surface-bar: var(--bar-bg);
+  --surface-code: var(--text-bg);
+  --status-error: var(--sys-red);
+  --status-warning: var(--sys-orange);
+  --status-ok: var(--sys-green);
+  --banner-error-bg: rgba(255, 59, 48, 0.13);
+  --banner-warning-bg: rgba(255, 149, 0, 0.13);
+  --banner-error-strip-bg: rgba(255, 59, 48, 0.1);
+
+  /* The gaps preview tile — accentColor at 28% fill, 70% stroke */
+  --tile-fill: rgba(0, 122, 255, 0.28);
+  --tile-stroke: rgba(0, 122, 255, 0.7);
+  --recorder-armed-fill: rgba(0, 122, 255, 0.14);
+}
+
+/* ---- Dark appearance. Applied with [data-appearance="dark"] or automatically. ---- */
+[data-appearance="dark"] {
+  --sys-blue: #0a84ff;
+  --sys-red: #ff453a;
+  --sys-orange: #ff9f0a;
+  --sys-green: #30d158;
+  --sys-yellow: #ffd60a;
+  --sys-gray: #98989d;
+
+  --label: rgba(255, 255, 255, 0.85);
+  --label-secondary: rgba(255, 255, 255, 0.55);
+  --label-tertiary: rgba(255, 255, 255, 0.25);
+  --label-quaternary: rgba(255, 255, 255, 0.1);
+  --label-placeholder: rgba(255, 255, 255, 0.25);
+
+  --window-bg: #323232;
+  --grouped-bg: #1e1e1e;
+  --control-bg: #3a3a3c;
+  --text-bg: #1e1e1e;
+  --bar-bg: rgba(46, 46, 46, 0.84);
+  --selection: #0a84ff;
+
+  --fill-subtle: rgba(255, 255, 255, 0.05);
+  --fill: rgba(255, 255, 255, 0.08);
+  --fill-strong: rgba(255, 255, 255, 0.12);
+
+  --separator: rgba(255, 255, 255, 0.15);
+  --border-control: rgba(255, 255, 255, 0.2);
+
+  --banner-error-bg: rgba(255, 69, 58, 0.16);
+  --banner-warning-bg: rgba(255, 159, 10, 0.16);
+  --banner-error-strip-bg: rgba(255, 69, 58, 0.12);
+
+  --tile-fill: rgba(10, 132, 255, 0.28);
+  --tile-stroke: rgba(10, 132, 255, 0.7);
+  --recorder-armed-fill: rgba(10, 132, 255, 0.16);
+}

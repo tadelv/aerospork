@@ -1,0 +1,59 @@
+= aerospork-move-mouse(1)
+include::./util/man-attributes.adoc[]
+// tag::purpose[]
+:manpurpose: Move mouse to the requested position
+// end::purpose[]
+:manname: aerospork-move-mouse
+
+// =========================================================== Synopsis
+== Synopsis
+[verse]
+// tag::synopsis[]
+aerospork move-mouse [-h|--help] [--fail-if-noop] <mouse-position>
+
+// end::synopsis[]
+
+// =========================================================== Description
+== Description
+
+// tag::body[]
+{manpurpose}
+
+// =========================================================== Options
+include::./util/conditional-options-header.adoc[]
+
+-h, --help:: Print help
+
+--fail-if-noop::
+Exit with non-zero exit code if mouse is already at the requested position.
+The flag is compatible only with `window-lazy-center` and `monitor-lazy-center` arguments.
+
+// =========================================================== Arguments
+include::./util/conditional-arguments-header.adoc[]
+
+<mouse-position>::
+Position to move mouse to.
+Possible values:
++
+* `monitor-lazy-center`. Move mouse to the center of the focused monitor, *unless* it is already within the monitor boundaries.
+* `monitor-force-center`. Move mouse to the center of the focused monitor.
+* `window-lazy-center`. Move mouse to the center of the focused window, *unless* it is already within the window boundaries.
+* `window-force-center`. Move mouse to the center of the focused window.
+
+When no window is focused — an empty workspace — both `window-*` values fall back to the focused
+monitor. Centering on "the focused window" has no meaning there, and the alternative is leaving the
+pointer on the monitor you just switched away from. This matters most in
+`on-focused-workspace-changed`, where a callback is a list of commands and cannot express the shell
+fallback below.
+
+// =========================================================== Examples
+include::util/conditional-examples-header.adoc[]
+
+* Move mouse to the center of the focused window, falling back to the monitor when a workspace is
+empty (the fallback is built in; no `||` needed): +
+`aerospork move-mouse window-lazy-center`
+
+// end::body[]
+
+// =========================================================== Footer
+include::./util/man-footer.adoc[]

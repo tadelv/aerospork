@@ -1,0 +1,44 @@
+= aerospork-open-settings(1)
+include::util/man-attributes.adoc[]
+:manname: aerospork-open-settings
+// tag::purpose[]
+:manpurpose: Open the settings window
+// end::purpose[]
+
+// =========================================================== Synopsis
+== Synopsis
+[verse]
+// tag::synopsis[]
+aerospork open-settings [-h|--help]
+
+// end::synopsis[]
+
+// =========================================================== Description
+== Description
+
+// tag::body[]
+{manpurpose}
+
+Equivalent to choosing *Settings…* from the menu bar icon, or pressing kbd:[Cmd+,] while
+AeroSpork is frontmost. The settings window is a singleton, so running this while it is already
+open just brings it to the front.
+
+Because this is allowed in config, it can be bound to a key:
+
+[source,toml]
+----
+[mode.main.binding]
+alt-shift-comma = 'open-settings'
+----
+
+Structured settings apply live as you change them. The *Raw TOML* tab is the exception: it applies
+explicitly, so half-typed TOML is never written.
+
+// =========================================================== Options
+include::util/conditional-options-header.adoc[]
+
+-h, --help:: Print help
+// end::body[]
+
+// =========================================================== Footer
+include::util/man-footer.adoc[]

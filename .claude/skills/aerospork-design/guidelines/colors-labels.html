@@ -1,0 +1,13 @@
+<!-- @dsCard group="Colors" viewport="700x150" name="Label hierarchy" subtitle="Four levels of text, defined as opacity on black — never as grey hexes" -->
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Label hierarchy</title><link rel="stylesheet" href="../styles.css">
+<style>body{margin:0;padding:14px 16px;background:var(--grouped-bg);font-family:var(--font-system);color:var(--label);box-sizing:border-box}
+.lbl{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--label-tertiary)}
+.mono{font-family:var(--font-mono)}
+.wrap{display:flex;gap:14px}.c{flex:1;background:var(--control-bg);border-radius:8px;padding:11px 12px;box-shadow:0 0 0 .5px var(--separator)}
+.t{font-size:13px;margin-bottom:2px}.v{font-family:var(--font-mono);font-size:9px;color:var(--label-tertiary)}</style></head><body><div class="wrap">
+<div class="c"><div class="t" style="color:var(--label)">Primary label</div><div class="v">--label · 85%</div></div>
+<div class="c"><div class="t" style="color:var(--label-secondary)">Secondary — hints, footers</div><div class="v">--label-secondary · 50%</div></div>
+<div class="c"><div class="t" style="color:var(--label-tertiary)">Tertiary — empty-state glyph, UUID</div><div class="v">--label-tertiary · 26%</div></div>
+<div class="c"><div class="t" style="color:var(--label-placeholder)">Placeholder text</div><div class="v">--label-placeholder · 25%</div></div>
+</div></body></html>

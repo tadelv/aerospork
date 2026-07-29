@@ -1,0 +1,19 @@
+<!-- @dsCard group="Spacing" viewport="700x160" name="Corner radii" subtitle="Every rounded rect is a continuous squircle; CSS radius is the approximation" -->
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Radii</title><link rel="stylesheet" href="../styles.css">
+<style>body{margin:0;padding:14px 16px;background:var(--grouped-bg);font-family:var(--font-system);color:var(--label);box-sizing:border-box}
+.lbl{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--label-tertiary)}
+.mono{font-family:var(--font-mono)}
+.row{display:flex;gap:12px}
+.c{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
+.s{width:100%;height:56px;background:var(--fill);box-shadow:inset 0 0 0 1px var(--separator)}
+.v{font-family:var(--font-mono);font-size:9px;color:var(--label-secondary);text-align:center}
+.n{font-size:11px}</style></head><body><div class="row">
+<div class="c"><div class="s" style="border-radius:4px"></div><div class="n">Tile</div><div class="v">4px</div></div>
+<div class="c"><div class="s" style="border-radius:5px"></div><div class="n">Recorder</div><div class="v">5px</div></div>
+<div class="c"><div class="s" style="border-radius:6px"></div><div class="n">Field / button</div><div class="v">6px</div></div>
+<div class="c"><div class="s" style="border-radius:8px"></div><div class="n">Card / row</div><div class="v">8px</div></div>
+<div class="c"><div class="s" style="border-radius:10px"></div><div class="n">Window</div><div class="v">10px</div></div>
+<div class="c"><div class="s" style="border-radius:999px"></div><div class="n">Capsule</div><div class="v">--radius-pill</div></div>
+<div class="c"><div class="s" style="border-radius:22.5%"></div><div class="n">Icon squircle</div><div class="v">22.5% of plate</div></div>
+</div></body></html>

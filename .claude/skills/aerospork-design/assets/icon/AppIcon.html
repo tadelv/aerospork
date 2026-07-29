@@ -1,0 +1,37 @@
+<!-- @dsCard group="Brand" viewport="700x260" name="App icon" subtitle="Icon Composer layers: plate, glass panes, specular, rim — default / light / mono" -->
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>AeroSpork app icon</title><link rel="stylesheet" href="../../styles.css">
+<style>
+body{background:var(--grouped-bg);display:flex;align-items:center;justify-content:center;gap:34px;padding:28px;font-family:var(--font-system)}
+.wrap{display:flex;flex-direction:column;align-items:center;gap:9px}
+.cap{font-size:var(--text-caption);color:var(--label-tertiary);letter-spacing:.06em;text-transform:uppercase}
+/* The icon is one element; every dimension is em, so font-size IS the icon size. */
+.icon{position:relative;width:1em;height:1em;font-size:180px}
+.plate{position:absolute;left:5.5%;top:5.5%;width:89%;height:89%;border-radius:.2003em;overflow:hidden;display:grid;grid-template-columns:.268em .2108em;grid-template-rows:repeat(3,1fr);gap:.0552em;padding:.178em;box-sizing:border-box;box-shadow:0 .04em .08em rgba(0,0,0,.28),0 .012em .02em rgba(0,0,0,.22)}
+/* layer 1 — plate gradient */
+.plate{background:linear-gradient(180deg,#1c202c,#10121a)}
+/* layer 2 — top-light + rim highlight, the glass shell */
+.plate::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 28% -10%,rgba(255,255,255,.20),rgba(255,255,255,0) 62%);pointer-events:none}
+.plate::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 .005em rgba(255,255,255,.14),inset 0 .006em 0 rgba(255,255,255,.22),inset 0 -.008em .02em rgba(0,0,0,.5);pointer-events:none}
+/* layer 3 — panes */
+.pane{position:relative;border-radius:.04em;z-index:1}
+.focused{grid-row:1/4;background:linear-gradient(170deg,#82b7ff,#3d80ea 72%,#2f6ed6);box-shadow:inset 0 .006em 0 rgba(255,255,255,.62),inset 0 -.005em .012em rgba(0,0,0,.28),0 .012em .028em rgba(0,0,0,.42)}
+.focused::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,rgba(255,255,255,.30),rgba(255,255,255,0) 46%)}
+.dim{background:linear-gradient(180deg,rgba(255,255,255,.17),rgba(255,255,255,.075));box-shadow:inset 0 0 0 .004em rgba(255,255,255,.16),inset 0 .005em 0 rgba(255,255,255,.28),0 .008em .02em rgba(0,0,0,.3)}
+/* light plate variant */
+.light .plate{background:linear-gradient(180deg,#f4f6fa,#d3dae7)}
+.light .plate::before{background:radial-gradient(120% 80% at 28% -10%,rgba(255,255,255,.9),rgba(255,255,255,0) 60%)}
+.light .plate::after{box-shadow:inset 0 0 0 .005em rgba(255,255,255,.8),inset 0 .006em 0 rgba(255,255,255,.9),inset 0 -.008em .02em rgba(0,0,0,.12)}
+.light .dim{background:linear-gradient(180deg,rgba(28,32,44,.30),rgba(28,32,44,.20));box-shadow:inset 0 0 0 .004em rgba(255,255,255,.5),0 .006em .014em rgba(0,0,0,.14)}
+/* mono / tinted variant — the shape has to survive with no color at all */
+.mono .plate{background:linear-gradient(180deg,#5b6070,#3a3e4b)}
+.mono .plate::before{background:radial-gradient(120% 80% at 28% -10%,rgba(255,255,255,.26),rgba(255,255,255,0) 62%)}
+.mono .focused{background:linear-gradient(170deg,#ffffff,#e3e6ec);box-shadow:inset 0 .006em 0 rgba(255,255,255,.9),0 .012em .028em rgba(0,0,0,.34)}
+.mono .focused::after{background:linear-gradient(180deg,rgba(255,255,255,.5),rgba(255,255,255,0) 46%)}
+.mono .dim{background:linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,.12))}
+</style></head>
+<body>
+<div class="wrap"><div class="icon" id="icon-default"><div class="plate"><div class="pane focused"></div><div class="pane dim"></div><div class="pane dim"></div><div class="pane dim"></div></div></div><div class="cap">Default</div></div>
+<div class="wrap"><div class="icon light" id="icon-light"><div class="plate"><div class="pane focused"></div><div class="pane dim"></div><div class="pane dim"></div><div class="pane dim"></div></div></div><div class="cap">Light plate</div></div>
+<div class="wrap"><div class="icon mono" id="icon-mono"><div class="plate"><div class="pane focused"></div><div class="pane dim"></div><div class="pane dim"></div><div class="pane dim"></div></div></div><div class="cap">Monochrome / tinted</div></div>
+</body></html>

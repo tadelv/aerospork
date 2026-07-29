@@ -1,0 +1,67 @@
+import Common
+import TOMLKit
+
+private let keyMappingParser: [String: any ParserProtocol<KeyMapping>] = [
+    "preset": Parser(\.preset, parsePreset),
+    "key-notation-to-key-code": Parser(\.rawKeyNotationToKeyCode, parseKeyNotationToKeyCode),
+]
+
+struct KeyMapping: ConvenienceCopyable, Equatable, Sendable {
+    enum Preset: String, CaseIterable, Sendable {
+        case qwerty, dvorak, colemak
+    }
+
+    init(
+        preset: Preset = .qwerty,
+        rawKeyNotationToKeyCode: [String: Key] = [:],
+    ) {
+        self.preset = preset
+        self.rawKeyNotationToKeyCode = rawKeyNotationToKeyCode
+    }
+
+    fileprivate var preset: Preset = .qwerty
+    fileprivate var rawKeyNotationToKeyCode: [String: Key] = [:]
+
+    func resolve() -> [String: Key] {
+        getKeysPreset(preset) + rawKeyNotationToKeyCode
+    }
+
+    /// Read-only view for `config --get`. The stored properties stay `fileprivate` so that only the
+    /// parser in this file can write them; reporting the effective values needs no such privilege.
+    var presetName: String { preset.rawValue }
+    var customKeyNotations: [String: Key] { rawKeyNotationToKeyCode }
+}
+
+func parseKeyMapping(_ raw: TOMLValueConvertible, _ backtrace: TomlBacktrace, _ errors: inout [TomlParseError]) -> KeyMapping {
+    parseTable(raw, KeyMapping(), keyMappingParser, backtrace, &errors)
+}
+
+private func parsePreset(_ raw: TOMLValueConvertible, _ backtrace: TomlBacktrace) -> ParsedToml<KeyMapping.Preset> {
+    parseString(raw, backtrace).flatMap { parseEnum($0, KeyMapping.Preset.self).toParsedToml(backtrace) }
+}
+
+private func parseKeyNotationToKeyCode(_ raw: TOMLValueConvertible, _ backtrace: TomlBacktrace, _ errors: inout [TomlParseError]) -> [String: Key] {
+    var result: [String: Key] = [:]
+    guard let table = raw.expectTable(backtrace).unwrapOrCollect(&errors) else {
+        return result
+    }
+    for (key, value): (String, TOMLValueConvertible) in table {
+        if isValidKeyNotation(key) {
+            let backtrace = backtrace + .key(key)
+            if let value = value.expectString(backtrace).unwrapOrCollect(&errors) {
+                if let value = keyNotationToKeyCode[value] {
+                    result[key] = value
+                } else {
+                    errors.append(.semantic(backtrace, "'\(value)' is invalid key code"))
+                }
+            }
+        } else {
+            errors.append(.semantic(backtrace, "'\(key)' is invalid key notation"))
+        }
+    }
+    return result
+}
+
+private func isValidKeyNotation(_ str: String) -> Bool {
+    str.rangeOfCharacter(from: .whitespacesAndNewlines) == nil && !str.contains("-")
+}

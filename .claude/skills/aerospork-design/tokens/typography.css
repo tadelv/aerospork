@@ -1,0 +1,39 @@
+/* AeroSpork type.
+   There are no webfonts. Every string in the app is San Francisco, requested through the
+   system font: `.font(.body)`, `.font(.system(.body, design: .monospaced))` for anything that
+   is code, and `design: .rounded` in exactly one place — the menu bar workspace chips.
+   Sizes below are what macOS resolves those text styles to at the default setting. */
+
+:root {
+  --font-system: -apple-system, BlinkMacSystemFont, system-ui, "Helvetica Neue", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Monaco, monospace;
+  --font-rounded: ui-rounded, -apple-system, system-ui, sans-serif;
+
+  --text-large-title: 26px;
+  --text-title1: 22px;
+  --text-title2: 17px;   /* the monitor glyph in the Monitors tab */
+  --text-title3: 15px;   /* banner icons */
+  --text-headline: 13px; /* SectionLabel — 13px semibold */
+  --text-default: 13px;  /* systemFontSize: every label, field and button title */
+  --text-callout: 12px;  /* SettingsHint, footers, status labels */
+  --text-subheadline: 11px;
+  --text-footnote: 10px;
+  --text-caption: 10px;
+  --text-caption2: 10px; /* the "generated" origin badge */
+
+  --weight-regular: 400;
+  --weight-medium: 500; /* .fontWeight(.medium) — monitor name */
+  --weight-semibold: 600; /* .headline, chip glyphs */
+  --weight-light: 300;   /* the 34px empty-state glyph */
+
+  --leading-tight: 1.2;
+  --leading-body: 1.35;
+  --leading-prose: 1.45;
+
+  /* Semantic aliases */
+  --font-code: var(--font-mono);
+  --font-ui: var(--font-system);
+  --font-chip: var(--font-rounded);
+  --text-hint: var(--text-callout);
+  --text-label: var(--text-default);
+}

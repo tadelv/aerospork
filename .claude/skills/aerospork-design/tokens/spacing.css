@@ -1,0 +1,43 @@
+/* AeroSpork spacing.
+   Not a 4/8 grid — these are the literal paddings in the SwiftUI source, which follow AppKit
+   metrics (odd numbers included: `.padding(.vertical, 9)`, `.padding(.top, 7)`). Use them as
+   written; rounding them to 8s is what makes a recreation look like a web page. */
+
+:root {
+  --space-1: 1px;
+  --space-2: 2px;
+  --space-4: 4px;
+  --space-5: 5px;   /* chip gap, match-cell gap */
+  --space-6: 6px;   /* NumberField internals, CopyButton gap */
+  --space-7: 7px;   /* ListActionBar top padding, filter field h-padding */
+  --space-8: 8px;   /* the default HStack spacing in this app */
+  --space-9: 9px;   /* bar strip vertical padding */
+  --space-10: 10px;
+  --space-11: 11px; /* banner vertical padding */
+  --space-12: 12px;
+  --space-14: 14px; /* bar strip horizontal padding */
+  --space-16: 16px; /* Form/section horizontal padding */
+  --space-24: 24px; /* empty-state padding */
+
+  /* Semantic aliases */
+  --gap-row: var(--space-8);
+  --gap-tight: var(--space-5);
+  --pad-bar-x: var(--space-14);
+  --pad-bar-y: var(--space-9);
+  --pad-section-x: var(--space-16);
+  --pad-card-x: var(--space-12);
+  --pad-card-y: var(--space-9);
+  --pad-empty-state: var(--space-24);
+
+  /* Fixed control widths taken from the source */
+  --w-number-field: 58px;
+  --w-recorder-row: 150px;
+  --w-recorder-composer: 170px;
+  --w-filter-field: 150px;
+  --w-env-name: 150px;
+  --h-control: 22px;
+  --w-settings-min: 780px;
+  --w-settings-ideal: 880px;
+  --h-settings-min: 520px;
+  --h-settings-ideal: 620px;
+}

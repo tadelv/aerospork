@@ -1,0 +1,313 @@
+import AppKit
+import Common
+
+class TreeNode: Equatable, AeroAny {
+    private var _children: [TreeNode] = []
+    var children: [TreeNode] { _children }
+    fileprivate final weak var _parent: NonLeafTreeNodeObject? = nil
+    final var parent: NonLeafTreeNodeObject? { _parent }
+    private var adaptiveWeight: CGFloat
+    private let _mruChildren: MruStack<TreeNode> = MruStack()
+    // Usages:
+    // - resize with mouse
+    // - makeFloatingWindowsSeenAsTiling in focus command
+    var lastAppliedLayoutVirtualRect: Rect? = nil  // as if inner gaps were always zero
+    // Usages:
+    // - resize with mouse
+    // - drag window with mouse
+    // - move-mouse command
+    var lastAppliedLayoutPhysicalRect: Rect? = nil // with real inner gaps
+    final var unboundStacktrace: String? = nil
+    var isBound: Bool { parent != nil } // todo drop, once https://github.com/wbsmolen/aerospork/issues/1215 is fixed
+
+    @MainActor
+    init(parent: NonLeafTreeNodeObject, adaptiveWeight: CGFloat, index: Int) {
+        self.adaptiveWeight = adaptiveWeight
+        bind(to: parent, adaptiveWeight: adaptiveWeight, index: index)
+    }
+
+    fileprivate init() {
+        adaptiveWeight = 0
+    }
+
+    /// See: ``getWeight(_:)``
+    func setWeight(_ targetOrientation: Orientation, _ newValue: CGFloat) {
+        guard let parent else { die("Can't change weight if TreeNode doesn't have parent") }
+        switch getChildParentRelation(child: self, parent: parent) {
+            case .tiling(let parent):
+                if parent.orientation != targetOrientation {
+                    die("You can't change \(targetOrientation) weight of nodes located in \(parent.orientation) container")
+                }
+                if parent.layout != .tiles {
+                    die("Weight can be changed only for nodes whose parent has 'tiles' layout")
+                }
+                // Floor at 1pt. `resize` and mouse-resize give a node's delta back by subtracting it
+                // from the siblings, so a single `resize width -2000` drives a weight negative --
+                // and layout's rescale is proportional, so it preserves the sign all the way to a
+                // negative CGSize on the AX API, i.e. a window that silently vanishes. Every weight
+                // writer (resize, mouse-resize, balance-sizes, layout itself) goes through here, so
+                // one floor covers them all. See
+                // LayoutRecursiveTest.testNegativeWeightNeverReachesTheAxApi.
+                adaptiveWeight = max(newValue, 1)
+            default:
+                die("Can't change weight")
+        }
+    }
+
+    /// Weight itself doesn't make sense. The parent container controls semantics of weight
+    @MainActor
+    func getWeight(_ targetOrientation: Orientation) -> CGFloat {
+        guard let parent else { die("Weight doesn't make sense for containers without parent") }
+        return switch getChildParentRelation(child: self, parent: parent) {
+            case .tiling(let parent):
+                parent.orientation == targetOrientation ? adaptiveWeight : parent.getWeight(targetOrientation)
+            case .rootTilingContainer: parent.getWeight(targetOrientation)
+            case .floatingWindow, .macosNativeFullscreenWindow: dieT("Weight doesn't make sense for floating windows")
+            case .macosNativeMinimizedWindow: dieT("Weight doesn't make sense for minimized windows")
+            case .macosPopupWindow: dieT("Weight doesn't make sense for popup windows")
+            case .macosNativeHiddenAppWindow: dieT("Weight doesn't make sense for windows of hidden apps")
+            case .shimContainerRelation: dieT("Weight doesn't make sense for stub containers")
+        }
+    }
+
+    @MainActor
+    @discardableResult
+    func bind(to newParent: NonLeafTreeNodeObject, adaptiveWeight: CGFloat, index: Int) -> BindingData? {
+        let result = unbindIfBound()
+
+        if newParent === NilTreeNode.instance {
+            return result
+        }
+        let relation = getChildParentRelation(child: self, parent: newParent) // Side effect: verify relation
+        if adaptiveWeight == WEIGHT_AUTO {
+            self.adaptiveWeight = switch relation {
+                case .tiling(let newParent):
+                    CGFloat(newParent.children.sumOfDouble { $0.getWeight(newParent.orientation) }).div(newParent.children.count) ?? 1
+                case .floatingWindow, .macosNativeFullscreenWindow,
+                     .rootTilingContainer, .macosNativeMinimizedWindow,
+                     .shimContainerRelation, .macosPopupWindow, .macosNativeHiddenAppWindow:
+                    WEIGHT_DOESNT_MATTER
+            }
+        } else {
+            self.adaptiveWeight = adaptiveWeight
+        }
+        newParent._children.insert(self, at: index != INDEX_BIND_LAST ? index : newParent._children.count)
+        _parent = newParent
+        unboundStacktrace = nil
+        // todo consider disabling automatic mru propogation
+        // 1. "floating windows" in FocusCommand break the MRU because of that :(
+        // 2. Misbehaved apps that abuse real window as popups https://github.com/wbsmolen/aerospork/issues/106 (the
+        //    last appeared window, is not necessarily the one that has the focus)
+        markAsMostRecentChild()
+
+        return result
+    }
+
+    @MainActor
+    private func unbindIfBound() -> BindingData? {
+        guard let _parent else { return nil }
+
+        let index = _parent._children.remove(element: self) ?? dieT("Can't find child in its parent")
+        check(_parent._mruChildren.remove(self))
+        self._parent = nil
+        // Gated. `Thread.callStackSymbols` symbolicates every frame of a deep async stack, and this
+        // runs on EVERY rebind -- `bind(to:)` unbinds first, so container flattening, relayout and
+        // every tree-moving command pay it -- to produce a string whose only consumer is the
+        // `dieT` message in `unbindFromParent()`. Same gate as `debugLog`; turn it on with
+        // AEROSPORK_DEBUG_LOG=1 when you are actually chasing a double-unbind.
+        unboundStacktrace = isDebugLoggingEnabled ? getStringStacktrace() : nil
+
+        return BindingData(parent: _parent, adaptiveWeight: adaptiveWeight, index: index)
+    }
+
+    func markAsMostRecentChild() {
+        guard let _parent else { return }
+        _parent._mruChildren.pushOrRaise(self)
+        _parent.markAsMostRecentChild()
+    }
+
+    var mostRecentChild: TreeNode? {
+        var iterator = _mruChildren.makeIterator()
+        return iterator.next() ?? children.last
+    }
+
+    @MainActor
+    @discardableResult
+    func unbindFromParent() -> BindingData {
+        unbindIfBound() ?? dieT("\(self) is already unbound. The stacktrace where it was unbound:\n" +
+            (unboundStacktrace ?? "<not captured -- rerun with AEROSPORK_DEBUG_LOG=1>"))
+    }
+
+    nonisolated static func == (lhs: TreeNode, rhs: TreeNode) -> Bool {
+        lhs === rhs
+    }
+
+    private var userData: [String: Any] = [:]
+    func getUserData<T>(key: TreeNodeUserDataKey<T>) -> T? { userData[key.key] as! T? }
+    func putUserData<T>(key: TreeNodeUserDataKey<T>, data: T) {
+        userData[key.key] = data
+    }
+    @discardableResult
+    func cleanUserData<T>(key: TreeNodeUserDataKey<T>) -> T? { userData.removeValue(forKey: key.key) as! T? }
+
+    // MARK: - Tree Navigation
+
+    private func visit(node: TreeNode, result: inout [Window], maxDepth: Int = 100, currentDepth: Int = 0) {
+        // Add depth limit to prevent infinite recursion
+        guard currentDepth < maxDepth else { return }
+
+        if let node = node as? Window {
+            result.append(node)
+            return // Early exit for leaf nodes
+        }
+
+        // Skip empty containers early
+        if node.children.isEmpty { return }
+
+        for child in node.children {
+            visit(node: child, result: &result, maxDepth: maxDepth, currentDepth: currentDepth + 1)
+        }
+    }
+
+    var allLeafWindowsRecursive: [Window] {
+        var result: [Window] = []
+        result.reserveCapacity(32) // Pre-allocate for typical window count
+        visit(node: self, result: &result)
+        return result
+    }
+
+    var ownIndex: Int? {
+        guard let parent else { return nil }
+        return parent.children.firstIndex(of: self).orDie()
+    }
+
+    var parents: [NonLeafTreeNodeObject] { parent.flatMap { [$0] + $0.parents } ?? [] }
+    var parentsWithSelf: [TreeNode] { parent.flatMap { [self] + $0.parentsWithSelf } ?? [self] }
+
+    /// Also see visualWorkspace
+    var nodeWorkspace: Workspace? {
+        self as? Workspace ?? parent?.nodeWorkspace
+    }
+
+    /// Also see: workspace
+    @MainActor
+    var visualWorkspace: Workspace? { nodeWorkspace ?? nodeMonitor?.activeWorkspace }
+
+    @MainActor
+    var nodeMonitor: Monitor? {
+        switch self.nodeCases {
+            case .workspace(let ws): ws.workspaceMonitor
+            case .window: parent?.nodeMonitor
+            case .tilingContainer: parent?.nodeMonitor
+            case .macosFullscreenWindowsContainer: parent?.nodeMonitor
+            case .macosHiddenAppsWindowsContainer: parent?.nodeMonitor
+            case .macosMinimizedWindowsContainer, .macosPopupWindowsContainer: nil
+        }
+    }
+
+    var mostRecentWindowRecursive: Window? {
+        // Iterative approach to avoid deep recursion
+        var current: TreeNode? = self
+        var depth = 0
+        let maxDepth = 100
+
+        while let node = current, depth < maxDepth {
+            if let window = node as? Window {
+                return window
+            }
+            current = node.mostRecentChild
+            depth += 1
+        }
+        return nil
+    }
+
+    var anyLeafWindowRecursive: Window? {
+        // Early exit for windows
+        if let window = self as? Window {
+            return window
+        }
+
+        // Early exit for empty containers
+        if children.isEmpty { return nil }
+
+        // Use first(where:) for early exit on first found window
+        return children.lazy.compactMap { $0.anyLeafWindowRecursive }.first
+    }
+
+    // Doesn't contain at least one window
+    var isEffectivelyEmpty: Bool {
+        // Quick check for windows first
+        if self is Window { return false }
+
+        // Quick check for empty containers
+        if children.isEmpty { return true }
+
+        // Use lazy evaluation for efficiency
+        return !children.lazy.contains { !$0.isEffectivelyEmpty }
+    }
+
+    @MainActor
+    var hWeight: CGFloat {
+        get { getWeight(.h) }
+        set { setWeight(.h, newValue) }
+    }
+
+    @MainActor
+    var vWeight: CGFloat {
+        get { getWeight(.v) }
+        set { setWeight(.v, newValue) }
+    }
+
+    /// Returns closest parent that has children in specified direction relative to `self`
+    func closestParent(
+        hasChildrenInDirection direction: CardinalDirection,
+        withLayout layout: Layout?,
+    ) -> (parent: TilingContainer, ownIndex: Int)? {
+        let innermostChild = parentsWithSelf.first(where: { (node: TreeNode) -> Bool in
+            return switch node.parent?.cases {
+                // stop searching. We didn't find it, or something went wrong
+                case .workspace, nil, .macosMinimizedWindowsContainer,
+                     .macosFullscreenWindowsContainer, .macosHiddenAppsWindowsContainer, .macosPopupWindowsContainer:
+                    true
+                case .tilingContainer(let parent):
+                    (layout == nil || parent.layout == layout) &&
+                        parent.orientation == direction.orientation &&
+                        (node.ownIndex.map { parent.children.indices.contains($0 + direction.focusOffset) } ?? true)
+            }
+        })
+        guard let innermostChild else { return nil }
+        switch innermostChild.parent?.cases {
+            case .tilingContainer(let parent):
+                check(parent.orientation == direction.orientation)
+                return innermostChild.ownIndex.map { (parent, $0) }
+            case .workspace, nil, .macosMinimizedWindowsContainer,
+                 .macosFullscreenWindowsContainer, .macosHiddenAppsWindowsContainer, .macosPopupWindowsContainer:
+                return nil
+        }
+    }
+}
+
+struct TreeNodeUserDataKey<T> {
+    let key: String
+}
+
+let WEIGHT_DOESNT_MATTER = CGFloat(-2)
+/// Splits containers evenly if tiling.
+///
+/// Reset weight is bind to workspace (aka "floating windows")
+let WEIGHT_AUTO = CGFloat(-1)
+
+let INDEX_BIND_LAST = -1
+
+struct BindingData {
+    let parent: NonLeafTreeNodeObject
+    let adaptiveWeight: CGFloat
+    let index: Int
+}
+
+class NilTreeNode: TreeNode, NonLeafTreeNodeObject {
+    override private init() {
+        super.init()
+    }
+    @MainActor static let instance = NilTreeNode()
+}

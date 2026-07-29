@@ -1,0 +1,15 @@
+<!-- @dsCard group="Colors" viewport="700x170" name="Surfaces" subtitle="Window, grouped canvas, control, text and translucent bar" -->
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Surfaces</title><link rel="stylesheet" href="../styles.css">
+<style>body{margin:0;padding:14px 16px;background:var(--grouped-bg);font-family:var(--font-system);color:var(--label);box-sizing:border-box}
+.lbl{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--label-tertiary)}
+.mono{font-family:var(--font-mono)}
+.row{display:flex;gap:10px}.sw{flex:1;height:96px;border-radius:8px;box-shadow:inset 0 0 0 .5px var(--separator);display:flex;flex-direction:column;justify-content:flex-end;padding:8px;box-sizing:border-box}
+.n{font-size:11px;font-weight:600}.v{font-family:var(--font-mono);font-size:9px;color:var(--label-secondary)}
+.bar{background:var(--bar-bg);backdrop-filter:blur(20px)}</style></head><body><div class="row">
+<div class="sw" style="background:var(--window-bg)"><span class="n">Window</span><span class="v">--window-bg</span></div>
+<div class="sw" style="background:var(--grouped-bg)"><span class="n">Grouped form</span><span class="v">--grouped-bg</span></div>
+<div class="sw" style="background:var(--control-bg)"><span class="n">Control / card</span><span class="v">--control-bg</span></div>
+<div class="sw" style="background:var(--text-bg)"><span class="n">Text / code</span><span class="v">--text-bg</span></div>
+<div class="sw bar"><span class="n">Bar (.bar)</span><span class="v">--bar-bg + blur</span></div>
+</div></body></html>

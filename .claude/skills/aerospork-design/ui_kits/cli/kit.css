@@ -1,0 +1,12 @@
+body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #1a1c22; padding: 26px; font-family: var(--font-system); }
+.term { width: 860px; height: 560px; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow-window); }
+.term-bar { height: 28px; display: flex; align-items: center; gap: 8px; padding: 0 12px; background: rgba(238,238,240,.92); border-bottom: 1px solid rgba(0,0,0,.14); font-size: 12px; font-weight: 600; color: #35353c; }
+.tl { width: 12px; height: 12px; border-radius: 50%; }
+.term-body { flex: 1; min-height: 0; overflow: auto; background: #14161c; padding: 14px 16px; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.55; color: #d7dbe4; }
+.prompt { color: #5e9eff; }
+.dim { color: #6f7787; }
+.ok { color: #34c759; }
+.warn { color: #ff9f0a; }
+.picker { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 12px; background: #1b1e26; border-top: 1px solid rgba(255,255,255,.08); }
+.picker button { font-family: var(--font-mono); font-size: 11.5px; color: #b9c0cd; background: rgba(255,255,255,.06); border: none; padding: 4px 9px; border-radius: 5px; cursor: pointer; }
+.picker button.on { background: var(--brand-focused); color: #0b1020; }

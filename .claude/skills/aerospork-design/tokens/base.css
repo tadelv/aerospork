@@ -1,0 +1,15 @@
+/* Minimal base so a card or screen inherits the right type and colors without extra setup. */
+
+body {
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: var(--text-default);
+  line-height: var(--leading-body);
+  color: var(--label);
+  background: var(--window-bg);
+  -webkit-font-smoothing: antialiased;
+}
+code, kbd, pre, .mono { font-family: var(--font-mono); }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button { font-family: inherit; }

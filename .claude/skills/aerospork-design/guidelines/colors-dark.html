@@ -1,0 +1,11 @@
+<!-- @dsCard group="Colors" viewport="700x180" name="Dark appearance" subtitle="Same tokens under [data-appearance=dark] — every surface and label flips" -->
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Dark appearance</title><link rel="stylesheet" href="../styles.css">
+<style>body{margin:0;padding:14px 16px;background:var(--grouped-bg);font-family:var(--font-system);color:var(--label);box-sizing:border-box}
+.lbl{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--label-tertiary)}
+.mono{font-family:var(--font-mono)}
+.pane{background:var(--grouped-bg);border-radius:8px;padding:12px;display:flex;gap:10px}
+.box{flex:1;background:var(--control-bg);border-radius:8px;padding:10px;box-shadow:0 0 0 .5px var(--separator);font-size:12px;color:var(--label)}
+.s{color:var(--label-secondary);font-size:11px;margin-top:4px}
+.acc{height:22px;border-radius:6px;background:var(--accent);margin-top:8px}</style></head><body><div data-appearance="dark" class="pane"><div class="box">Dark<div class="s">--control-bg on --grouped-bg</div><div class="acc"></div></div>
+<div class="box">Secondary label at 55%<div class="s">Labels lighten; separators go to white 15%</div><div class="acc"></div></div></div></body></html>

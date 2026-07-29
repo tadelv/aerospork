@@ -1,0 +1,15 @@
+<!-- @dsCard group="Colors" viewport="700x150" name="Status & banners" subtitle="Red = config not loaded, orange = warning, green = valid" -->
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Status</title><link rel="stylesheet" href="../styles.css">
+<style>body{margin:0;padding:14px 16px;background:var(--grouped-bg);font-family:var(--font-system);color:var(--label);box-sizing:border-box}
+.lbl{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--label-tertiary)}
+.mono{font-family:var(--font-mono)}
+.b{display:flex;gap:9px;padding:11px 14px;font-size:12px;line-height:1.45;align-items:flex-start;border-bottom:1px solid var(--separator)}
+.dot{width:13px;height:13px;border-radius:3px;flex:0 0 auto;margin-top:1px}
+.wrap{border-radius:8px;overflow:hidden;box-shadow:0 0 0 .5px var(--separator)}
+.st{display:flex;gap:18px;padding:10px 2px;font-size:12px}
+.st span{display:flex;gap:6px;align-items:center}.sq{width:11px;height:11px;border-radius:50%}</style></head><body><div class="wrap">
+<div class="b" style="background:var(--banner-error-bg)"><span class="dot" style="background:var(--sys-red)"></span><span>Your config was not loaded — AeroSpork is running built-in defaults. Fix the errors below and save; the config reloads by itself.</span></div>
+<div class="b" style="background:var(--banner-warning-bg);border-bottom:none"><span class="dot" style="background:var(--sys-orange)"></span><span>Unknown key on line 24 was ignored.</span></div>
+</div>
+<div class="st"><span style="color:var(--sys-green)"><i class="sq" style="background:currentColor"></i>Valid — press Apply</span><span style="color:var(--sys-red)"><i class="sq" style="background:currentColor"></i>Parse error</span><span style="color:var(--label-secondary)"><i class="sq" style="background:currentColor"></i>Matches the file on disk</span></div></body></html>

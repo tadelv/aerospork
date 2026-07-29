@@ -1,0 +1,124 @@
+= aerospork-config(1)
+include::util/man-attributes.adoc[]
+:manname: aerospork-config
+// tag::purpose[]
+:manpurpose: Query AeroSpork config options
+// end::purpose[]
+
+// =========================================================== Synopsis
+== Synopsis
+[verse]
+// tag::synopsis[]
+aerospork config [-h|--help] --get <name> [--json] [--keys]
+aerospork config [-h|--help] --major-keys
+aerospork config [-h|--help] --all-keys
+aerospork config [-h|--help] --config-path
+
+// end::synopsis[]
+
+// =========================================================== Description
+== Description
+
+// tag::body[]
+{manpurpose}
+
+Under the hood, the config is represented as recursive data structure of maps, arrays, strings, and integers.
+What you query is the *effective* config -- what AeroSpork is running right now, after the config file has
+been desugared -- so `--get mode.main.binding` lists the generated bindings as well as the ones you wrote.
+
+Printing without `--json` or `--keys` flag is supported only for scalar types (strings and integers) and array of scalar types.
+Printing other complicated objects requires `--json` or `--keys` flag.
+
+// =========================================================== Options
+include::util/conditional-options-header.adoc[]
+
+-h, --help:: Print help
+--get <name>:: Get the value for a given key. You can inspect available keys with `--major-keys` or `--all-keys`
+--major-keys:: Print major keys
+--all-keys:: Print all available keys recursively
+--json:: Print result in JSON format
+--keys:: Print keys of the complicated object (map or array)
+--config-path:: Print absolute path to the loaded config
+
+// =========================================================== Examples
+include::util/conditional-examples-header.adoc[]
+
+* List all binding modes:
++
+----
+$ aerospork config --get mode --keys
+main
+service
+----
+* List all key bindings for 'main' binding mode:
++
+----
+$ aerospork config --get mode.main.binding --keys
+alt-1
+alt-2
+...
+----
+* List all key bindings for 'main' binding mode in JSON format:
++
+----
+$ aerospork config --get mode.main.binding --json
+{
+  "alt-w" : "workspace W",
+  "alt-y" : "workspace Y",
+  "alt-n" : "workspace N",
+  "alt-shift-e" : "move-node-to-workspace E",
+  "alt-shift-m" : "move-node-to-workspace M",
+  "alt-shift-t" : "move-node-to-workspace T",
+...
+----
+
+// =========================================================== Config file
+== The config file
+
+`~/.aerospork.toml` (or `~/.aerospork-debug.toml` for a debug build). A complete config:
+
+----
+mod = "alt"              # base modifier for the generated bindings
+workspaces = "1-9"       # a range, a list (["dev", "web"]), or both
+
+[gaps]
+inner = 8
+outer = 8                # or { top = 32, bottom = 8, left = 8, right = 8 }
+
+[keys]                   # only what you want beyond the generated defaults
+alt-shift-semicolon = "mode service"
+
+[keys.service]           # a named mode; enter with `mode service`, leave with `mode main`
+esc = ["reload-config", "mode main"]
+
+[monitors]               # workspace -> monitor
+2 = { uuid = "AAAAAAAA-0000-4000-8000-000000000001" }
+
+[on-window]              # app id -> what to do when its window appears
+"com.apple.mail" = "move-node-to-workspace 3"
+----
+
+=== Generated bindings
+
+`mod` generates `mod-h/j/k/l` (focus), `mod-shift-h/j/k/l` (move), `mod-minus`/`mod-equal` (resize),
+`mod-slash`/`mod-comma` (layout) and `mod-tab` (previous workspace).
+Each entry in `workspaces` additionally generates `mod-<key>` to switch to it and `mod-shift-<key>` to
+move the focused window there, where `<key>` is the first character of the name, lower-cased.
+
+Anything in `[keys]` **overrides** a generated binding with the same key, so the defaults never trap you.
+Remove `mod` and nothing is generated at all.
+
+=== Older configs
+
+A config written in the previous schema -- the one with `[mode.main.binding]` and
+`workspace-to-monitor-force-assignment` -- is converted on first launch, and the original is kept next
+to it as `<name>.pre-v2`. The conversion is only performed when the converted file provably loads to
+the same configuration; otherwise your file is left exactly as it is.
+
+`[mode.<name>.binding]`, `workspace-to-monitor-force-assignment`, `[[on-window-detected]]` and the
+per-edge `gaps` spelling all still parse, so a hand-written or GUI-edited mixture keeps working.
+
+// end::body[]
+
+// =========================================================== Footer
+include::util/man-footer.adoc[]

@@ -1,0 +1,22 @@
+/* AeroSpork motion.
+   The product's thesis is that switching is *instant* — workspaces are emulated precisely so
+   there is no macOS Spaces animation. So: no transitions on anything structural. What is left
+   is standard AppKit control feedback and a few product timings worth encoding.
+
+   --dur-instant   workspace switch, tab switch, layout change
+   --dur-control   hover/press on a control
+   --dur-appear    popover / menu appearance
+   Product timings (quote these in copy, not in CSS animations):
+   --timing-refresh-debounce   RefreshDebouncer coalesces accessibility bursts
+   --timing-autosave-debounce  structured settings tabs apply live
+   --timing-copied-flash       CopyButton checkmark hold */
+
+:root {
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1); /* @kind other */
+  --dur-instant: 0ms; /* @kind other */
+  --dur-control: 120ms; /* @kind other */
+  --dur-appear: 180ms; /* @kind other */
+  --timing-refresh-debounce: 50ms; /* @kind other */
+  --timing-autosave-debounce: 600ms; /* @kind other */
+  --timing-copied-flash: 1400ms; /* @kind other */
+}

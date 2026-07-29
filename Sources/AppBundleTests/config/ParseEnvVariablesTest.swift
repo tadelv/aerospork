@@ -1,0 +1,88 @@
+@testable import AppBundle
+import Common
+import XCTest
+
+@MainActor
+final class ParseEnvVariablesTest: XCTestCase {
+    func testInterpolation() {
+        testSucInterpolation("echo ${foo}", ["foo": "bar"], expected: "echo bar")
+        testSucInterpolation("echo $foo", expected: "echo $foo")
+        testSucInterpolation("echo $$foo", expected: "echo $$foo")
+        testSucInterpolation("echo $${foo}", ["foo": "bar"], expected: "echo $bar")
+        testSucInterpolation("echo $", expected: "echo $")
+
+        testFailInterpolation("echo ${foo")
+        testFailInterpolation("echo ${foo{bar}")
+        testFailInterpolation("echo ${foo$bar}")
+        testFailInterpolation("echo ${foo}")
+    }
+
+    func parseConfigForTest(_ rawToml: String) -> (Config, [TomlParseError]) {
+        switch parseConfig(rawToml) {
+            case .success(let config):
+                return (config, [])
+            case .failure(let errors):
+                return (Config(), errors)
+        }
+    }
+
+    func testInherit() {
+        let (config1, errors1) = parseConfigForTest("exec.inherit-env-vars = false")
+        assertEquals(errors1, [])
+        assertEquals(config1.execConfig.envVariables, [:])
+
+        let (config2, errors2) = parseConfigForTest("exec.inherit-env-vars = true")
+        assertEquals(errors2, [])
+        assertEquals(config2.execConfig.envVariables, testEnv)
+    }
+
+    func testAddVars() {
+        let (config, errors) = parseConfigForTest(
+            """
+            [exec.env-vars]
+            FOO = 'BAR'
+            """,
+        )
+        assertEquals(errors, [])
+        assertEquals(config.execConfig.envVariables, testEnv + ["FOO": "BAR"])
+    }
+
+    func testCyclicDep() {
+        let (_, errors) = parseConfigForTest(
+            """
+            [exec.env-vars]
+            FOO = '${BAR}'
+            BAR = '${FOO}'
+            """,
+        )
+        // Asserted on the substring that carries the meaning, not the whole sentence: the tail of
+        // this message is produced by `Common/util/StringEx.swift` and its wording is that module's
+        // business, not this test's.
+        assertEquals(errors.count, 2)
+        XCTAssertTrue(errors.descriptions.contains { $0.hasPrefix("exec.env-vars.BAR: Env variable 'FOO' isn't presented") }, errors.descriptions.description)
+        XCTAssertTrue(errors.descriptions.contains { $0.hasPrefix("exec.env-vars.FOO: Env variable 'BAR' isn't presented") }, errors.descriptions.description)
+    }
+
+    func testForbidPwd() {
+        let (_, errors) = parseConfigForTest(
+            """
+            [exec.env-vars]
+            PWD = '/foo'
+            """,
+        )
+        assertEquals(errors.descriptions, [
+            "exec.env-vars.PWD: Changing 'PWD' is not allowed",
+        ])
+    }
+}
+
+private func testSucInterpolation(_ str: String, _ vars: [String: String] = [:], expected: String) {
+    let (result, errors) = str.interpolate(with: vars).getOrNils()
+    assertEquals(result, expected)
+    assertEquals(errors ?? [], [])
+}
+
+private func testFailInterpolation(_ str: String, _ vars: [String: String] = [:]) {
+    let (_, errors) = str.interpolate(with: vars).getOrNils()
+    XCTAssertNotEqual(errors ?? [], [])
+}

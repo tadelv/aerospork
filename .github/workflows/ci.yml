@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  # Branch filter on push so a PR from a branch in this repo doesn't run the whole suite twice.
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    # ponytail: `macos-latest` rather than a pinned image, so the runner label never goes stale.
+    # If toolchain drift ever breaks a build, pin the label -- that is the whole maintenance story.
+    runs-on: macos-latest
+    # The failure this whole toolchain dance exists to avoid -- `swiftly run swift` spinning at 100%
+    # CPU forever -- produces no output, so it would otherwise burn the 360min default before anyone
+    # noticed. A clean run is ~10min including the dependency downloads.
+    timeout-minutes: 30
+    env:
+      # script/setup.sh routes `swift` through `swiftly run swift` whenever swiftly is on PATH.
+      # Hosted runners have Xcode and no swiftly, so it would silently fall through to plain `swift`
+      # plus a "compilation might not be reproducible" warning. Pin it to the xcode-select'd
+      # toolchain instead, which is exactly what the runner is set up to provide.
+      AEROSPORK_SWIFT: xcrun
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Select newest installed Xcode
+        run: |
+          xcode=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -1)
+          if test -n "$xcode"; then sudo xcode-select -s "$xcode"; fi
+          xcodebuild -version
+          # Package.swift uses trailing commas in argument lists (SE-0439), so Swift >= 6.1.
+          swift --version
+
+      # One step on purpose: run-tests.sh is the invariant this project is actually held to, and
+      # everything below shares one expensive build.
+      #   ./build-debug.sh              -> builds app + CLI + test target
+      #   ./run-swift-test.sh           -> `swift test`: both bundles, AppBundleTests + CommonTests
+      #   ./.debug/aerospork -h/-v/...  -> CLI smoke checks
+      #   ./format.sh                   -> swiftformat (rewrites) + swiftlint
+      #   ./generate.sh --all           -> regenerates every *Generated.swift + the xcodeproj
+      #   ./script/check-uncommitted-files.sh
+      #        -> fails on any diff, which is what turns the two rewriting steps above into
+      #           "formatting is clean" and "generated files are in sync" assertions.
+      # Splitting these into named steps would mean duplicating the script and letting it drift.
+      - name: run-tests.sh
+        run: ./run-tests.sh

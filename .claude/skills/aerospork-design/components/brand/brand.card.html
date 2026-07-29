@@ -1,0 +1,51 @@
+<!-- @dsCard group="Components" viewport="700x330" name="Brand surfaces" subtitle="Menu bar workspace chips, gaps preview, TOML editor, window chrome" -->
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Brand surfaces</title><link rel="stylesheet" href="../../styles.css">
+<style>body{background:var(--grouped-bg);margin:0;padding:14px 16px;font-family:var(--font-system);color:var(--label)}
+.grid{display:flex;flex-wrap:wrap;gap:18px 26px;align-items:flex-start}
+.col{display:flex;flex-direction:column;gap:8px}
+.lbl{font-size:var(--text-caption);color:var(--label-tertiary);letter-spacing:.05em;text-transform:uppercase}
+.row{display:flex;gap:8px;align-items:center}</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { WorkspaceChips, GapsPreview, CodeEditor, WindowChrome, BarStrip, StatusLabel, Button } = window.AeroSporkDesignSystem_078bd7;
+const TOML = ['mod = "alt"', 'workspaces = "1-9"', '', '[gaps]', 'inner = 8', 'outer = 8'].join('\n');
+function Card() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
+        <div className="col"><span className="lbl">Menu bar chips</span>
+          <div style={{ background: '#1c1c1e', borderRadius: 6, padding: '5px 10px' }}>
+            <WorkspaceChips ink="light" items={[{ name: '1', active: true }, { name: '2' }, { name: 'web' }, { name: 'service', type: 'mode', active: true }]} />
+          </div>
+          <div style={{ background: '#e8e8ea', borderRadius: 6, padding: '5px 10px' }}>
+            <WorkspaceChips ink="dark" items={[{ name: '1', active: true }, { name: '2' }, { name: 'web' }]} />
+          </div>
+        </div>
+        <div className="col"><span className="lbl">Gaps preview</span>
+          <GapsPreview width={300} height={110} outerTop={32} />
+        </div>
+      </div>
+      <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
+        <div className="col" style={{ flex: 1 }}><span className="lbl">TOML editor</span>
+          <div style={{ borderRadius: 8, overflow: 'hidden', boxShadow: '0 0 0 0.5px var(--separator)', display: 'flex', flexDirection: 'column', height: 132 }}>
+            <CodeEditor value={TOML} readOnly />
+            <BarStrip><div style={{ display: 'flex', alignItems: 'center' }}><StatusLabel kind="neutral">Matches the file on disk</StatusLabel><span style={{ flex: 1 }} /><Button variant="prominent" disabled>Apply</Button></div></BarStrip>
+          </div>
+        </div>
+        <div className="col"><span className="lbl">Window chrome</span>
+          <WindowChrome title="AeroSpork Settings" width={230} height={132}>
+            <div style={{ flex: 1, background: 'var(--grouped-bg)' }} />
+          </WindowChrome>
+        </div>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Card />);
+</script>
+</body></html>

@@ -1,0 +1,66 @@
+<!-- @dsCard group="Components" viewport="700x400" name="Layout" subtitle="Grouped form section, bar strips, tab bar, table, +/- action bar, menu panel" -->
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Layout</title><link rel="stylesheet" href="../../styles.css">
+<style>body{background:var(--grouped-bg);margin:0;padding:14px 16px;font-family:var(--font-system);color:var(--label)}
+.grid{display:flex;flex-wrap:wrap;gap:18px 26px;align-items:flex-start}
+.col{display:flex;flex-direction:column;gap:8px}
+.lbl{font-size:var(--text-caption);color:var(--label-tertiary);letter-spacing:.05em;text-transform:uppercase}
+.row{display:flex;gap:8px;align-items:center}</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { FormSection, SectionLabel, SettingsHint, SettingsFooter, ListActionBar, TabBar, BarStrip, LabeledContent, DataTable, MenuPanel, TextField, SegmentedPicker, NumberField, Button, StatusLabel } = window.AeroSporkDesignSystem_078bd7;
+function Card() {
+  const [tab, setTab] = React.useState('gaps');
+  const [sel, setSel] = React.useState('a');
+  return (
+    <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
+      <div style={{ width: 330, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <span className="lbl">Tab bar</span>
+        <div style={{ borderRadius: 8, overflow: 'hidden', boxShadow: '0 0 0 0.5px var(--separator)' }}>
+          <TabBar value={tab} onChange={setTab} tabs={[
+            { id: 'general', label: 'General', sf: 'gearshape' },
+            { id: 'gaps', label: 'Gaps', sf: 'rectangle.split.3x3' },
+            { id: 'keys', label: 'Keys', sf: 'keyboard' },
+            { id: 'monitors', label: 'Monitors', sf: 'display.2' },
+          ]} />
+        </div>
+        <span className="lbl">Form section</span>
+        <FormSection header={<SectionLabel title="Between windows" sf="rectangle.split.2x1" />}
+          footer="The top gap is measured below the menu bar, so 0 is flush with the usable area.">
+          <NumberField title="Horizontal" value={8} />
+          <NumberField title="Vertical" value={8} />
+        </FormSection>
+      </div>
+      <div style={{ width: 300, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <span className="lbl">Table + action bar</span>
+        <div style={{ borderRadius: 8, overflow: 'hidden', boxShadow: '0 0 0 0.5px var(--separator)', background: 'var(--control-bg)' }}>
+          <DataTable selected={sel} onSelect={setSel} columns={[{ key: 'ws', title: 'Workspace', width: '120px' }, { key: 'mon', title: 'Monitor' }]}
+            rows={[{ id: 'a', ws: '1', mon: 'Primary' }, { id: 'b', ws: 'web', mon: 'DELL U2720Q' }]} />
+          <ListActionBar addHelp="Pin a workspace to a monitor" removeHelp="Remove the selected assignment" onAdd={() => {}} onRemove={() => {}} />
+        </div>
+        <span className="lbl">Bar strip</span>
+        <div style={{ borderRadius: 8, overflow: 'hidden', boxShadow: '0 0 0 0.5px var(--separator)', background: 'var(--text-bg)' }}>
+          <div style={{ height: 26 }} />
+          <BarStrip><div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><StatusLabel kind="ok">Valid — press Apply (⌘S)</StatusLabel><span style={{ flex: 1 }} /><Button>Revert</Button><Button variant="prominent">Apply</Button></div></BarStrip>
+        </div>
+        <SettingsFooter>Use Raw TOML for per-monitor rules.</SettingsFooter>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <span className="lbl">Menu panel</span>
+        <MenuPanel width={210} items={[
+          { label: '1', mono: true, checked: true }, { label: '2', mono: true }, { label: 'web', mono: true },
+          { divider: true },
+          { label: 'Pause Tiling', shortcut: '⌘E' }, { divider: true },
+          { label: 'Settings…', shortcut: '⌘,' }, { label: 'Quit AeroSpork', shortcut: '⌘Q' },
+        ]} />
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Card />);
+</script>
+</body></html>

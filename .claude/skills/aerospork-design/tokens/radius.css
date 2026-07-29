@@ -1,0 +1,20 @@
+/* AeroSpork corner radii.
+   Every rounded rectangle in the app is `style: .continuous` — a squircle, not a circular arc.
+   CSS has no continuous corner, so `border-radius` is the approximation; where it shows
+   (the icon, large plates) use the squircle mask instead. */
+
+:root {
+  --radius-tile: 4px;       /* the schematic window tiles in the gaps preview */
+  --radius-recorder: 5px;   /* the hand-drawn NSView key recorder */
+  --radius-field: 6px;      /* roundedBorder text fields, filter field */
+  --radius-card: 8px;       /* monitor rows, the gaps preview screen */
+  --radius-window: 10px;    /* macOS window corner */
+  --radius-pill: 999px;     /* Capsule() — badges, the mode chip */
+
+  --icon-corner-ratio: 0.225;  /* macOS squircle corner ratio used by the app icon */
+  --icon-inset-ratio: 0.055;   /* Apple's icon grid inset — the art is not full-bleed */
+
+  --border-hairline: 1px;
+  --border-recorder-armed: 2px;
+  --border-chip: 3px;        /* the outline weight of an unfocused workspace chip */
+}

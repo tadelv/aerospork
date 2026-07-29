@@ -1,0 +1,351 @@
+_aerospork_cmd_46 () {
+    aerospork list-workspaces --monitor all --empty no
+}
+
+_aerospork_cmd_49 () {
+    aerospork config --get mode --keys
+}
+
+_aerospork_cmd_42 () {
+    aerospork list-windows --all --format '%{window-id}%{tab}%{app-name} - %{window-title}'
+}
+
+_aerospork_cmd_53 () {
+    true
+}
+
+_aerospork_cmd_37 () {
+    aerospork list-apps --format '%{app-bundle-id}%{tab}%{app-name}'
+}
+
+_aerospork_cmd_54 () {
+    aerospork list-apps --format '%{app-pid}%{tab}%{app-name}'
+}
+
+_aerospork_cmd_51 () {
+    aerospork list-monitors --format '%{monitor-id}%{tab}%{monitor-name}'
+}
+
+_aerospork_cmd_21 () {
+    aerospork config --get mode --keys | xargs -I{} aerospork config --get mode.{}.binding --keys
+}
+
+_aerospork_cmd_12 () {
+    aerospork config --major-keys
+}
+
+_aerospork_subword_cmd_0 () {
+    true
+}
+
+_aerospork_subword_0 () {
+    [[ $# -ne 2 ]] && return 1
+    local mode=$1
+    local word=$2
+
+    local -a literals=(- +)
+
+    declare -A literal_transitions
+    literal_transitions[0]="([0]=1 [1]=1)"
+
+    declare -A match_anything_transitions
+    match_anything_transitions=([0]=2 [1]=2)
+
+    local state=0
+    local char_index=0
+    local matched=0
+    while true; do
+        if [[ $char_index -ge ${#word} ]]; then
+            matched=1
+            break
+        fi
+
+        local subword=${word:$char_index}
+
+        if [[ -v "literal_transitions[$state]" ]]; then
+            declare -A state_transitions
+            eval "state_transitions=${literal_transitions[$state]}"
+
+            local literal_matched=0
+            for literal_id in $(seq 0 $((${#literals[@]} - 1))); do
+                local literal=${literals[$literal_id]}
+                local literal_len=${#literal}
+                if [[ ${subword:0:$literal_len} = "$literal" ]]; then
+                    if [[ -v "state_transitions[$literal_id]" ]]; then
+                        state=${state_transitions[$literal_id]}
+                        char_index=$((char_index + literal_len))
+                        literal_matched=1
+                    fi
+                fi
+            done
+            if [[ $literal_matched -ne 0 ]]; then
+                continue
+            fi
+        fi
+
+        if [[ -v "match_anything_transitions[$state]" ]]; then
+            state=${match_anything_transitions[$state]}
+            matched=1
+            break
+        fi
+
+        break
+    done
+
+    if [[ $mode = matches ]]; then
+        return $((1 - matched))
+    fi
+
+    local matched_prefix="${word:0:$char_index}"
+    local completed_prefix="${word:$char_index}"
+
+    if [[ -v "literal_transitions[$state]" ]]; then
+        declare -A state_transitions
+        eval "state_transitions=${literal_transitions[$state]}"
+
+        for literal_id in "${!state_transitions[@]}"; do
+            local literal=${literals[$literal_id]}
+            if [[ $literal = "${completed_prefix}"* ]]; then
+                local completion="$matched_prefix$literal"
+                local to_state=${state_transitions[$literal_id]}
+                if [[ -v "literal_transitions[$to_state]" || -v "match_anything_transitions[$to_state]" ]]; then
+                    echo $completion
+                else
+                    echo "$completion "
+                fi
+            fi
+        done
+    fi
+
+    declare -A commands
+    commands=([0]=0 [1]=0)
+    if [[ -v "commands[$state]" ]]; then
+        local command_id=${commands[$state]}
+        local completions=()
+        mapfile -t completions < <(_aerospork_subword_cmd_${command_id} "$matched_prefix" | cut -f1)
+        for item in "${completions[@]}"; do
+            echo "$matched_prefix$item"
+        done
+    fi
+
+    return 0
+}
+
+_aerospork () {
+    if [[ $(type -t _get_comp_words_by_ref) != function ]]; then
+        echo _get_comp_words_by_ref: function not defined.  Make sure the bash-completions system package is installed
+        return 1
+    fi
+
+    local words cword
+    _get_comp_words_by_ref -n "$COMP_WORDBREAKS" words cword
+
+    local -a literals=(move-mouse --count -v smart macos-native-fullscreen mute-toggle height toggle all-monitors-outer-frame h_accordion all --window-id monitor-force-center list-apps flatten-workspace-tree mode width summon-workspace focus-back-and-forth list-monitors h_tiles prev window-force-center trigger-binding -h move-node-to-workspace wrap-around-the-workspace enable --ignore-floating --visible close-all-windows-but-current --help --macos-native-hidden off move-workspace-to-monitor --boundaries set workspace-back-and-forth --quit-if-last-window window-lazy-center workspace --major-keys accordion --focused tiling --app-bundle-id --mouse balance-sizes opposite on --auto-back-and-forth --version --json join-with reload-config --workspace floating --mode --boundaries-action resize visible close up layout --fail-if-noop list-exec-env-vars fail --monitor --focus-follows-window split --pid mute-on v_tiles monitor-lazy-center --keys wrap-around-all-monitors --wrap-around horizontal create-implicit-container config --no-outer-gaps focused mute-off --all-keys --show-secrets --all left right --config-path --get --empty tiles --no-gui --format smart-opposite list-modes --dry-run move-node-to-monitor move focus down list-workspaces volume no stop debug-windows macos-native-minimize list-windows mouse next --dfs-index open-settings fullscreen focus-monitor --current v_accordion vertical)
+
+    declare -A literal_transitions
+    literal_transitions[0]="([0]=106 [2]=2 [53]=111 [54]=112 [34]=49 [4]=62 [37]=2 [59]=84 [61]=66 [95]=104 [13]=81 [40]=97 [63]=113 [65]=114 [14]=3 [97]=101 [69]=7 [19]=58 [15]=51 [18]=2 [98]=6 [99]=70 [17]=108 [23]=55 [24]=2 [101]=115 [25]=116 [102]=89 [105]=8 [106]=8 [107]=15 [27]=117 [47]=3 [79]=76 [111]=2 [30]=78 [51]=2 [112]=118 [31]=2 [113]=79)"
+    literal_transitions[1]="([76]=2)"
+    literal_transitions[3]="([55]=4)"
+    literal_transitions[5]="([66]=6 [78]=6 [104]=6)"
+    literal_transitions[6]="([35]=90 [58]=5 [86]=88 [87]=88 [11]=91 [100]=88 [62]=88)"
+    literal_transitions[7]="([48]=8 [11]=9 [77]=8 [116]=8)"
+    literal_transitions[8]="([11]=24)"
+    literal_transitions[11]="([80]=31 [64]=26 [11]=32 [33]=73 [49]=33)"
+    literal_transitions[12]="([55]=13 [76]=14)"
+    literal_transitions[14]="([55]=13 [76]=14)"
+    literal_transitions[15]="([70]=16 [1]=17 [55]=18 [93]=19 [43]=20 [85]=20 [45]=21 [52]=17 [67]=22)"
+    literal_transitions[17]="([70]=16 [1]=36 [55]=18 [93]=37 [43]=20 [85]=20 [45]=21 [52]=36 [67]=22)"
+    literal_transitions[18]="([60]=123 [81]=123)"
+    literal_transitions[20]="([93]=72 [1]=2 [52]=2)"
+    literal_transitions[22]="([10]=86 [108]=86 [81]=86)"
+    literal_transitions[26]="([80]=26 [64]=26 [11]=25 [49]=33)"
+    literal_transitions[27]="([52]=27 [89]=28 [74]=27)"
+    literal_transitions[29]="([52]=29 [74]=29)"
+    literal_transitions[30]="([9]=30 [20]=30 [56]=30 [77]=30 [91]=30 [44]=30 [72]=30 [42]=30 [115]=30 [116]=30)"
+    literal_transitions[31]="([80]=31 [64]=26 [11]=32 [49]=33)"
+    literal_transitions[33]="([11]=122 [80]=33 [64]=33)"
+    literal_transitions[35]="([77]=8 [116]=8 [48]=8)"
+    literal_transitions[36]="([70]=16 [1]=36 [45]=21 [55]=18 [52]=36 [67]=22 [93]=37)"
+    literal_transitions[38]="([11]=39 [64]=38 [68]=38)"
+    literal_transitions[41]="([64]=41 [11]=40 [76]=41 [68]=41)"
+    literal_transitions[43]="([9]=30 [20]=30 [56]=30 [77]=30 [91]=30 [44]=30 [72]=30 [42]=30 [115]=30 [116]=30)"
+    literal_transitions[44]="([104]=45 [26]=45 [66]=45 [75]=45)"
+    literal_transitions[45]="([35]=71 [58]=44 [86]=47 [87]=47 [100]=47 [28]=45 [62]=47)"
+    literal_transitions[46]="([8]=47 [40]=47)"
+    literal_transitions[47]="([35]=46 [58]=65 [28]=47)"
+    literal_transitions[49]="([109]=14 [55]=48 [21]=14 [100]=14 [62]=14 [86]=14 [87]=14 [76]=49)"
+    literal_transitions[50]="([57]=51)"
+    literal_transitions[52]="([29]=52 [1]=53 [103]=53 [90]=52 [93]=54 [52]=53)"
+    literal_transitions[53]="([29]=52 [1]=53 [90]=52 [93]=54 [52]=53)"
+    literal_transitions[55]="([57]=34)"
+    literal_transitions[56]="([76]=56 [68]=56)"
+    literal_transitions[57]="([103]=58 [1]=58 [93]=59 [52]=58 [46]=57 [43]=57)"
+    literal_transitions[58]="([1]=58 [93]=59 [52]=58 [46]=57 [43]=57)"
+    literal_transitions[61]="([16]=75 [3]=75 [6]=75 [94]=75)"
+    literal_transitions[62]="([64]=62 [11]=63 [33]=64 [49]=64)"
+    literal_transitions[64]="([11]=92 [64]=64)"
+    literal_transitions[65]="([104]=47 [26]=47 [66]=47 [75]=47)"
+    literal_transitions[66]="([11]=67 [38]=66)"
+    literal_transitions[69]="([11]=68 [64]=69 [68]=69)"
+    literal_transitions[70]="([11]=24 [100]=47 [28]=45 [62]=47 [35]=71 [58]=44 [86]=47 [87]=47 [110]=72)"
+    literal_transitions[71]="([8]=45 [40]=45)"
+    literal_transitions[73]="([11]=24 [64]=2)"
+    literal_transitions[74]="([86]=1 [87]=1 [109]=1 [100]=1 [21]=1 [62]=1)"
+    literal_transitions[76]="([83]=2 [41]=2 [74]=27 [52]=27 [89]=28 [88]=2)"
+    literal_transitions[77]="([80]=26 [64]=26 [11]=25 [33]=73 [49]=33)"
+    literal_transitions[78]="([38]=2)"
+    literal_transitions[79]="([109]=1 [100]=1 [21]=1 [62]=1 [86]=1 [87]=1 [76]=74)"
+    literal_transitions[81]="([1]=81 [93]=82 [52]=81 [32]=83)"
+    literal_transitions[83]="([103]=81 [1]=81 [93]=82 [52]=81 [32]=83)"
+    literal_transitions[84]="([16]=75 [3]=75 [6]=75 [11]=60 [94]=75)"
+    literal_transitions[85]="([50]=85 [64]=85)"
+    literal_transitions[86]="([10]=86 [1]=36 [70]=16 [108]=86 [55]=18 [93]=37 [67]=22 [45]=21 [52]=36 [81]=86)"
+    literal_transitions[88]="([11]=87 [35]=127 [58]=119)"
+    literal_transitions[89]="([62]=2 [36]=72 [5]=2 [71]=2 [100]=2 [82]=2)"
+    literal_transitions[90]="([8]=6 [40]=6)"
+    literal_transitions[94]="([64]=2)"
+    literal_transitions[96]="([109]=41 [11]=95 [21]=41 [100]=41 [62]=41 [86]=41 [87]=41 [64]=96 [76]=96 [68]=96)"
+    literal_transitions[97]="([50]=98 [64]=98 [109]=1 [21]=1 [76]=99)"
+    literal_transitions[98]="([64]=98 [50]=98)"
+    literal_transitions[99]="([21]=1 [109]=1)"
+    literal_transitions[101]="([109]=41 [11]=100 [21]=41 [100]=41 [62]=41 [86]=41 [87]=41 [64]=101 [76]=96 [68]=101)"
+    literal_transitions[102]="([109]=56 [21]=56 [76]=102 [68]=102)"
+    literal_transitions[103]="([86]=2 [87]=2 [100]=2 [62]=2)"
+    literal_transitions[104]="([114]=2)"
+    literal_transitions[106]="([64]=107 [39]=94 [12]=94 [22]=94 [73]=94)"
+    literal_transitions[107]="([73]=94 [39]=94 [12]=94 [22]=94)"
+    literal_transitions[108]="([64]=93)"
+    literal_transitions[110]="([1]=121 [90]=124 [93]=120 [43]=20 [29]=124 [85]=20 [52]=121 [67]=125)"
+    literal_transitions[111]="([86]=2 [87]=2 [11]=105 [100]=2 [62]=2)"
+    literal_transitions[112]="([92]=112 [96]=112)"
+    literal_transitions[113]="([9]=30 [91]=30 [11]=42 [20]=30 [56]=30 [77]=30 [44]=30 [72]=30 [42]=30 [115]=30 [116]=30)"
+    literal_transitions[114]="([84]=2)"
+    literal_transitions[115]="([1]=110 [90]=124 [93]=109 [43]=20 [29]=124 [85]=20 [52]=110 [67]=125)"
+    literal_transitions[116]="([64]=69 [68]=116 [109]=56 [11]=68 [76]=102 [21]=56)"
+    literal_transitions[117]="([64]=128 [33]=94 [7]=2 [49]=94)"
+    literal_transitions[118]="([80]=31 [64]=77 [11]=10 [33]=73 [49]=33)"
+    literal_transitions[119]="([66]=88 [78]=88 [104]=88)"
+    literal_transitions[121]="([29]=124 [1]=121 [90]=124 [93]=120 [52]=121 [67]=125)"
+    literal_transitions[123]="([70]=16 [1]=36 [60]=123 [55]=18 [93]=37 [45]=21 [52]=36 [81]=123 [67]=22)"
+    literal_transitions[124]="([29]=124 [1]=121 [103]=121 [90]=124 [93]=120 [52]=121 [67]=125)"
+    literal_transitions[125]="([10]=129 [108]=129 [81]=129)"
+    literal_transitions[126]="([64]=38 [11]=39 [68]=38)"
+    literal_transitions[127]="([8]=88 [40]=88)"
+    literal_transitions[128]="([33]=94 [49]=94)"
+    literal_transitions[129]="([10]=129 [1]=53 [108]=129 [90]=52 [93]=54 [29]=52 [52]=53 [81]=129)"
+
+    declare -A match_anything_transitions
+    match_anything_transitions=([23]=2 [39]=38 [126]=126 [95]=96 [87]=88 [98]=85 [122]=33 [79]=80 [10]=11 [105]=103 [82]=81 [4]=2 [28]=29 [42]=43 [24]=2 [9]=35 [13]=14 [59]=58 [19]=17 [100]=101 [67]=66 [55]=50 [93]=94 [32]=31 [68]=69 [37]=36 [69]=38 [63]=62 [25]=26 [54]=53 [108]=94 [49]=12 [123]=123 [60]=61 [116]=38 [125]=129 [40]=41 [21]=36 [101]=126 [91]=6 [48]=49 [51]=2 [92]=64 [129]=129 [18]=123 [80]=80 [97]=85 [120]=121 [22]=86 [34]=23 [72]=2 [86]=86 [12]=12 [109]=110 [16]=36)
+    declare -A subword_transitions
+    subword_transitions[75]="([0]=8)"
+
+    local state=0
+    local word_index=1
+    while [[ $word_index -lt $cword ]]; do
+        local word=${words[$word_index]}
+
+        if [[ -v "literal_transitions[$state]" ]]; then
+            declare -A state_transitions
+            eval "state_transitions=${literal_transitions[$state]}"
+
+            local word_matched=0
+            for literal_id in $(seq 0 $((${#literals[@]} - 1))); do
+                if [[ ${literals[$literal_id]} = "$word" ]]; then
+                    if [[ -v "state_transitions[$literal_id]" ]]; then
+                        state=${state_transitions[$literal_id]}
+                        word_index=$((word_index + 1))
+                        word_matched=1
+                        break
+                    fi
+                fi
+            done
+            if [[ $word_matched -ne 0 ]]; then
+                continue
+            fi
+        fi
+
+        if [[ -v "subword_transitions[$state]" ]]; then
+            declare -A state_transitions
+            eval "state_transitions=${subword_transitions[$state]}"
+
+            local subword_matched=0
+            for subword_id in "${!state_transitions[@]}"; do
+                if _aerospork_subword_"${subword_id}" matches "$word"; then
+                    subword_matched=1
+                    state=${state_transitions[$subword_id]}
+                    word_index=$((word_index + 1))
+                    break
+                fi
+            done
+            if [[ $subword_matched -ne 0 ]]; then
+                continue
+            fi
+        fi
+
+        if [[ -v "match_anything_transitions[$state]" ]]; then
+            state=${match_anything_transitions[$state]}
+            word_index=$((word_index + 1))
+            continue
+        fi
+
+        return 1
+    done
+
+
+    local -a matches=()
+
+    local prefix="${words[$cword]}"
+    if [[ -v "literal_transitions[$state]" ]]; then
+        local state_transitions_initializer=${literal_transitions[$state]}
+        declare -A state_transitions
+        eval "state_transitions=$state_transitions_initializer"
+
+        for literal_id in "${!state_transitions[@]}"; do
+            local literal="${literals[$literal_id]}"
+            if [[ $literal = "${prefix}"* ]]; then
+                matches+=("$literal ")
+            fi
+        done
+    fi
+
+    if [[ -v "subword_transitions[$state]" ]]; then
+        local state_transitions_initializer=${subword_transitions[$state]}
+        declare -A state_transitions
+        eval "state_transitions=$state_transitions_initializer"
+
+        for subword_id in "${!state_transitions[@]}"; do
+            mapfile -t -O "${#matches[@]}" matches < <(_aerospork_subword_"${subword_id}" complete "${words[$cword]}")
+        done
+    fi
+    declare -A commands
+    commands=([86]=51 [105]=42 [69]=46 [82]=53 [63]=42 [25]=42 [49]=53 [54]=53 [23]=21 [39]=42 [4]=46 [108]=46 [28]=12 [123]=46 [92]=42 [60]=42 [129]=51 [18]=46 [80]=53 [116]=46 [42]=42 [24]=42 [9]=42 [97]=46 [120]=53 [13]=46 [109]=53 [126]=53 [59]=53 [22]=51 [19]=53 [100]=42 [67]=42 [125]=51 [34]=49 [95]=42 [87]=42 [98]=46 [55]=21 [122]=42 [93]=46 [32]=42 [68]=42 [72]=53 [40]=42 [21]=37 [79]=53 [37]=53 [101]=53 [91]=42 [12]=53 [10]=42 [48]=46 [51]=49 [16]=54)
+    if [[ -v "commands[$state]" ]]; then
+        local command_id=${commands[$state]}
+        local completions=()
+        mapfile -t completions < <(_aerospork_cmd_${command_id} "$prefix" | cut -f1)
+        for item in "${completions[@]}"; do
+            if [[ $item = "${prefix}"* ]]; then
+                matches+=("$item")
+            fi
+        done
+    fi
+
+
+    local shortest_suffix="$prefix"
+    for ((i=0; i < ${#COMP_WORDBREAKS}; i++)); do
+        local char="${COMP_WORDBREAKS:$i:1}"
+        local candidate=${prefix##*$char}
+        if [[ ${#candidate} -lt ${#shortest_suffix} ]]; then
+            shortest_suffix=$candidate
+        fi
+    done
+    local superfluous_prefix=""
+    if [[ "$shortest_suffix" != "$prefix" ]]; then
+        local superfluous_prefix=${prefix%$shortest_suffix}
+    fi
+    COMPREPLY=("${matches[@]#$superfluous_prefix}")
+
+    return 0
+}
+
+complete -o nospace -F _aerospork aerospork

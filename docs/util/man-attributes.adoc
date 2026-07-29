@@ -1,0 +1,5 @@
+ifndef::env-site[]
+:doctype: manpage
+:manmanual: AeroSpork Manual
+:mansource: AeroSpork
+endif::[]

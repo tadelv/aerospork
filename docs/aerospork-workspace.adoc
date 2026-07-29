@@ -1,0 +1,65 @@
+= aerospork-workspace(1)
+include::util/man-attributes.adoc[]
+:manname: aerospork-workspace
+// tag::purpose[]
+:manpurpose: Focus the specified workspace
+// end::purpose[]
+
+// =========================================================== Synopsis
+== Synopsis
+[verse]
+// tag::synopsis[]
+aerospork workspace [-h|--help] [--auto-back-and-forth] [--fail-if-noop] <workspace-name>
+aerospork workspace [-h|--help] [--wrap-around] (next|prev)
+
+// end::synopsis[]
+
+// =========================================================== Description
+== Description
+
+// tag::body[]
+*1. <workspace-name> syntax*
+
+{manpurpose}
+
+*2. (next|prev) syntax*
+
+Focuses next or previous workspace in *the list*.
+
+* If stdin is not TTY and stdin contains non whitespace characters then *the list* is taken from stdin
+* Otherwise, *the list* is defined as all workspaces on focused monitor in alphabetical order
+
+*Workspace lifecycle*
+
+Workspaces are created the first time you switch to one, and released once they are empty and no
+longer visible. There is no list of workspaces to declare or maintain, and an empty workspace costs
+nothing: switching to it recreates it indistinguishably, because an empty workspace is nothing but
+its name.
+
+This is why `aerospork list-workspaces --all` shows only the workspaces actually in use rather than
+every name your config mentions.
+
+// =========================================================== Options
+include::util/conditional-options-header.adoc[]
+
+-h, --help:: Print help
+--wrap-around:: Make it possible to jump between first and last workspaces using `(next|prev)`
+
+--auto-back-and-forth::
+Automatic `back-and-forth` when switching to already focused workspace.
+Incompatible with `--fail-if-noop`
+
+--fail-if-noop::
+Exit with non-zero exit code if switch to the already focused workspace
+Incompatible with `--auto-back-and-forth`
+
+// =========================================================== Examples
+include::util/conditional-examples-header.adoc[]
+
+* Go to the next non empty workspace on the focused monitor: +
+`aerospork list-workspaces --monitor focused --empty no | aerospork workspace next`
+
+// end::body[]
+
+// =========================================================== Footer
+include::util/man-footer.adoc[]

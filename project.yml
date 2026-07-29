@@ -1,0 +1,104 @@
+# Xcode project configuration. Managed by https://github.com/yonaskolb/XcodeGen
+# Xcode is only used to build the release App Bundle. Debug builds only use Swift Package Manager
+
+name: aerospork
+
+packages:
+  aerosporkPackage:
+    path: .
+
+configs:
+  Debug: debug
+  Release: release
+
+targets:
+  aerospork:
+    type: application
+    platform: macOS
+    deploymentTarget: "13.0"
+    sources:
+      - "Sources/aerosporkApp"
+      - path: "resources"
+        excludes:
+          # Debug-only Info.plist. build-debug-app.sh copies it straight out of resources/; Xcode
+          # generates the release Info.plist (GENERATE_INFOPLIST_FILE), so listing it here only
+          # copied a stray debug plist into the shipped bundle.
+          - "Info-Debug.plist"
+    dependencies:
+      - package: aerosporkPackage
+        product: AppBundle
+    # https://developer.apple.com/documentation/xcode/build-settings-reference
+    settings:
+      base:
+        SWIFT_VERSION: 6.0
+        GENERATE_INFOPLIST_FILE: YES
+        MARKETING_VERSION: ${XCODEGEN_AEROSPORK_VERSION}
+        CURRENT_PROJECT_VERSION: 1
+        # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/LaunchServicesKeys.html#//apple_ref/doc/uid/20001431-108256
+        # Specifies whether the app runs as an agent app. If this key is set to YES, Launch Services runs the app as an agent app.
+        # Agent apps do not appear in the Dock or in the Force Quit window
+        INFOPLIST_KEY_LSUIElement: YES
+        # DEVELOPMENT_TEAM is REQUIRED for signing to work at all: without it xcodebuild fails
+        # outright with "Signing requires a development team". It was missing, which is why the
+        # release build could never get past the Xcode step even once signing identities existed.
+        DEVELOPMENT_TEAM: ${XCODEGEN_AEROSPORK_DEVELOPMENT_TEAM}
+        # Notarization requirements
+        ENABLE_HARDENED_RUNTIME: YES
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
+        INFOPLIST_KEY_NSHumanReadableCopyright: "Copyright © 2025 AeroSpork. All rights reserved."
+        # The name macOS shows: Settings window title, Force Quit, Login Items, and the
+        # Accessibility permission prompt. It has to be set separately from PRODUCT_NAME, which
+        # feeds CFBundleName *and* names the bundle on disk -- so capitalizing PRODUCT_NAME would
+        # rename aerospork.app, which every script, socket path and doc refers to in lowercase.
+        # macOS prefers CFBundleDisplayName over CFBundleName wherever it shows an app to a human.
+        INFOPLIST_KEY_CFBundleDisplayName: AeroSpork
+        # App icon
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+      configs:
+        Debug:
+          PRODUCT_NAME: aerospork-Debug
+          PRODUCT_BUNDLE_IDENTIFIER: com.wbs.aerospork.debug
+          # Debug is a convenience only; build-debug-app.sh is what actually produces and signs the
+          # debug bundle. Automatic is fine here and keeps a plain Xcode build working.
+          CODE_SIGN_STYLE: Automatic
+        Release:
+          PRODUCT_NAME: aerospork
+          PRODUCT_BUNDLE_IDENTIFIER: com.wbs.aerospork
+          # MANUAL, and this is the whole reason notarization used to fail.
+          #
+          # Under `Automatic`, Xcode picked "Apple Development: ..." for a Release build and the
+          # notary service rejected the result with three errors that all trace back to that one
+          # choice: not signed with a Developer ID cert, no secure timestamp, and -- the giveaway --
+          # `com.apple.security.get-task-allow`, the debug entitlement Xcode injects for development
+          # signing. It is not in resources/aerospork.entitlements; Xcode added it.
+          #
+          # `XCODEGEN_AEROSPORK_CODE_SIGN_IDENTITY` was exported by generate.sh all along and
+          # referenced by nothing, so the carefully detected Developer ID was never actually used.
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: ${XCODEGEN_AEROSPORK_CODE_SIGN_IDENTITY}
+          # Developer ID distribution needs no provisioning profile; an empty specifier stops Xcode
+          # looking for one under manual signing.
+          PROVISIONING_PROFILE_SPECIFIER: ""
+          # The secure timestamp notarization requires. The .app got none because Xcode omits it for
+          # development signing.
+          OTHER_CODE_SIGN_FLAGS: --timestamp
+          # Belt and braces against get-task-allow coming back.
+          CODE_SIGN_INJECT_BASE_ENTITLEMENTS: NO
+    entitlements:
+      path: resources/aerospork.entitlements
+      properties:
+        # Accessibility API required for window management doesn't work in sandboxed apps
+        # Therefore, aerospork is distributed outside Mac App Store (notarized for security)
+        com.apple.security.app-sandbox: false
+
+# Without a *shared* scheme, xcodebuild auto-generates schemes from everything it can see and
+# `-scheme aerospork` binds to the `aerospork` executable product in Package.swift instead of the
+# app target of the same name. It then builds a bare Mach-O, prints BUILD SUCCEEDED, and
+# build-release.sh fails on the missing aerospork.app. Declaring the scheme makes it deterministic.
+schemes:
+  aerospork:
+    build:
+      targets:
+        aerospork: all
+    archive:
+      config: Release
