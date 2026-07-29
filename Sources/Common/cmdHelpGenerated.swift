@@ -25,7 +25,7 @@ let enable_help_generated = """
        OR: enable [-h|--help] off [--fail-if-noop]
     """
 let exec_and_forget_help_generated = """
-    exec-and-forget <bash-script>   # config only -- not available in CLI
+    exec-and-forget <bash-script>   # config only, not available in CLI
     """
 let flatten_workspace_tree_help_generated = """
     USAGE: flatten-workspace-tree [-h|--help] [--workspace <workspace>]
