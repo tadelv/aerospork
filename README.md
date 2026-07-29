@@ -3,7 +3,6 @@
 <img src="docs/assets/readme-banner.png" alt="AeroSpork — an i3-like tiling window manager for macOS" width="820">
 
 <p>
-  <a href="https://github.com/wbsmolen/aerospork/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/wbsmolen/aerospork/actions/workflows/ci.yml/badge.svg"></a>
   <img alt="macOS 13+" src="https://img.shields.io/badge/macOS-13%2B-000?logo=apple&logoColor=white">
   <img alt="Swift 6" src="https://img.shields.io/badge/Swift-6-F05138?logo=swift&logoColor=white">
   <a href="legal/LICENSE.txt"><img alt="MIT" src="https://img.shields.io/badge/license-MIT-blue"></a>
@@ -27,13 +26,13 @@ MIT licensed; see [`legal/`](legal/).
 
 On 2025-07-07 the author opened
 [nikitabobko/AeroSpace#1526](https://github.com/nikitabobko/AeroSpace/pull/1526) ("Major
-Enhancements"): 4,515 added lines across 41 files, proposing two things, hardware-based monitor
-fingerprinting for persistent workspace assignment and a set of performance optimisations. It was
-closed on 2025-07-08, the following day, with no review comment. Other users asked in the thread why
-and received no answer. AeroSpork is the fork that followed.
+Enhancements"): 4,515 added lines across 41 files, proposing two things: hardware-based monitor
+fingerprinting for persistent workspace assignment, and a set of performance optimizations. It was
+closed on 2025-07-08 with no review comment. AeroSpork is the fork that followed.
 
-Those two areas are still what the fork is for: monitor identity that holds up across USB docks and
-identical panels, and a configuration surface that does not require memorizing a schema.
+Monitor identity is still the fork's main concern: hardware matching that holds up across USB docks
+and identical panels. A configuration surface that does not require memorizing a schema came later,
+and the PR did not propose it.
 
 ## Tech stack
 
@@ -41,7 +40,7 @@ identical panels, and a configuration surface that does not require memorizing a
 |---|---|
 | Language | Swift, 6.0 language mode (`Package.swift`); `.swift-version` pins toolchain 6.4 |
 | Minimum OS | macOS 13.0 (Ventura) |
-| UI | SwiftUI: a `MenuBarExtra` and a `Settings` scene of seven tabs |
+| UI | SwiftUI: a `MenuBarExtra` and a `Settings` scene |
 | Third-party dependencies | TOMLKit, and nothing else |
 | CLI/app IPC | POSIX `AF_UNIX` stream socket, length-prefixed framing (`Sources/Common/util/UnixSocket.swift`) |
 | Global hotkeys | Carbon `RegisterEventHotKey` (`config/HotkeyBinding.swift`) |
@@ -50,7 +49,8 @@ identical panels, and a configuration surface that does not require memorizing a
 | Window IDs | C shim over the private `_AXUIElementGetWindow` (`Sources/PrivateApi/`) |
 | Build | SwiftPM for the CLI and debug builds; XcodeGen plus `xcodebuild` for the `.app`, since SwiftPM cannot produce a bundle |
 
-BlueSocket, HotKey, ISSoundAdditions and the ANTLR-generated shell grammar are gone.
+Relative to the fork point, BlueSocket, HotKey, ISSoundAdditions, swift-collections and the
+ANTLR-generated shell grammar are gone; see [`legal/`](legal/) for the full list.
 `exec-and-forget` hands its string to `/bin/bash -c`.
 
 ```
@@ -69,19 +69,19 @@ behave the same way. Only the deltas are listed.
 
 | | AeroSpace | AeroSpork |
 |---|:---:|:---:|
-| Monitor matching by hardware UUID / EDID | ❌ &nbsp;name, regex or index only | ✅ |
-| Pin a workspace to a specific DisplayLink panel | ❌ | ✅ |
-| Settings GUI | ❌ &nbsp;"No GUI configuration" | ✅ &nbsp;7 tabs |
-| Signed, notarized and stapled builds | ❌ &nbsp;"Not notarized" | ✅ |
+| Monitor matching by hardware UUID / EDID | ❌ &nbsp;name, regex or number only | ✅ &nbsp;also pins DisplayLink panels |
+| Settings GUI | ❌ &nbsp;"will never provide a GUI for configuration" | ✅ &nbsp;7 tabs |
+| Notarized builds | ❌ | ✅ &nbsp;signed, notarized, stapled |
 | Third-party dependencies | 4 | **1** |
 | Config schema | one syntax | v2 shorthand, older syntax still parses |
 | Command surface | **larger** | smaller |
 | Maturity | **public beta, larger community** | younger fork |
 
-<sub>Upstream column verified against
-<a href="https://github.com/nikitabobko/AeroSpace">nikitabobko/AeroSpace</a> <code>main</code>: its README
-lists "No GUI configuration" and "Not notarized" as limitations, its <code>Package.swift</code>
-declares 4 dependencies, and its guide documents monitor patterns as main/secondary/index/regex only.</sub>
+<sub>Upstream column checked against
+<a href="https://github.com/nikitabobko/AeroSpace">nikitabobko/AeroSpace</a> <code>main</code> on 2026-07-29: its README
+says AeroSpace "will never provide a GUI for configuration" and that "it's not notarized", its
+<code>Package.swift</code> declares four dependencies, and its guide documents monitor patterns as
+main/secondary/number/regex only.</sub>
 
 **Monitor identity.** A display is matched on, in order of reliability, the stable per-display UUID,
 then EDID vendor/model/serial read from CoreGraphics, then the localized name, then size. DisplayLink
@@ -127,8 +127,8 @@ Download the notarized universal (arm64 + x86_64) build from the
 brew install --cask wbsmolen/tap/aerospork
 ```
 
-Both repositories are private during early release, so `brew install` currently works only for
-accounts with access. The release zip works for anyone.
+Both repositories are private during early release, so the cask and the release download both
+require an account with access.
 
 ## Configuration
 
@@ -136,7 +136,7 @@ AeroSpork reads whichever of these exists, and reports an error at startup if bo
 `~/.aerospork.toml` or `${XDG_CONFIG_HOME}/aerospork/aerospork.toml` (`XDG_CONFIG_HOME` defaults to
 `~/.config`). With neither, it falls back to a complete default bundled in the app, also checked in
 as [`docs/config-examples/default-config.toml`](docs/config-examples/default-config.toml). Saved
-changes hot-reload; there is no reload command to remember.
+changes hot-reload, so you never need to run `reload-config` by hand.
 
 ```toml
 mod = "alt"                 # generates the i3 keymap: alt-h/j/k/l, alt-shift-h/j/k/l, ...
@@ -177,8 +177,9 @@ aerospork list-monitors                     # connected displays and how they ar
 aerospork --help
 ```
 
-Troubleshooting: `aerospork config --config-path` prints the file actually loaded (a path inside the
-`.app` bundle means your config failed to load and built-in defaults are in use),
+Troubleshooting: `aerospork config --config-path` prints the file actually loaded. A path inside the
+`.app` bundle means no user config is loaded, either because you have none or because yours failed to
+parse; `aerospork reload-config --dry-run` says which.
 `aerospork reload-config --dry-run` parses without applying and says why not, and `aerospork
 --version` reports both client and server. Logs go to the unified log, with no files and nothing to
 enable:
@@ -187,8 +188,9 @@ enable:
 log show --last 1h --predicate 'subsystem == "com.wbs.aerospork"' --style compact
 ```
 
-Use `com.wbs.aerospork.debug` for a debug build, add `AND category == "config"` to narrow, and set
-`AEROSPORK_DEBUG_LOG=1` for a verbose per-refresh trace. See *Troubleshooting and bug reports* in
+Use `com.wbs.aerospork.debug` for a debug build and add `AND category == "config"` to narrow.
+`AEROSPORK_DEBUG_LOG=1` adds a verbose per-refresh trace, which goes to stderr rather than the
+unified log, so run the binary directly to read it. See *Troubleshooting and bug reports* in
 [the guide](docs/guide.adoc) for what to attach to a report.
 
 ## Development
@@ -201,7 +203,8 @@ Use `com.wbs.aerospork.debug` for a debug build, add `AND category == "config"` 
 ```
 
 The suite is headless, using a fake window tree and a mocked Accessibility layer, so it needs no real
-windows and no Accessibility permission. Building the release `.app` needs Xcode 26 or newer.
+windows and no Accessibility permission. `Package.swift` uses SE-0439 trailing commas, so the floor is
+Swift 6.1 (Xcode 16.3); `.swift-version` pins 6.4 for reproducibility.
 
 [`.claude/skills/aerospork-design/`](.claude/skills/aerospork-design/) holds the design system:
 tokens, components, three click-through UI kits and the brand artwork. It is derived from
