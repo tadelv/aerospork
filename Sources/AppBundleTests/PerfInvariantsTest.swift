@@ -16,7 +16,7 @@ final class PerfInvariantsTest: XCTestCase {
 
     /// `refresh()` membership-tests one id per live window, so an Array here is O(W^2).
     ///
-    /// ponytail: asserted against the source text because `aliveWindowIds` is a local inside a
+    /// TRADEOFF: asserted against the source text because `aliveWindowIds` is a local inside a
     /// private `refresh()` that needs real AX apps to reach. Upgrade path: if the alive-id set ever
     /// becomes a value the refresh loop is handed rather than one it builds, assert on its type.
     func testAliveWindowIdsIsASetNotAnArray() throws {

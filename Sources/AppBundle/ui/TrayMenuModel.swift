@@ -52,7 +52,7 @@ struct AppVisibility: Equatable {
 /// startup) and from the settings window's own save, which reloads the config without running a
 /// refresh session. Both are guarded assignments, so the steady state costs one comparison.
 ///
-/// ponytail: `runRefreshSessionBlocking` returns early while tiling is paused, so an edit made in an
+/// TRADEOFF: `runRefreshSessionBlocking` returns early while tiling is paused, so an edit made in an
 /// external editor during a pause only lands when tiling resumes or any command runs (`runSession`
 /// always reaches here). Upgrade path if that ever matters: call this from `reloadConfig` instead.
 ///

@@ -211,11 +211,16 @@ Managed via Swift Package Manager (Package.swift). The only third-party dependen
 
 Everything else is native: Unix-socket IPC (POSIX), global hotkeys (Carbon), volume control (CoreAudio), ordered collections (plain Swift).
 
-External tools (installed via scripts in `./script/install-dep.sh`):
+External tools installed by `./script/install-dep.sh`:
 - swiftformat: Code formatting
 - swiftlint: Linting
-- asciidoctor (Ruby): Man page generation
-- swiftly: Swift version management (uses `.swift-version` file)
+- xcodegen: Generates `aerospork.xcodeproj` from `project.yml`
+- complgen: Shell-completion generation
+- bundler: Pulls in asciidoctor (Ruby) for the man pages and docs site
+
+Not installed by that script: **swiftly**, the Swift toolchain manager that honours
+`.swift-version`. Install it yourself (`brew install swiftly`); `script/setup.sh` uses it only if
+it is present.
 
 ## Important Files to Know
 

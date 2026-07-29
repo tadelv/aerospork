@@ -132,7 +132,7 @@ extension TilingContainer {
             // did when it started from a sum of zero.
             child.setWeight(orientation, sum > 0 ? child.getWeight(orientation) * size / sum : size / CGFloat(children.count))
         }
-        // ponytail: still a write-back from what is a render pass, but a harmless one -- it lands on
+        // TRADEOFF: still a write-back from what is a render pass, but a harmless one -- it lands on
         // the same weights it just computed, so it converges in one pass and repeated layouts of an
         // unchanged tree agree to ~1 ULP (`Σ w * size / sum` doesn't re-sum to `size` exactly in
         // binary floating point, so frames wobble in their last bits forever;

@@ -28,7 +28,7 @@ headless and reusable:
   normalization, split/join/move/resize are all exercised with no real windows.
 - **An AX read seam**: `protocol AxUiElementMock` (`get` + `containingWindowId`) with a
   real `AXUIElement` conformance and a `[String: Json]` fake. `AxWindowKindTest` replays
-  **61 captured real-window AX dumps** from `axDumps/*.json5` through the window-kind
+  the captured real-window AX dumps in `axDumps/` through the window-kind
   heuristics — genuinely headless classification regression tests.
 - **A machine-readable control/observability surface**: a socket-speaking CLI
   (`.debug/aerospork`), `--json` on `list-windows`/`list-workspaces`/`list-monitors`,
@@ -45,13 +45,13 @@ headless and reusable:
    editing) and the settings GUI are guarded by automated writer tests in `ConfigTest.swift` (they replaced `test-settings-ui.sh`, which was a *manual,
    interactive* checklist whose Test 1 is "did keybindings survive a Save?" i.e. a real
    data-loss bug now guarded by a human pressing Enter. Same for the other revamp code:
-   `UnixSocket` framing, `Key` Carbon mapping, `SystemVolume`, `MonitorFingerprint`
-   UUID matching, `ConfigFileWatcher` — **zero tests each.**
-3. **Layout geometry is unreachable in tests.** `layoutRecursive` computes each node's rect
-   and records it (`lastAppliedLayoutPhysicalRect`) *before* the AX write, but the write
-   (`TestWindow.setAxFrame`) inherits `Window`'s `die("Not implemented")`, so no test can
-   call `layoutWorkspace()`. The math is pure and the answer is already on the node; one
-   override unlocks it (§4).
+   `Key` Carbon mapping, `SystemVolume` and `ConfigFileWatcher` still have no tests.
+   `UnixSocket` framing and `MonitorFingerprint` UUID matching since gained them
+   (`UnixSocketTest`, `MonitorFingerprintTest`).
+3. ~~**Layout geometry is unreachable in tests.**~~ Fixed. `LayoutTestWindow` overrides
+   `setAxFrame`/`setAxTopLeftCorner` to record the rect instead of hitting `Window`'s base
+   `die("Not implemented")`, and `LayoutRecursiveTest` runs `layoutWorkspace()` headlessly
+   against `testMonitor`. Kept here because §4 describes the seam.
 4. **No live-app integration test exists.** Every test is in-process. `ClientServerTest`
    only checks the JSON codec. It never binds a socket.
 5. **No window-geometry in the queryable surface** (see §7): a product gap that limits
@@ -76,7 +76,7 @@ only with real AX/monitors, e2e/manual.
 **CI feasibility:** most meaningful tests are headless and belong in CI.
 The AX/multi-monitor slice needs a real Mac; DisplayLink needs the physical dongle.
 GitHub-*hosted* runners can't even build this until a stable macOS-27 + Xcode-27 image
-ships, until then **CI = a self-hosted Mac on the pinned beta** running `run-tests.sh`.
+ships. CI now runs `run-tests.sh` on a hosted `macos-latest` runner.
 
 ---
 
@@ -118,9 +118,9 @@ whole categories of headless tests.
 
 ### Seam A — layout geometry (≈1–3 lines)
 
-`layoutRecursive` records each node's computed rect on the node *before* calling
-`window.setAxFrame` (`layout/layoutRecursive.swift:37-39`). On a `TestWindow` that write
-hits `Window`'s base `die("Not implemented")` and aborts the run.
+**Built.** `layoutRecursive` records each node's computed rect on the node *before* calling
+`window.setAxFrame`. On a bare `TestWindow` that write hit `Window`'s base
+`die("Not implemented")` and aborted the run.
 
 **Change:** override `setAxFrame` (and `setAxTopLeftCorner`/`getAxTopLeftCorner`/`getAxSize`
 for the floating path) in `TestWindow` to *record* the rect instead of dying (base
@@ -134,9 +134,10 @@ that's fine, it's a thin wrapper the mock doesn't need.
 
 ### Seam B — injectable monitors (small)
 
-`monitors`/`mainMonitor`/`sortedMonitors` (`model/Monitor.swift:101-115`) branch on
-`isUnitTest` and return a single hardcoded `testMonitor`. There's no way to hand tests a
-2- or 3-monitor arrangement, so multi-monitor and DisplayLink logic can't be constructed.
+**Built.** `monitors`/`mainMonitor`/`sortedMonitors` used to branch on `isUnitTest` and
+return a single hardcoded `testMonitor`, so a 2- or 3-monitor arrangement could not be
+constructed. `Monitor.testMonitors` is now a settable array and `MonitorIdentityTest` and
+`LayoutRecursiveTest` both inject arrangements through it.
 
 **Change:** replace the `isUnitTest` branch with a settable `@MainActor var
 testMonitorsOverride: [Monitor]?` (nil ⇒ real NSScreen path). Add a `fingerprint`
@@ -257,13 +258,13 @@ makes `swift build` **hang with no error**.
 
 ## 9. CI
 
-- **Add `.github/workflows/ci.yml`** that runs the existing `run-tests.sh` on a
-  **self-hosted macOS-27-beta runner** with `DEVELOPER_DIR` pinned in `env:`. Nearly all
-  value, almost no new code: the test body already exists.
-- Keep the toolchain pin in one place so the day a stable macOS-27 + Xcode-27 hosted image
-  lands, you flip one value and move to hosted runners.
-- CI runs: static + unit tiers on every PR; the integration tier (`run-e2e.sh`) on merge +
-  nightly on the self-hosted box where AX is granted once and persists.
+- **Done.** `.github/workflows/ci.yml` runs `run-tests.sh` on `macos-latest`, a
+  GitHub-hosted runner, with `AEROSPORK_SWIFT: xcrun`. The self-hosted beta runner this
+  section originally called for turned out to be unnecessary.
+- Keep the toolchain pin in one place, so moving between images stays a one-value change.
+- Still outstanding: the integration tier (`run-e2e.sh`) has nowhere to run. It needs
+  Accessibility permission, which a hosted runner cannot grant, so it would want a
+  self-hosted box where the grant persists.
 
 ---
 
@@ -274,7 +275,7 @@ harness, and the existing scripts (`build-debug-app.sh`,
 `reset-accessibility-permission-for-debug.sh`); add the minimum.
 
 1. **Toolchain preflight.** bash, `script/preflight-toolchain.sh`. §8. *Build first.*
-2. **CI workflow.** `.github/workflows/ci.yml` → `run-tests.sh` on self-hosted. §9. *Build first.*
+2. ~~**CI workflow.**~~ Done: `.github/workflows/ci.yml` runs `run-tests.sh` on a hosted runner. §9.
 3. **ConfigurationWriter round-trip + fuzz.** XCTest,
    `Sources/AppBundleTests/config/ConfigurationWriterTest.swift`. §3 P0. *Build first.*
 4. **Layout golden-rects.** extend XCTest under `Sources/AppBundleTests/layout/`, golden
@@ -302,7 +303,7 @@ harness, and the existing scripts (`build-debug-app.sh`,
 
 **Phase 1 — headless value, no new seams (a day or two):**
 1. Toolchain preflight (`script/preflight-toolchain.sh`), wired into build/test scripts.
-2. `.github/workflows/ci.yml` → `run-tests.sh` on self-hosted.
+2. ~~`.github/workflows/ci.yml`~~ done, on a hosted runner.
 3. P0 unit tests: default-config parses, UnixSocket framing, **ConfigurationWriter
    round-trip + fuzz** (done: `test-settings-ui.sh` retired into `ConfigTest.swift`).
 4. P1 unit tests: ✅ MonitorFingerprint UUID matching + fingerprint config parse (done);

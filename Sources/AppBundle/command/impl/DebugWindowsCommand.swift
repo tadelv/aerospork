@@ -9,7 +9,7 @@ private let disclaimer =
     """
 
 @MainActor private var debugWindowsState: DebugWindowsState = .notRecording
-// ponytail: insertion-ordered, capped at debugWindowsLimit entries; plain pair array beats an OrderedDictionary dep here
+// TRADEOFF: insertion-ordered, capped at debugWindowsLimit entries; plain pair array beats an OrderedDictionary dep here
 @MainActor private var debugWindowsLog: [(id: UInt32, dump: String)] = []
 private let debugWindowsLimit = 10
 

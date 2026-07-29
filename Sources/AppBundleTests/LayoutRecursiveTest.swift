@@ -66,7 +66,7 @@ final class LayoutRecursiveTest: XCTestCase {
     /// Layout rescales the children onto the container and writes the result back as weights, so
     /// weights stay denominated in points -- `resize`, mouse-resize and balance-sizes all rely on
     /// that. The rescale is proportional, so the ratio the user set is what survives. See the
-    /// `ponytail:` note in `layoutTiles`.
+    /// `TRADEOFF:` note in `layoutTiles`.
     func testWeightsAreNormalizedToPoints() async throws {
         let workspace = focus.workspace
         let wide = LayoutTestWindow.new(id: 0, parent: workspace.rootTilingContainer, adaptiveWeight: 300)

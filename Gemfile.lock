@@ -1,0 +1,18 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    asciidoctor (2.0.23)
+    pygments.rb (3.0.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  asciidoctor (= 2.0.23)
+  pygments.rb (= 3.0)
+
+RUBY VERSION
+   ruby 3.3.5p100
+
+BUNDLED WITH
+   2.6.9

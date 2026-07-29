@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   test:
-    # ponytail: `macos-latest` rather than a pinned image, so the runner label never goes stale.
+    # TRADEOFF: `macos-latest` rather than a pinned image, so the runner label never goes stale.
     # If toolchain drift ever breaks a build, pin the label -- that is the whole maintenance story.
     runs-on: macos-latest
     # The failure this whole toolchain dance exists to avoid -- `swiftly run swift` spinning at 100%

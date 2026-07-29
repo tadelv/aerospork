@@ -45,6 +45,18 @@ These are easy to trip over, so they are worth knowing before review points them
   `dev-docs/performance.md` explains which numbers exist and which the available benchmark could not
   resolve.
 
+## Comment conventions
+
+A `TRADEOFF:` comment marks a deliberate simplification and names its ceiling, so the next reader
+knows it was a decision rather than an oversight, and knows what would force a change:
+
+```swift
+// TRADEOFF: blocking I/O on a dedicated dispatch queue. A short-lived CLI process does not
+// need an async event loop; revisit if the server ever multiplexes many clients.
+```
+
+Use it for a known-adequate shortcut. Use a plain comment for everything else.
+
 ## Documentation
 
 Docs are AsciiDoc under `docs/`, and `docs/aerospork-*.adoc` doubles as the man pages and the CLI

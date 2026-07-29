@@ -79,7 +79,7 @@ enum SystemVolume {
         )
     }
 
-    // ponytail: assume master volume lives on the main element; only if the device
+    // TRADEOFF: assume master volume lives on the main element; only if the device
     // doesn't expose it there do we fall back to per-channel (1 = left, 2 = right).
     // Covers the common built-in/aggregate device split without probing every channel.
     private static func readVolume(_ device: AudioObjectID) -> Float? {

@@ -177,7 +177,7 @@ tooltip that reads as its name; and **emoji are never used as icons**. Unicode g
 one thing only: modifier keys (`⌃⌥⇧⌘`) and the shortcut hints in menus.
 
 Available assets: `assets/icon/` (new layered icon set, banner, App Store hero),
-`assets/icon-legacy/` (the icon that ships today), `assets/product/` (tiling screenshots and the
+`assets/icon-legacy/` (the icon this one replaced), `assets/product/` (tiling screenshots and the
 repo's monitor-arrangement diagrams).
 
 ---
@@ -207,7 +207,7 @@ to rebuild the set.
 | `ui_kits/menu_bar/` | Menu bar extra over a tiled desktop |
 | `ui_kits/cli/` | Terminal session with the `aerospork` client |
 | `assets/icon/` | New layered app icon (`AppIcon.appiconset/`, 1024 PNGs, banner, App Store hero) |
-| `assets/icon-legacy/` | The icon currently shipped by the repo |
+| `assets/icon-legacy/` | The previous icon, kept for the before/after specimen |
 | `assets/icons/` | The 41 Lucide SVGs the `Icon` component substitutes for SF Symbols |
 | `assets/product/` | Product screenshots and monitor diagrams from `docs/assets/` |
 | `thumbnail.html` | Homepage tile |

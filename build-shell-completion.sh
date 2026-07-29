@@ -11,7 +11,7 @@ source ./script/setup.sh
 # So: run this script by hand after editing the grammar, and commit the result. build-release.sh
 # just copies ./shell-completion.
 #
-# ponytail: drift between the grammar and the vendored output is caught by a human, not CI --
+# TRADEOFF: drift between the grammar and the vendored output is caught by a human, not CI --
 # CI would have to `cargo install --git` complgen on every run. Add a cached CI job if it ever
 # actually drifts.
 

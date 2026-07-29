@@ -4,7 +4,7 @@ import Foundation
 // Minimal blocking AF_UNIX SOCK_STREAM wrapper with length-prefixed framing.
 // Replaces the BlueSocket dependency. Both AeroSpork's server and CLI speak this
 // framing: a 4-byte big-endian length header followed by the JSON payload.
-// ponytail: blocking I/O on a dedicated dispatch queue / short-lived CLI process — no async event loop needed for a local IPC socket.
+// TRADEOFF: blocking I/O on a dedicated dispatch queue / short-lived CLI process — no async event loop needed for a local IPC socket.
 
 private func withSockaddrUn<R>(path: String, _ body: (UnsafePointer<sockaddr>, socklen_t) -> R) -> R? {
     var addr = sockaddr_un()

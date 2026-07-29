@@ -127,7 +127,7 @@ final class UISettingsTest: XCTestCase {
         for file in files {
             // Comments are stripped first: the whole point of a comment like "square.resize is SF
             // Symbols 5, so we use rectangle.split.3x3" is to record the rule, not break it.
-            // ponytail: naive `//` split, so a banned token inside a string containing `//` would
+            // TRADEOFF: naive `//` split, so a banned token inside a string containing `//` would
             // be missed. Upgrade path: none needed until a symbol name lives inside a URL.
             let source = try String(contentsOf: file, encoding: .utf8)
                 .split(separator: "\n", omittingEmptySubsequences: false)

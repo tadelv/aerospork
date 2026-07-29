@@ -186,5 +186,6 @@ AEROSPORK_DEBUG_LOG=1 /Applications/AeroSpork.app/Contents/MacOS/AeroSpork 2>&1 
 - **Regression coverage is structural, not timing-based.** `PerfInvariantsTest` pins the algorithmic
   properties (workspace GC, the tray publish guard, `aliveWindowIds` being a `Set`, the `debugLog`
   autoclosure) and `AxWriteTest` counts AX operations through the mock. Neither measures wall clock,
-  deliberately; see below. What is *not* covered: `isUnitTest` short-circuits `monitors` to a single
-  fixed `testMonitor`, so the real monitor and AX paths are never exercised by the suite.
+  deliberately; see below. What is *not* covered: the real
+  monitor and AX paths. `Monitor.testMonitors` lets a test inject an arrangement, so
+  multi-monitor logic is reachable, but nothing drives a live `AXUIElement`.
