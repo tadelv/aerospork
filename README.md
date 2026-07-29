@@ -213,8 +213,9 @@ surface. `UIChromeConsistencyTest` enforces the two rules that matter: shared co
 [`SettingsChrome.swift`](Sources/AppBundle/ui/SettingsChrome.swift) and a tab never grows its own
 copy, and status symbols come from `StatusLabel.Kind` rather than string literals.
 
-See [`dev-docs/`](dev-docs/) for architecture notes, contributor setup including code signing,
-testing strategy and performance measurement. `CLAUDE.md` covers repository conventions.
+[`CONTRIBUTING.md`](CONTRIBUTING.md) covers the gate and the invariants the tests enforce.
+[`dev-docs/`](dev-docs/) has architecture notes, contributor setup including code signing, testing
+strategy and performance measurement.
 
 ## License
 
