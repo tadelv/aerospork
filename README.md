@@ -5,7 +5,7 @@
 <p>
   <a href="https://github.com/wbsmolen/aerospork/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/wbsmolen/aerospork/actions/workflows/ci.yml/badge.svg"></a>
   <img alt="macOS 13+" src="https://img.shields.io/badge/macOS-13%2B-000?logo=apple&logoColor=white">
-  <img alt="Swift 6.4" src="https://img.shields.io/badge/Swift-6.4-F05138?logo=swift&logoColor=white">
+  <img alt="Swift 6" src="https://img.shields.io/badge/Swift-6-F05138?logo=swift&logoColor=white">
   <a href="legal/LICENSE.txt"><img alt="MIT" src="https://img.shields.io/badge/license-MIT-blue"></a>
 </p>
 
@@ -90,8 +90,8 @@ hotkeys are Carbon `RegisterEventHotKey`, and volume is CoreAudio, replacing Blu
 ISSoundAdditions. The ANTLR-generated shell language is gone; `exec-and-forget` hands the string to
 `/bin/bash -c`.
 
-**A release pipeline that produces something installable.** Universal (arm64 + x86_64) builds,
-signed with a Developer ID, notarized and stapled, with a Homebrew cask generated from the result.
+**Signed, notarized releases.** Universal (arm64 + x86_64) builds, signed with a Developer ID,
+notarized and stapled, with a Homebrew cask generated from the result.
 
 Smaller things: workspaces are created on demand and released when they empty, rather than being
 materialized for every name a keybinding mentions; redundant Accessibility frame writes are skipped,
@@ -115,6 +115,19 @@ Everything else behaves as you expect: the tree model, the commands, the layout 
 ---
 
 ## Installation
+
+Download the notarized build from the
+[releases page](https://github.com/wbsmolen/aerospork/releases), move `aerospork.app` to
+`/Applications`, and grant Accessibility permission when prompted.
+
+A Homebrew cask is published at [`wbsmolen/tap`](https://github.com/wbsmolen/homebrew-tap):
+
+```bash
+brew install --cask wbsmolen/tap/aerospork
+```
+
+Both repositories are private during early release, so `brew install` currently works only for
+accounts with access; the release zip works for anyone.
 
 ### Build from Source
 
