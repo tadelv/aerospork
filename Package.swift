@@ -67,6 +67,19 @@ let package = Package(
             dependencies: [
                 .target(name: "AppBundle"),
             ],
+            // AppBundle links Sparkle, so the test bundle inherits that link. Without a runpath
+            // pointing at SwiftPM's PackageFrameworks directory, dyld cannot find
+            // Sparkle.framework when the test host launches and the whole bundle dies with signal
+            // 5 before a single test runs -- which looked like "53 tests passed" because only
+            // CommonTests survived.
+            linkerSettings: [
+                .unsafeFlags([
+                    // The test binary sits at Products/<config>/AppBundleTests.xctest/Contents/
+                    // MacOS/, and SwiftPM copies Sparkle.framework to Products/<config>/, so the
+                    // framework is exactly three directories up.
+                    "-Xlinker", "-rpath", "-Xlinker", "@loader_path/../../..",
+                ]),
+            ],
         ),
         // Common (socket codec, cmd-args parsing, TOML error formatting, string utils) is shared by
         // the app and the CLI, and used to be reachable only through AppBundle. Depending on Cli
