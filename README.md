@@ -66,9 +66,39 @@ What that turned into, in this codebase:
 | Window IDs | C shim over the private `_AXUIElementGetWindow` (`Sources/PrivateApi/`) |
 | Build | SwiftPM for the CLI and debug builds; XcodeGen plus `xcodebuild` for the `.app`, since SwiftPM cannot produce a bundle |
 
-Relative to the fork point, BlueSocket, HotKey, ISSoundAdditions, swift-collections and the
-ANTLR-generated shell grammar are gone; see [`legal/`](legal/) for the full list.
-`exec-and-forget` hands its string to `/bin/bash -c`.
+### Why these choices
+
+If you are weighing this against upstream, the reasoning matters more than the table.
+
+**Two dependencies instead of four, and each removal was a wrapper going away.** BlueSocket was
+wrapping a local Unix socket, so it became `AF_UNIX` directly. HotKey was wrapping Carbon's
+`RegisterEventHotKey`, which is one call plus the bookkeeping to unregister it. ISSoundAdditions was wrapping CoreAudio.
+swift-collections supplied one ordered dictionary. The ANTLR-generated shell grammar parsed command
+strings that `/bin/bash -c` already parses. Every one of those is a thing that can break on an OS
+update, or need a version bump before the app can be rebuilt, in exchange for code the platform
+already provides. Sparkle is the one addition, and only because there is no App Store update path
+to inherit.
+
+**Display identity comes from CoreGraphics, not IOKit.** Upstream reads EDID through
+`IOServiceMatching("IODisplayConnect")`. That IOKit class does not exist on Apple Silicon, so the
+iterator yields nothing and vendor/model/serial come back `nil` for every display. CoreGraphics
+returns the same values and adds the per-display UUID, which is the only field that survives a
+DisplayLink dock.
+
+**The private `_AXUIElementGetWindow` stays, and it costs something.** It is the only way to get a
+window id that is stable across refreshes, and window identity is what the whole tree is keyed on.
+The price is that the Mac App Store is permanently out: private symbols fail review, and the
+Accessibility APIs this app is built on do not work in a sandbox anyway. Hence Developer ID signing,
+notarization, and Sparkle rather than TestFlight.
+
+**The Xcode project is generated, not committed.** `project.yml` plus XcodeGen produces it, because
+SwiftPM cannot build an app bundle but a checked-in `.pbxproj` is a merge conflict waiting to happen.
+Debug builds skip Xcode entirely.
+
+**The config writer is line-based on purpose.** Re-serializing the whole file would be far simpler,
+and would destroy every comment plus anything the GUI cannot model, such as per-monitor gap arrays.
+Instead it rewrites only the keys you changed and refuses edits it cannot represent, pointing you at
+the raw TOML tab. That is what makes a GUI safe to put on top of a dotfile.
 
 ```
 Sources/
