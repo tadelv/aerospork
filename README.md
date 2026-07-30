@@ -130,6 +130,14 @@ brew install --cask wbsmolen/tap/aerospork
 Both repositories are private during early release, so the cask and the release download both
 require an account with access.
 
+Installed copies check for updates themselves through
+[Sparkle](https://sparkle-project.org), against a signed appcast served from
+`agreeable-glacier-0a845c510.7.azurestaticapps.net`. Updates are verified against an EdDSA public
+key compiled into the app, so a build refuses anything it cannot verify. Automatic checking is off
+until you allow it; **Check for Updates…** in the menu bar checks on demand. There is no App Store
+update path to inherit, because the Accessibility APIs this app is built on do not work in a
+sandbox.
+
 ## Configuration
 
 AeroSpork reads whichever of these exists, and reports an error at startup if both do:

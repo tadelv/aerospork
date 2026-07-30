@@ -135,6 +135,15 @@ Sources/
 > from `StatusLabel.Kind` / `Banner.Kind`, never string literals in a tab.
 > `UIChromeConsistencyTest` enforces both rules. `dev-docs/architecture.md` explains why they exist.
 
+**In-app updates**: `ui/Updater.swift` wraps `SPUStandardUpdaterController`. Two things about it
+are easy to get wrong. Sparkle's `SUFeedURL`/`SUPublicEDKey` **cannot** be set through
+`INFOPLIST_KEY_*` in `project.yml`; that prefix only supports keys Xcode recognises and drops
+third-party ones silently, so they come from the `info.properties` plist instead and
+`build-release.sh` asserts both are present in the finished bundle. And Sparkle embeds a framework
+with its own XPC helpers in `Contents/Frameworks`, so the release script signs nested code
+deepest-first before sealing the bundle, copies with `cp -R` to keep the framework's symlinks, and
+checks that every nested Mach-O is independently signed rather than rejecting nested code outright.
+
 **MRU Tracking**: Tree nodes track most-recently-used order for focus navigation.
 
 ## Design System
