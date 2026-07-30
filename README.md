@@ -24,17 +24,32 @@ MIT licensed; see [`legal/`](legal/).
 
 ## Why I forked it
 
-I used AeroSpace daily on a four-monitor setup with a DisplayLink dock, and two things kept biting
-me: workspaces landed on the wrong screen after every undock, and I could not tell two identical
-panels apart because monitors are matched by name, regex or index.
+I ran AeroSpace daily on four monitors behind a DisplayLink dock, and three things wore me down. It
+felt sluggish. Long sessions drifted, so state that was correct at login was not correct by the
+evening. And the DisplayLink panels were a coin flip: workspaces came back on the wrong screens
+after every undock, because monitors are matched by name, regex or index, and none of those survive
+a redock. Two identical displays are indistinguishable to a name match.
 
-So I fixed it and opened [nikitabobko/AeroSpace#1526](https://github.com/nikitabobko/AeroSpace/pull/1526)
-on 2025-07-07: hardware-based monitor fingerprinting plus a set of performance changes, 4,515 lines
-across 41 files. It was closed the next day without a review comment. That is the maintainer's call
-to make on their own project, and upstream is explicit that it keeps a deliberately small surface.
+I sent the monitor work upstream as
+[PR #1526](https://github.com/nikitabobko/AeroSpace/pull/1526) in July 2025. It was closed the next
+day without review. That is the maintainer's call on their own project, and upstream is clear that
+it keeps a deliberately small surface, so I kept the work here instead.
 
-I still wanted the fixes, so this is the fork. Monitor identity by hardware is the reason it exists;
-the settings GUI and the shorter config schema came afterwards, and neither was in that PR.
+What that turned into, in this codebase:
+
+- **The DisplayLink problem** is `model/MonitorFingerprint.swift`. A display is matched on the
+  per-display UUID first, then EDID vendor/model/serial from CoreGraphics, then name, then size.
+  DisplayLink panels report no EDID at all, so the UUID is the only key that separates two of them.
+  Screen reconfiguration is also debounced, because a dock connects in several stages and fires the
+  change notification more than once.
+- **The sluggishness** is two changes rather than a rewrite. Bursts of accessibility events coalesce
+  into one layout pass on a 50ms debounce (`util/RefreshDebouncer.swift`), and `MacApp.setFrame`
+  skips the AX write when a window already sits at its target frame, which matters over a
+  DisplayLink link where every write repaints a framebuffer. I have not published speedup numbers;
+  `dev-docs/performance.md` says which measurements exist and why the benchmark could not settle
+  the rest.
+- **The drift** is mostly workspace lifecycle. Workspaces are created on demand and released when
+  they empty, instead of being materialized for every name a keybinding mentions.
 
 ## Tech stack
 
@@ -85,11 +100,6 @@ says AeroSpace "will never provide a GUI for configuration" and that "it's not n
 <code>Package.swift</code> declares four dependencies, and its guide documents monitor patterns as
 main/secondary/number/regex only.</sub>
 
-**Monitor identity.** A display is matched on, in order of reliability, the stable per-display UUID,
-then EDID vendor/model/serial read from CoreGraphics, then the localized name, then size. DisplayLink
-panels expose no EDID at all, so the UUID is the only key that can distinguish two identical ones.
-Screen reconfiguration is debounced, because a DisplayLink dock connects in several stages.
-
 **Config schema.** `mod` plus `workspaces` generates the usual i3 keymap, and `[keys]`, `[monitors]`
 and `[on-window]` replace the longer upstream spellings. An existing config is migrated once on
 first launch, and only when the result is proven to parse to the same effective configuration;
@@ -99,12 +109,6 @@ otherwise the file is left alone. The original is kept beside it as `*.pre-v2`.
 changed, so opening Settings and changing nothing leaves the file byte-identical and editing one
 section never rewrites another. A raw TOML tab validates against the same parser the app uses at
 startup, so no config key is unreachable from the GUI.
-
-**Performance.** Two structural changes: accessibility events are coalesced by a fixed 50ms debounce
-(`util/RefreshDebouncer.swift`) into a single layout pass, and AX position/size writes are skipped
-for a window already at its target frame, which matters over DisplayLink where every write repaints a
-framebuffer. No speedup percentages are claimed for either; `dev-docs/performance.md` records which
-measurements exist and why the available benchmark could not resolve the rest.
 
 ### Coming from AeroSpace
 
