@@ -1,0 +1,33 @@
+<!-- @dsCard group="Brand" viewport="700x350" name="Social preview" subtitle="1280×640 GitHub social preview; readable when a link unfurls at ~500px" -->
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>AeroSpork social preview</title><link rel="stylesheet" href="../../styles.css">
+<style>
+body{margin:0;background:#0b0d13;display:grid;place-items:center}
+/* 1280x640 is GitHub's recommended size. Everything is sized for legibility at ~40% scale,
+   which is roughly how wide a Slack or Twitter unfurl renders it, so the type is much larger
+   than the README banner's and there is far less of it. */
+#s{position:relative;width:1280px;height:640px;overflow:hidden;box-sizing:border-box;
+  background:linear-gradient(165deg,#1e2432,#0d0f16 72%);font-family:var(--font-system);color:#fff;
+  display:flex;flex-direction:column;justify-content:center;padding:0 90px}
+#s .motif{position:absolute;inset:-10% -14% -10% 52%;display:grid;
+  grid-template-columns:1.45fr 1fr;grid-template-rows:repeat(3,1fr);gap:26px;transform:rotate(-8deg);opacity:.42}
+#s .motif div{border-radius:16px;background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+#s .motif div:first-child{grid-row:1/4;background:linear-gradient(170deg,rgba(94,158,255,.34),rgba(61,128,234,.16));
+  box-shadow:inset 0 0 0 1px rgba(126,180,255,.42)}
+#s .glow{position:absolute;inset:0;background:radial-gradient(88% 68% at 10% -6%,rgba(94,158,255,.17),rgba(0,0,0,0) 62%)}
+#s .row{position:relative;display:flex;align-items:center;gap:34px}
+#s img{width:168px;height:168px;display:block}
+#s h1{margin:0;font-size:104px;line-height:1;letter-spacing:-.028em;font-weight:600}
+#s p{position:relative;margin:30px 0 0;font-size:38px;line-height:1.25;letter-spacing:-.012em;
+  color:rgba(255,255,255,.72);max-width:760px}
+#s .meta{position:relative;margin-top:26px;font-family:var(--font-mono);font-size:23px;color:rgba(255,255,255,.42)}
+</style></head>
+<body>
+<div id="s">
+  <div class="motif"><div></div><div></div><div></div><div></div></div>
+  <div class="glow"></div>
+  <div class="row"><img src="aerospork-icon-1024.png" alt="AeroSpork"><h1>AeroSpork</h1></div>
+  <p>An i3-like tiling window manager for macOS.</p>
+  <div class="meta">Workspaces pinned to monitors by hardware ID</div>
+</div>
+</body></html>
