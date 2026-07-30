@@ -40,3 +40,6 @@ xcshareddata/
 /.claude/skills/*
 !/.claude/skills/aerospork-design/
 /.aerospork-Info.plist
+
+# Browser-automation session dumps (page snapshots, console logs). Tooling output, not source.
+/.playwright-mcp

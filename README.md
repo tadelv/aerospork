@@ -22,17 +22,19 @@ MIT licensed; see [`legal/`](legal/).
   <img src="docs/assets/layout-modes.png" alt="Tiles layout beside accordion layout" width="820">
 </div>
 
-## Why this fork exists
+## Why I forked it
 
-On 2025-07-07 the author opened
-[nikitabobko/AeroSpace#1526](https://github.com/nikitabobko/AeroSpace/pull/1526) ("Major
-Enhancements"): 4,515 added lines across 41 files, proposing two things: hardware-based monitor
-fingerprinting for persistent workspace assignment, and a set of performance optimizations. It was
-closed on 2025-07-08 with no review comment. AeroSpork is the fork that followed.
+I used AeroSpace daily on a four-monitor setup with a DisplayLink dock, and two things kept biting
+me: workspaces landed on the wrong screen after every undock, and I could not tell two identical
+panels apart because monitors are matched by name, regex or index.
 
-Monitor identity is still the fork's main concern: hardware matching that holds up across USB docks
-and identical panels. A configuration surface that does not require memorizing a schema came later,
-and the PR did not propose it.
+So I fixed it and opened [nikitabobko/AeroSpace#1526](https://github.com/nikitabobko/AeroSpace/pull/1526)
+on 2025-07-07: hardware-based monitor fingerprinting plus a set of performance changes, 4,515 lines
+across 41 files. It was closed the next day without a review comment. That is the maintainer's call
+to make on their own project, and upstream is explicit that it keeps a deliberately small surface.
+
+I still wanted the fixes, so this is the fork. Monitor identity by hardware is the reason it exists;
+the settings GUI and the shorter config schema came afterwards, and neither was in that PR.
 
 ## Tech stack
 
