@@ -274,6 +274,7 @@ enum ConfigurationWriter {
             "default-root-container-layout", "default-root-container-orientation",
             "accordion-padding", "after-startup-command", "on-focus-changed",
             "on-focused-workspace-changed", "on-focused-monitor-changed",
+            "show-menu-bar-icon", "show-dock-icon",
         ]
 
         // Sub-tables this writer re-emits itself are fine; any other sub-table of a

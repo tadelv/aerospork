@@ -25,6 +25,11 @@ When you disable AeroSpork, windows from currently invisible workspaces will be 
 
 Key events are not intercepted when AeroSpork is disabled
 
+While disabled, the server rejects every other command — including query commands — with a non-zero
+exit code and the message "server is disabled and doesn't accept commands".
+`aerospork enable on|off|toggle` is the one exception.
+`-h|--help` and `-v|--version` still work because the CLI answers them without contacting the server
+
 // =========================================================== Options
 include::util/conditional-options-header.adoc[]
 

@@ -16,6 +16,10 @@ final class CliSurfaceTest: XCTestCase {
         let described = Set(subcommandDescriptions.map { $0[0].trimmingCharacters(in: .whitespaces) })
         let missing = cliReachableCmdKinds.filter { !described.contains($0) }
         XCTAssertEqual(missing, [])
+        // And the mirror: an orphan docs/aerospork-*.adoc page with no matching command would
+        // list a nonexistent subcommand in --help and ship a man page for it, with nothing failing.
+        let orphans = described.subtracting(cliReachableCmdKinds)
+        XCTAssertEqual(orphans, [])
     }
 
     func testNoSubcommandDescriptionIsBlank() {

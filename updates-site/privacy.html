@@ -42,7 +42,9 @@ anywhere, stored beyond what is described below, or shared with anyone.</p>
   <li>Your configuration, at <code>~/.aerospork.toml</code> or under
       <code>$XDG_CONFIG_HOME</code> — whichever you use. The settings window edits this file in
       place.</li>
-  <li>Timestamped backups of that file beside it, so a bad edit is recoverable.</li>
+  <li>Timestamped backups of that file beside it, so a bad edit is recoverable — and, once, a
+      <code>.pre-v2</code> copy of a config written in the older schema, kept when the file is
+      migrated to the current one.</li>
   <li><code>~/Library/Caches/com.wbs.aerospork/workspace-memory.json</code>, readable only by your
       user account. It records which workspace each open window was on, along with the bundle
       identifier of its application and an identifier for the monitor the workspace was on, so a
@@ -68,9 +70,10 @@ way any download host would.</p>
 <p>These pages are static files on Azure Static Web Apps. Nothing is loaded from another host — no
 third-party fonts, images, scripts, embeds or trackers — there are no cookies, and nothing follows
 you between visits. That is not only a promise: the site sends a
-<code>Content-Security-Policy</code> of <code>default-src 'none'</code> with everything else
-restricted to <code>'self'</code>, so your browser refuses any off-site request this page might make,
-including one added by mistake.</p>
+<code>Content-Security-Policy</code> of <code>default-src 'none'</code> that permits no other
+host anywhere — every allowance is <code>'self'</code>, plus inline styles on the documentation
+pages, whose generator embeds its stylesheet in the page. Your browser refuses any off-site
+request this site might make, including one added by mistake.</p>
 <p>The only script on the site is <a href="/copy.js">a few lines on the front page</a> that put the
 install command on your clipboard when you click the copy button. It sends nothing anywhere, and you
 can read it.</p>

@@ -50,7 +50,8 @@ Move window to next|prev monitor in the order they appear in the menu bar icon
 <monitor-pattern>...::
 Find the first matching monitor and move the window there.
 Multiple monitor patterns are useful for covering different monitor configurations.
-Monitor patterns follow the same format as in `workspace-to-monitor-force-assignment` config option
+Monitor patterns follow the same format as in the `[monitors]` config section
+(previously `workspace-to-monitor-force-assignment`, still accepted)
 
 // end::body[]
 

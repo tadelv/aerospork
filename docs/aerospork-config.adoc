@@ -76,7 +76,10 @@ $ aerospork config --get mode.main.binding --json
 // =========================================================== Config file
 == The config file
 
-`~/.aerospork.toml` (or `~/.aerospork-debug.toml` for a debug build). A complete config:
+`~/.aerospork.toml` or `+${XDG_CONFIG_HOME}/aerospork/aerospork.toml+`
+(`XDG_CONFIG_HOME` falls back to `~/.config` when the variable is not set);
+a debug build uses `~/.aerospork-debug.toml`.
+If a config is found in more than one location, the ambiguity is reported. A complete config:
 
 ----
 mod = "alt"              # base modifier for the generated bindings

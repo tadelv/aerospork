@@ -47,10 +47,12 @@ Filter results to only print empty workspaces.
 Incompatible with `--count`
 
 --count:: Output only the number of workspaces.
-Incompatible with `--format`
+Incompatible with: `--format`, `--json`
 
 --json:: Output in JSON format.
 Can be used in combination with `--format` to specify which data to include into the json.
+With `--json`, the `<output-format>` may contain only interpolation variables and spaces
+(`%{right-padding}` and literal text are rejected).
 Incompatible with `--count`
 
 // =========================================================== Output Format
@@ -71,6 +73,12 @@ The following variables can be used inside `<output-format>`:
 %{monitor-id}:: 1-based Number. Sequential number of the belonging monitor
 %{monitor-appkit-nsscreen-screens-id}:: 1-based Number. Index of the belonging monitor in the `NSScreen.screens` array. Useful for integration with other tools that use `NSScreen.screens` ordering (like sketchybar).
 %{monitor-name}:: String. Name of the belonging monitor
+%{monitor-fingerprint}:: String. Hardware fingerprint of the monitor: whichever of vendor, model, serial, name, resolution and UUID the display reports. Use it to identify a specific physical monitor in a docking setup.
+%{monitor-vendor-id}:: String. Vendor ID of the monitor in hexadecimal format (e.g., `0x10AC`). Empty if not available.
+%{monitor-model-id}:: String. Model ID of the monitor in hexadecimal format (e.g., `0xD0C1`). Empty if not available.
+%{monitor-serial-number}:: String. Serial number of the monitor. Empty if not available.
+%{monitor-width}:: Number. Width of the monitor in points
+%{monitor-height}:: Number. Height of the monitor in points
 
 %{right-padding}:: Expands to the minimum number of spaces required to right-pad the current column
 %{newline}:: Unicode U+000A newline symbol `\n`

@@ -91,9 +91,7 @@ Use these snippets as a starting point.
 after-startup-command = ['exec-and-forget sketchybar']
 
 # Notify Sketchybar about workspace change
-exec-on-workspace-change = ['/bin/bash', '-c',
-    'sketchybar --trigger aerospork_workspace_change FOCUSED_WORKSPACE=$AEROSPORK_FOCUSED_WORKSPACE'
-]
+on-focused-workspace-changed = ['exec-and-forget sketchybar --trigger aerospork_workspace_change FOCUSED_WORKSPACE=$AEROSPORK_FOCUSED_WORKSPACE']
 ----
 
 .~/.config/sketchybar/sketchybarrc

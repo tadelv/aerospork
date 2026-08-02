@@ -38,6 +38,8 @@ Incompatible with: `--format`, `--json`
 
 --json:: Output in JSON format.
 Can be used in combination with `--format` to specify which data to include into the json.
+With `--json`, the `<output-format>` may contain only interpolation variables and spaces
+(`%{right-padding}` and literal text are rejected).
 Incompatible with `--count`
 
 // =========================================================== Output Format

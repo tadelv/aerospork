@@ -13,12 +13,14 @@ AeroSpork is an i3-like tiling window manager for macOS.
 
 The *aerospork* command line program manipulates AeroSpork and queries its state.
 
-See https://github.com/wbsmolen/aerospork/blob/main/docs/commands.adoc for the available <subcommand> options
+See https://aerospork.app/docs/commands.html for the available <subcommand> options
 
 See each subcommand's own man page for its <subcommand-options> and <subcommand-arguments>
 
 == Options
 
 -h, --help:: Print help
+
+-v, --version:: Print the version
 
 include::util/man-footer.adoc[]

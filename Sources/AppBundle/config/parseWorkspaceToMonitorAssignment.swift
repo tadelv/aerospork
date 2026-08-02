@@ -60,20 +60,27 @@ private func parseFingerprintPattern(_ table: TOMLTable, _ backtrace: TomlBacktr
         let keyBacktrace = backtrace + .key(key)
         switch key {
             case "vendor", "vendor_id", "vendorID":
-                if let int = value.int {
-                    vendorID = UInt32(int)
-                } else if let string = value.string, string.hasPrefix("0x") || string.hasPrefix("0X") {
-                    vendorID = UInt32(string.dropFirst(2), radix: 16)
+                // UInt32(exactly:) and a nil check on the hex parse: `vendor_id = -1` or a value
+                // past 32 bits must be a config error, not a crash, and `0xZZZZ` must not be
+                // silently dropped (a dropped field silently WIDENS the match).
+                if let int = value.int, let v = UInt32(exactly: int) {
+                    vendorID = v
+                } else if let string = value.string, string.hasPrefix("0x") || string.hasPrefix("0X"),
+                          let v = UInt32(string.dropFirst(2), radix: 16)
+                {
+                    vendorID = v
                 } else {
-                    return .failure(.semantic(keyBacktrace, "vendor_id must be an integer or hex string (e.g., '0x1234')"))
+                    return .failure(.semantic(keyBacktrace, "vendor_id must be a 32-bit unsigned integer or hex string (e.g., '0x1234')"))
                 }
             case "model", "model_id", "modelID":
-                if let int = value.int {
-                    modelID = UInt32(int)
-                } else if let string = value.string, string.hasPrefix("0x") || string.hasPrefix("0X") {
-                    modelID = UInt32(string.dropFirst(2), radix: 16)
+                if let int = value.int, let v = UInt32(exactly: int) {
+                    modelID = v
+                } else if let string = value.string, string.hasPrefix("0x") || string.hasPrefix("0X"),
+                          let v = UInt32(string.dropFirst(2), radix: 16)
+                {
+                    modelID = v
                 } else {
-                    return .failure(.semantic(keyBacktrace, "model_id must be an integer or hex string (e.g., '0x5678')"))
+                    return .failure(.semantic(keyBacktrace, "model_id must be a 32-bit unsigned integer or hex string (e.g., '0x5678')"))
                 }
             case "serial", "serial_number", "serialNumber":
                 guard let string = value.string else {

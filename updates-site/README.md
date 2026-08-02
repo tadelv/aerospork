@@ -42,11 +42,16 @@ update it cannot verify against that key.
 ## Deploying
 
 ```bash
-swa deploy updates-site \
-  --app-name aerospork-updates \
-  --resource-group aerospork-updates \
-  --env production
+script/deploy-site.sh
 ```
+
+Not a bare `swa deploy updates-site`: the live site also serves the built documentation under
+`/docs/`, which the script assembles from `build-docs.sh` output at deploy time (generated HTML is
+deliberately not committed). Deploying this directory alone would republish the site with the docs
+tree missing. `publish-release.sh` runs the same script, so the hosted docs always match the
+newest published build. The docs pages carry their own CSP route in `staticwebapp.config.json` —
+asciidoctor embeds its stylesheet inline, so `/docs/*` allows inline styles while everything else
+stays locked to `'self'`.
 
 ## The old hostname must keep answering
 

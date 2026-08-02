@@ -27,6 +27,8 @@ If several arguments are supplied then finds the first argument that doesn't des
 * Change orientation but preserve layout: `horizontal|vertical`
 * Toggle floating/tiling mode: `tiling|floating`
 
+Deprecated (but still supported) layout names: `list`, `h_list`, `v_list` for `tiles`, `h_tiles`, `v_tiles`
+
 // =========================================================== Options
 include::util/conditional-options-header.adoc[]
 

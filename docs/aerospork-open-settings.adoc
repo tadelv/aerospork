@@ -27,13 +27,19 @@ The command is allowed in config, so it can be bound to a key:
 
 [source,toml]
 ----
-[mode.main.binding]
+[keys]
 alt-shift-comma = 'open-settings'
 ----
 
+The window has seven panes: General, Gaps, Keys, Monitors, Events, Window Rules, and Raw TOML.
+It is resizable (opens at 880×620, minimum 780×520) and remembers its selected pane.
+
 Structured settings apply live as you change them. The *Raw TOML* pane is the exception: it applies
-explicitly, so half-typed TOML is never written. The window remembers its selected pane. Raw TOML
+explicitly, so half-typed TOML is never written. Raw TOML
 supports native Find, line numbers, section jumps, and parser errors that link to the failing line.
+
+A *complex* badge marks a value richer than the structured controls can edit. Such a value is
+preserved on save, and can be edited in Raw TOML.
 
 // =========================================================== Options
 include::util/conditional-options-header.adoc[]

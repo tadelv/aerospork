@@ -13,7 +13,6 @@ public struct ListExecEnvVarsCmdArgs: CmdArgs {
 
     /*conforms*/ public var windowId: UInt32?
     /*conforms*/ public var workspaceName: WorkspaceName?
-    /// Values of credential-shaped var names are redacted unless this is passed. Not in the
-    /// generated help yet — docs/commands.adoc needs a `./generate.sh` run.
+    /// Values of credential-shaped var names are redacted unless this is passed.
     public var showSecrets: Bool = false
 }

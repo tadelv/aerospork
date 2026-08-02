@@ -107,8 +107,10 @@ Debug builds skip Xcode entirely.
 
 **The config writer is line-based on purpose.** Re-serializing the whole file would be far simpler,
 and would destroy every comment plus anything the GUI cannot model, such as per-monitor gap arrays.
-Instead it rewrites only the keys you changed and refuses edits it cannot represent, pointing you at
-the Raw TOML pane. That is what makes a GUI safe to put on top of a dotfile.
+Instead it rewrites only the keys you changed, preserves what the panes cannot model (a rich
+monitor fingerprint, a fallback list) field for field on every save, and refuses the few shapes it
+cannot rewrite safely, pointing you at the Raw TOML pane. That is what makes a GUI safe to put on
+top of a dotfile.
 
 ```
 Sources/
@@ -192,6 +194,9 @@ sets out exactly what is stored, what is sent, and what is not: no analytics, no
 system profile.
 
 ## Configuration
+
+The rendered docs live at [aerospork.app/docs](https://aerospork.app/docs/guide.html) — the guide,
+the command reference, and goodies — and the same content is in [`docs/`](docs/) here.
 
 AeroSpork reads whichever of these exists, and reports an error at startup if both do:
 `~/.aerospork.toml` or `${XDG_CONFIG_HOME}/aerospork/aerospork.toml` (`XDG_CONFIG_HOME` defaults to

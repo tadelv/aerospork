@@ -216,6 +216,7 @@ Query commands examine the current state without changing it.
 - Query commands are *NOT* available in config +
 (because there is no way to consume the stdout of these commands in config)
 - Query commands are only available in CLI
+- `list-exec-env-vars` is the one exception: it is also available in config, so callbacks can inspect the environment their commands run with
 
 === config
 ----

@@ -66,6 +66,18 @@ final class SiteInvariantsTest: XCTestCase {
     func testEveryLocalAssetReferencedByThePagesExists() throws {
         for (name, text) in try htmlFiles() {
             for path in text.localAssetPaths() {
+                // /docs/* is not in updates-site/: deploy-site.sh stages it from build-docs.sh
+                // output at deploy time. The invariant survives by mapping each page back to its
+                // asciidoc source, so a typo'd /docs/guid.html still fails here.
+                if path.hasPrefix("docs/") {
+                    let source = projectRoot.appending(path: path.replacingOccurrences(of: ".html", with: ".adoc"))
+                    XCTAssertTrue(
+                        FileManager.default.fileExists(atPath: source.path),
+                        "\(name) references /\(path), but \(path.replacingOccurrences(of: ".html", with: ".adoc")) "
+                            + "does not exist, so deploy-site.sh will never stage that page and it will 404.",
+                    )
+                    continue
+                }
                 let file = siteRoot.appending(path: path)
                 XCTAssertTrue(
                     FileManager.default.fileExists(atPath: file.path),

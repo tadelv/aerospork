@@ -18,8 +18,8 @@ cp -R updates-site/. "$staging"
 mkdir "$staging/docs"
 cp -R .site/. "$staging/docs"
 
-# The checked-in docs index is a redirect to GitHub -- it exists for the copy packaged into the
-# release zip, where GitHub is the only canonical home. On the hosted site the guide IS the home.
+# The checked-in docs/index.html is a redirect to GitHub, for anyone opening a local .site build
+# in a browser. On the hosted site the guide IS the home.
 cat > "$staging/docs/index.html" << 'HTML'
 <!doctype html>
 <meta charset="utf-8">

@@ -13,11 +13,18 @@ Skip what you already know.
 [#manual-installation]
 === Manual installation
 
+AeroSpork needs macOS 13 or later, on Apple silicon or Intel.
+
 . Download the latest available zip from https://github.com/wbsmolen/aerospork/releases[releases page]
 . Unpack zip
 . Put unpacked `aerospork-v$VERSION/AeroSpork.app` to `/Applications`
-. Put unpacked `aerospork-v$VERSION/bin/aerospork` anywhere on `$PATH`
-(optional; needed only to drive AeroSpork from the CLI)
+. Symlink the CLI onto `$PATH`
+(optional; needed only to drive AeroSpork from the CLI):
+`ln -s /Applications/AeroSpork.app/Contents/MacOS/aerospork-cli /usr/local/bin/aerospork`
+
+NOTE: The zip's `bin/aerospork` is itself a relative symlink into the bundle — that is what keeps
+the CLI covered by the app's notarization ticket — so copying it out of the unpacked folder leaves
+a link that points at nothing. Symlink the installed app's copy instead, as above.
 
 [#homebrew-installation]
 === Homebrew installation
@@ -63,6 +70,11 @@ AeroSpork looks for a custom config in two locations:
 
 If a config is found in more than one location, the ambiguity is reported.
 
+Debug builds read `~/.aerospork-debug.toml` /
+`+${XDG_CONFIG_HOME}/aerospork/aerospork-debug.toml+` instead, so a debug build never touches the
+config your installed copy runs. Starting the app with `--config-path <file>` overrides both
+locations and skips the ambiguity check entirely.
+
 === Config samples
 
 * <<default-config,The default config>>
@@ -92,8 +104,10 @@ A key you omit falls back to AeroSpork's **built-in** default, which is not alwa
 |`mod` |unset: **no bindings are generated at all** |`alt`
 |`workspaces` |unset: no per-workspace bindings |`1-9`
 |`keys` / `mode.*.binding` |empty |a service mode
-|`monitors` / `on-window` |empty |examples
 |===
+
+(`monitors` and `on-window` are empty in both — the default config shows examples of each, but
+commented out.)
 
 The remaining built-in defaults are `accordion-padding = 30`,
 `default-root-container-layout = 'tiles'`, `default-root-container-orientation = 'auto'` and
@@ -121,6 +135,81 @@ link:config-examples/default-config.toml[Download default-config.toml]
 ----
 include::config-examples/default-config.toml[]
 ----
+
+[#config-v2]
+=== The v2 schema, and how older configs get there
+
+The default config above is written in the current (v2) schema: `mod` and `workspaces` generate
+the i3-style bindings, `[keys]` holds only what you add or override, and the assignment and rule
+sections are spelled `[monitors]` and `[on-window]`. A v1 config (everything spelled out under
+`[mode.main.binding]`, `workspace-to-monitor-force-assignment`, `[[on-window-detected]]`) still
+loads — and the first time it does, AeroSpork rewrites it to v2 in place, keeping your original
+next to it as `<name>.pre-v2`. The migration only happens when the converted file provably parses
+to the same configuration, and it is skipped forever once a `.pre-v2` file exists — so going back
+to v1 sticks. One consequence to know in advance: the rewrite regenerates the file, so comments
+and formatting from the original survive only in the `.pre-v2` copy.
+
+How the v2 pieces layer:
+
+* `mod = 'alt'` generates the i3 defaults (focus, move, resize, layout, workspace-back-and-forth,
+  and friends), and `workspaces = [ '1-9', 'A', 'chat' ]` generates two bindings per workspace —
+  switch and move-node. A token is a range only when it is exactly `<char>-<char>`, so
+  `my-workspace` stays a literal name.
+* `[keys]` (and `[keys.<mode>]` for other modes) layers on top of the generated set; a key you
+  write there wins. `[mode.*.binding]` still layers on top of both.
+* Because each workspace's binding comes from its name's first character, two workspaces sharing a
+  first character (`workspaces = ['dev', 'docs']`) is an error — the same key would be generated
+  twice — and a name whose first character has no key on the keyboard (for example a non-Latin
+  script) cannot generate a binding and is rejected too. Rename, or bind those workspaces yourself
+  in `[keys]`.
+
+xref:commands.adoc#config[`aerospork config`'s manual] documents the same schema from the
+command's point of view.
+
+[#key-notation]
+=== Key notation
+
+A binding key is modifiers joined to one key with `-`: `alt-shift-h`. The four modifiers are
+`shift`, `ctrl`, `alt` and `cmd`. Keys are named:
+
+* Letters `a`–`z` and digits `0`–`9`
+* `f1`–`f20`, arrows `left`/`down`/`up`/`right`
+* `minus`, `equal`, `period`, `comma`, `slash`, `backslash`, `quote`, `semicolon`, `backtick`,
+  `leftSquareBracket`, `rightSquareBracket`, `space`, `enter`, `esc`, `backspace`, `tab`,
+  `pageUp`, `pageDown`, `home`, `end`, `forwardDelete`, `sectionSign` (ISO keyboards)
+* Keypad: `keypad0`–`keypad9`, `keypadClear`, `keypadDecimalMark`, `keypadDivide`, `keypadEnter`,
+  `keypadEqual`, `keypadMinus`, `keypadMultiply`, `keypadPlus`
+
+[#gaps]
+=== Gaps
+
+`[gaps]` puts space between windows (`inner`) and between windows and the screen edge (`outer`):
+
+[source,toml]
+----
+[gaps]
+inner = 8              # both axes at once…
+outer = 8              # …or per direction:
+# inner.horizontal = 8
+# inner.vertical = 8
+# outer.top = 8
+# outer.bottom = 8
+# outer.left = 8
+# outer.right = 8
+----
+
+Any of the six per-direction values can also differ per monitor. The value becomes an array: one
+or more `{ monitor.<pattern> = <gap> }` rules tried in order, and the array's last element is the
+plain number used when nothing matches — it is required:
+
+[source,toml]
+----
+outer.top = [{ monitor.'built-in' = 3 }, { monitor.main = 16 }, 24]
+----
+
+`<pattern>` accepts the same monitor descriptions as <<assign-workspaces-to-monitors,workspace
+assignments>>. The settings GUI edits flat numbers only; it warns before an edit would replace
+per-monitor rules, which stay a Raw TOML affair.
 
 [#binding-modes]
 === Binding modes
@@ -234,6 +323,29 @@ So unless your config overrides the `exec` section, AeroSpork falls back to:
 [exec.env-vars]
     PATH = '/opt/homebrew/bin:/opt/homebrew/sbin:${PATH}'
 ----
+
+[#settings-gui]
+=== The settings GUI
+
+xref:commands.adoc#open-settings[`aerospork open-settings`] (or the menu-bar icon) opens a native
+settings window with seven panes: General, Gaps, Keys, Monitors, Events, Window Rules and Raw
+TOML. Structured controls apply live, a moment after you stop changing them — there is no Save
+button — and a save rewrites only the sections you actually edited, so your comments and
+formatting survive. Raw TOML is the exception: it applies only when you click Apply, since
+half-typed TOML is invalid most of the time, and it is the guarantee that no config key is out of
+the GUI's reach.
+
+Every GUI save first drops a timestamped backup next to your config
+(`<config>.toml.<yyyyMMdd-HHmmss>.backup`; the five most recent are kept), and the Raw TOML pane's
+Restore menu lists them. A few config shapes the structured panes cannot rewrite safely — Windows
+line endings, dotted or inline spellings of a managed section, multi-line arrays — are refused
+with a pointer to Raw TOML rather than degraded, and values richer than a pane's controls (a
+hardware fingerprint, a monitor fallback list) are marked `complex` and preserved untouched by
+every save.
+
+One related consequence worth knowing: `show-menu-bar-icon = false` together with
+`show-dock-icon = false` does not hide both. With no menu-bar icon the Dock icon is forced back
+on, because otherwise nothing would lead back into Settings.
 
 [#tree]
 == Tree
@@ -558,7 +670,10 @@ The callbacks are processed in the order they are declared.
 By default, the first callback that matches the criteria is run, and further callbacks are not considered.
 (The behavior can be overridden with `check-further-callbacks` option)
 
-Only xref:commands.adoc#move-node-to-workspace[move-node-to-workspace] and xref:commands.adoc#layout[layout] are supported in `run` so far.
+`run` supports exactly three commands so far: `layout floating`, `layout tiling` and
+xref:commands.adoc#move-node-to-workspace[move-node-to-workspace] — other `layout` arguments are
+rejected here. `move-node-to-workspace` may appear at most once, and only as the last command in
+the list.
 Post your use case to https://github.com/wbsmolen/aerospork/issues/20[the issue] if you need another command.
 
 Available window conditions:
@@ -664,7 +779,7 @@ xref:commands.adoc#exec-and-forget[exec-and-forget].
 ----
 # Notify Sketchybar about workspace change
 exec-on-workspace-change = ['/bin/bash', '-c',
-    'sketchybar --trigger aerospork_workspace_change FOCUSED=$AEROSPORK_FOCUSED_WORKSPACE'
+    'sketchybar --trigger aerospork_workspace_change FOCUSED_WORKSPACE=$AEROSPORK_FOCUSED_WORKSPACE'
 ]
 ----
 
@@ -711,11 +826,12 @@ and non-empty workspaces behave the same way.
 [#assign-workspaces-to-monitors]
 === Assign workspaces to monitors
 
-Use `workspace-to-monitor-force-assignment` to pin workspaces to particular monitors.
+Use `[monitors]` (spelled `workspace-to-monitor-force-assignment` in v1 configs — both are
+accepted) to pin workspaces to particular monitors.
 
 [source,toml]
 ----
-[workspace-to-monitor-force-assignment]
+[monitors]
     1 = 1                            # Monitor sequence number from left to right. 1-based indexing
     2 = 'main'                       # Main monitor
     3 = 'secondary'                  # Non-main monitor in case when there are only two monitors
@@ -751,7 +867,7 @@ often and their position is not stable.
 ----
 auto-move-workspaces-on-monitor-connect = true  # Default: true
 
-[workspace-to-monitor-force-assignment]
+[monitors]
 # The exact panel. Survives docking, and is the only thing that separates two identical monitors.
 1 = { fingerprint = { uuid = 'AAAAAAAA-0000-4000-8000-000000000001' } }
 
@@ -759,8 +875,10 @@ auto-move-workspaces-on-monitor-connect = true  # Default: true
 # string. A bare 'D0C1' or a vendor *name* like 'LG' is a parse error, not a match failure.
 2 = { fingerprint = { vendor_id = '0x10AC', model_id = '0xD0C1' } }
 
-# Fingerprint by serial number
-3 = { fingerprint = { serial_number = 'ABC123' } }
+# Fingerprint by serial number. The value macOS reports is a number-as-string — copy it verbatim
+# from `aerospork list-monitors --format "%{monitor-fingerprint}"` rather than from the label on
+# the back of the monitor.
+3 = { fingerprint = { serial_number = '16843009' } }
 
 # Fingerprint by vendor, model, and size
 4 = { fingerprint = { vendor_id = '0x1234', model_id = '0x5678', width_pixels = 3840, height_pixels = 2160 } }
@@ -800,11 +918,21 @@ Fingerprint fields:
 
 Every field is optional, and each accepts two other spellings: bare (`vendor`, `model`, `serial`,
 `name`, `width`, `height`) and camelCase (`vendorID`, `modelID`, `serialNumber`, `displayName`,
-`widthPixels`, `heightPixels`, `displayUUID`). They are the same fields; pick one style.
+`widthPixels`, `heightPixels`, `displayUUID`). They are the same fields; pick one style. The
+`fingerprint` wrapper itself is optional — `2 = { uuid = '…' }` means the same thing, and is the
+form the default config uses.
 
-Apart from `uuid`, which short-circuits, the more fields you specify the more specific the match.
-An unknown field name is a hard error that rejects the whole config, so a typo will not silently
-widen the match.
+Fields are checked in a fixed order, and two of them are decisive. `uuid`, when present, decides
+the match alone — nothing else is consulted. Otherwise `vendor_id`, `model_id` and `serial_number`
+combine as filters, and then `display_name`, when present, decides — `width_pixels` and
+`height_pixels` are only consulted when there is no name. So `{ name = 'DELL', width = 3840 }` is
+exactly `{ name = 'DELL' }`; pin by size *instead of* name, not alongside it. An unknown field
+name is a hard error that rejects the whole config, and a malformed hex value like `'0xZZZZ'` is
+rejected too rather than silently dropped, so a typo cannot widen the match.
+
+The settings GUI's Monitors pane edits UUID and name pins. A fingerprint richer than that — or a
+multi-pattern array — shows up there with a `complex` badge: it is preserved untouched by every
+structured save, and editable in the Raw TOML pane.
 
 == Dialog heuristics
 
@@ -902,7 +1030,8 @@ The always-on records above are deliberately sparse. For a per-refresh, per-comm
 [source,shell]
 ----
 launchctl setenv AEROSPORK_DEBUG_LOG 1
-killall aerospork && open -a aerospork          # restart so it inherits the variable
+killall AeroSpork && open -a AeroSpork          # restart so it inherits the variable
+                                                # (debug builds: killall AeroSporkApp)
 log stream --debug --predicate 'subsystem == "com.wbs.aerospork"'
 ----
 
