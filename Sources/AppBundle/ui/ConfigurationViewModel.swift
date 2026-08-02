@@ -8,6 +8,22 @@ import TOMLKit
 /// hands its fields to the comment-preserving `ConfigurationWriter`, then reloads the config.
 @MainActor
 final class ConfigurationViewModel: ObservableObject {
+    /// DisplayLink docks connect in stages, and Settings can be open while they do. Without this
+    /// the schematic, the pin menu's token, and every chip resolve against the monitor list from
+    /// the last config reload. Refreshes only `liveMonitors` — no edit state, so no writer risk.
+    /// Never removed, like `externalReloadObserver`: the view model lives as long as the app.
+    private var screenObserver: NSObjectProtocol?
+
+    init() {
+        screenObserver = NotificationCenter.default.addObserver(
+            forName: NSApplication.didChangeScreenParametersNotification,
+            object: nil,
+            queue: .main,
+        ) { [weak self] _ in
+            Task { @MainActor in self?.liveMonitors = self?.loadMonitors() ?? [] }
+        }
+    }
+
     // General
     @Published var startAtLogin = false
     @Published var automaticallyUnhideMacosHiddenApps = false
@@ -48,6 +64,8 @@ final class ConfigurationViewModel: ObservableObject {
 
     // Workspaces & monitors
     @Published var assignments: [WorkspaceAssignmentRow] = []
+    /// Every workspace name `workspaces` defines, ranges expanded, in config order.
+    @Published var definedWorkspaces: [String] = []
     @Published var liveMonitors: [MonitorRow] = []
 
     // Key mapping
@@ -221,6 +239,15 @@ final class ConfigurationViewModel: ObservableObject {
         var workspace: String
         var monitor: String
         var isComplex = false
+        /// What the config actually said, kept so the writer can re-emit an untouched row
+        /// faithfully. `monitor` is a lossy single token: a regex pattern and a fingerprint name
+        /// collapse to the same string, and a fallback list collapses to its first entry —
+        /// re-serializing every row from the token is how a sibling's regex silently became a
+        /// literal name that matches nothing. nil for rows created in this session.
+        var loadedDescriptions: [MonitorDescription]?
+        /// The token `loadedDescriptions` collapsed to at load. While `monitor` still equals it,
+        /// the user has not edited this row's monitor and the loaded spelling wins.
+        var loadedToken: String?
     }
 
     struct MonitorRow: Identifiable {
@@ -366,23 +393,14 @@ final class ConfigurationViewModel: ObservableObject {
             if case .perMonitor = value { true } else { false }
         }
 
-        assignments = config.workspaceToMonitorForceAssignment
-            .sorted { $0.key < $1.key }
-            .compactMap { workspace, descriptions in
-                descriptions.first.map {
-                    WorkspaceAssignmentRow(
-                        workspace: workspace,
-                        monitor: monitorToken($0),
-                        isComplex: descriptions.count > 1 || monitorDescriptionIsComplex($0),
-                    )
-                }
-            }
+        assignments = assignmentRows(from: config.workspaceToMonitorForceAssignment)
 
         liveMonitors = loadMonitors()
 
         let base = configBaseText()
         rawToml = base
         let table = try? TOMLTable(string: base)
+        definedWorkspaces = workspaceNames(table?["workspaces"])
         modes = loadBindings(table)
         inheritedBindings = loadInheritedBindings(table)
         // `KeyMapping.preset` is fileprivate and `RawExecConfig` isn't reachable from the parsed
@@ -459,11 +477,16 @@ final class ConfigurationViewModel: ObservableObject {
 
     private func monitorDescriptionIsComplex(_ description: MonitorDescription) -> Bool {
         guard case .fingerprint(let data) = description else { return false }
-        // A UUID-only fingerprint maps losslessly to the picker's exact-display option. Every
-        // other fingerprint carries structure a single token cannot faithfully round-trip.
-        return data.displayUUID == nil || data.vendorID != nil || data.modelID != nil ||
-            data.serialNumber != nil || data.displayNamePattern != nil ||
+        // A UUID-only fingerprint maps losslessly to the picker's exact-display option, and a
+        // name-only fingerprint to its matches-by-name option — the writer's own output for a
+        // name pin is `{ fingerprint = { name = … } }`, so calling that complex would brand this
+        // editor's output "use Raw TOML". Everything richer cannot round-trip through one token.
+        let hardware = data.vendorID != nil || data.modelID != nil || data.serialNumber != nil ||
             data.widthPixels != nil || data.heightPixels != nil
+        if hardware { return true }
+        let uuidOnly = data.displayUUID != nil && data.displayNamePattern == nil
+        let nameOnly = data.displayNamePattern != nil && data.displayUUID == nil
+        return !(uuidOnly || nameOnly)
     }
 
     private func loadMonitors() -> [MonitorRow] {
@@ -627,6 +650,41 @@ final class ConfigurationViewModel: ObservableObject {
         windowRules = loadWindowRules(try? TOMLTable(string: text))
     }
 
+    /// Same, for monitor assignments. Rows built here carry `loadedDescriptions`, which is what
+    /// the writer's do-no-harm re-emission of untouched rows depends on -- so a writer test that
+    /// hand-builds rows instead of loading them would never exercise the preservation path.
+    func loadAssignments(fromText text: String) {
+        guard let table = try? TOMLTable(string: text) else {
+            assignments = []
+            return
+        }
+        var errors: [TomlParseError] = []
+        let parsed: [String: [MonitorDescription]] = if let raw = table["workspace-to-monitor-force-assignment"] {
+            parseWorkspaceToMonitorAssignment(raw, .rootKey("workspace-to-monitor-force-assignment"), &errors)
+        } else if let raw = table["monitors"] {
+            parseWorkspaceToMonitorAssignment(raw, .rootKey("monitors"), &errors)
+        } else {
+            [:]
+        }
+        assignments = assignmentRows(from: parsed)
+    }
+
+    private func assignmentRows(from parsed: [String: [MonitorDescription]]) -> [WorkspaceAssignmentRow] {
+        parsed
+            .sorted { $0.key < $1.key }
+            .compactMap { workspace, descriptions in
+                descriptions.first.map {
+                    WorkspaceAssignmentRow(
+                        workspace: workspace,
+                        monitor: monitorToken($0),
+                        isComplex: descriptions.count > 1 || monitorDescriptionIsComplex($0),
+                        loadedDescriptions: descriptions,
+                        loadedToken: monitorToken($0),
+                    )
+                }
+            }
+    }
+
     // MARK: - Displaying
 
     /// Every mode that has bindings from any source, `main` first. The picker cannot read `modes`
@@ -756,14 +814,69 @@ final class ConfigurationViewModel: ObservableObject {
         markAsModified()
     }
 
-    func addAssignment() {
-        assignments.append(WorkspaceAssignmentRow(workspace: "", monitor: "main"))
+    /// Deliberately no autosave: an empty workspace name must not hit disk until typed.
+    @discardableResult
+    func addAssignment(monitorToken: String = "main") -> WorkspaceAssignmentRow.ID {
+        let row = WorkspaceAssignmentRow(workspace: "", monitor: monitorToken)
+        assignments.append(row)
         markAsModified()
+        return row.id
     }
 
     func removeAssignment(id: WorkspaceAssignmentRow.ID) {
         assignments.removeAll { $0.id == id }
         markAsModified()
+    }
+
+    /// Pin `workspace` to `monitorToken`, updating the existing assignment if there is one.
+    /// Returns the affected row's id so the pane can surface it in the table.
+    @discardableResult
+    func setAssignment(workspace: String, monitorToken: String) -> WorkspaceAssignmentRow.ID {
+        if let i = assignments.firstIndex(where: { $0.workspace == workspace }) {
+            guard assignments[i].monitor != monitorToken else { return assignments[i].id }
+            assignments[i].monitor = monitorToken
+            markAsModified()
+            scheduleAutoSave()
+            return assignments[i].id
+        }
+        let row = WorkspaceAssignmentRow(workspace: workspace, monitor: monitorToken)
+        assignments.append(row)
+        markAsModified()
+        scheduleAutoSave()
+        return row.id
+    }
+
+    /// Defined workspaces with no force-assignment — the pin menu's contents. Config order, deduped.
+    var unpinnedDefinedWorkspaces: [String] {
+        var seen = Set<String>()
+        let assigned = Set(assignments.map(\.workspace))
+        return definedWorkspaces.filter { seen.insert($0).inserted && !assigned.contains($0) }
+    }
+
+    /// Resolves an assignment token to a connected monitor for the detail strip's chips. Mirrors
+    /// the runtime's reading (`parseMonitorDescription` precedence, then resolution): a name is
+    /// matched exact-or-contains because at runtime both a bare pattern and a fingerprint name
+    /// are case-insensitive substring matches — exact equality would show "no workspaces pinned
+    /// here" for `monitor = 'dell'` on a DELL panel the runtime happily resolves.
+    /// A metacharacter regex or rich fingerprint resolves to nil; the `complex` badge owns those.
+    func monitorRow(forToken token: String) -> MonitorRow? {
+        if let n = Int(token) { return liveMonitors.first { $0.position == n } }
+        // Runtime falls back to the first monitor when none reports a zero origin (mirrored and
+        // transient arrangements) -- mirror that or the "main" chip vanishes in states the
+        // runtime handles.
+        if token == "main" { return liveMonitors.first(where: \.isMain) ?? liveMonitors.first }
+        if token == "secondary" {
+            return liveMonitors.count == 2 ? liveMonitors.first { !$0.isMain } : nil
+        }
+        if let exact = liveMonitors.first(where: { $0.uuid == token }) { return exact }
+        return liveMonitors.first {
+            $0.name == token || $0.name.localizedCaseInsensitiveContains(token)
+        }
+    }
+
+    /// The detail strip's chips: every assignment whose token resolves to this monitor.
+    func assignments(pinnedTo row: MonitorRow) -> [WorkspaceAssignmentRow] {
+        assignments.filter { monitorRow(forToken: $0.monitor)?.id == row.id }
     }
 
     func setInnerGaps(_ value: Int) {

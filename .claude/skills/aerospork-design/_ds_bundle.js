@@ -2390,7 +2390,7 @@ function SettingsApp({ framed = true, initialTab = "general", banner = null, wid
   const [inherit, setInherit] = React.useState(true);
   const [toml, setToml] = React.useState(D.toml);
 
-  const body = /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(TabBar, { tabs: TABS, value: tab, onChange: setTab }), /*#__PURE__*/React.createElement("div", { className: "tab-body" }, banner === "error" && /*#__PURE__*/React.createElement(Banner, { kind: "error" }, "Your config was not loaded — AeroSpork is running built-in defaults. Fix the errors below and save; the config reloads by itself.\nline 12: unknown key ‘mods’"), tab === "general" && /*#__PURE__*/React.createElement(GeneralTab, { s: settings, set }), tab === "gaps" && /*#__PURE__*/React.createElement(GapsTab, { s: settings, set }), tab === "keys" && /*#__PURE__*/React.createElement(KeysTab, { bindings, setBindings }), tab === "monitors" && /*#__PURE__*/React.createElement(MonitorsTab, { monitors: D.monitors, assignments, setAssignments }), tab === "events" && /*#__PURE__*/React.createElement(EventsTab, { events, setEvents, env, setEnv, inherit, setInherit }), tab === "rules" && /*#__PURE__*/React.createElement(RulesTab, { rules, setRules }), tab === "raw" && /*#__PURE__*/React.createElement(RawTomlTab, { toml, setToml, original: D.toml })));
+  const body = /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(TabBar, { tabs: TABS, value: tab, onChange: setTab }), /*#__PURE__*/React.createElement("div", { className: "tab-body" }, banner === "error" && /*#__PURE__*/React.createElement(Banner, { kind: "error" }, "Your config was not loaded — AeroSpork is running built-in defaults. Fix the errors below and save; the config reloads by itself.\nline 12: unknown key ‘mods’"), tab === "general" && /*#__PURE__*/React.createElement(GeneralTab, { s: settings, set }), tab === "gaps" && /*#__PURE__*/React.createElement(GapsTab, { s: settings, set }), tab === "keys" && /*#__PURE__*/React.createElement(KeysTab, { bindings, setBindings }), tab === "monitors" && /*#__PURE__*/React.createElement(MonitorsTab, { monitors: D.monitors, assignments, setAssignments, workspaces: D.workspaces }), tab === "events" && /*#__PURE__*/React.createElement(EventsTab, { events, setEvents, env, setEnv, inherit, setInherit }), tab === "rules" && /*#__PURE__*/React.createElement(RulesTab, { rules, setRules }), tab === "raw" && /*#__PURE__*/React.createElement(RawTomlTab, { toml, setToml, original: D.toml })));
   if (!framed) return /*#__PURE__*/React.createElement("div", { className: "settings-plain" }, body);
   return /*#__PURE__*/React.createElement(WindowChrome, { title: currentTab.label, width, height }, body);
 }
@@ -3535,35 +3535,53 @@ Object.assign(window, {
 
 // ui_kits/settings_app/MonitorsTab.jsx
 try { (() => {
-const { SectionLabel, CopyButton, Icon, DataTable, ListActionBar, TextField, Select, ContentUnavailable, Badge, Button, MonitorArrangement } = window.AeroSporkDesignSystem_078bd7;
-function MonitorsTab({ monitors, assignments, setAssignments }) {
+const { SectionLabel, CopyButton, Icon, DataTable, ListActionBar, TextField, Select, ContentUnavailable, Badge, Button, MonitorArrangement, MenuPanel } = window.AeroSporkDesignSystem_078bd7;
+function MonitorsTab({ monitors, assignments, setAssignments, workspaces = [] }) {
   const [selected, setSelected] = React.useState(null);
   const [selectedMonitor, setSelectedMonitor] = React.useState(null);
-  const monitorOptions = [
-    { value: "main", label: "Main" },
-    { value: "secondary", label: "Non-main" },
-    { separator: true },
-    ...monitors.map((m, i) => ({ value: String(i + 1), label: `Position ${i + 1} \u2014 left to right` })),
-    { separator: true },
-    ...monitors.flatMap((m) => [
-      // The plain name only needs disambiguating when a UUID sibling is offered right below it.
-      { value: m.name, label: m.uuid ? m.name + " \u2014 matches by name" : m.name },
-      ...m.uuid ? [{ value: m.uuid, label: m.name + " \u2014 exact display" }] : []
-    ])
+  const [pinMenuOpen, setPinMenuOpen] = React.useState(false);
+  React.useEffect(() => {
+    if (selectedMonitor == null && monitors.length > 0) {
+      setSelectedMonitor((monitors.find((m) => m.isMain) || monitors[0]).id);
+    }
+  }, []);
+  const monitorTokens = new Set(monitors.map((m) => m.uuid || m.name));
+  const legacyTokenLabel = (token) => {
+    if (token === "main") return "Main display";
+    if (token === "secondary") return "Non-main display";
+    if (/^[1-9]\d*$/.test(token)) return "Position " + token;
+    return token;
+  };
+  const monitorOptions = (current) => [
+    ...monitors.map((m, i) => ({ value: m.uuid || m.name, label: `${i + 1} \xB7 ${m.name}` })),
+    ...current && !monitorTokens.has(current) ? [{ separator: true }, { value: current, label: legacyTokenLabel(current) }] : []
   ];
   const resolveMonitorId = (token) => {
     if (!token) return null;
-    if (token === "main") return monitors.find((m) => m.isMain)?.id ?? null;
+    if (token === "main") return (monitors.find((m) => m.isMain) || monitors[0])?.id ?? null;
     if (token === "secondary") return monitors.length === 2 ? monitors.find((m) => !m.isMain)?.id ?? null : null;
     const seq = Number(token);
     if (Number.isInteger(seq) && String(seq) === token && seq >= 1) return monitors[seq - 1]?.id ?? null;
-    const hit = monitors.find((m) => m.uuid === token || m.name === token);
-    return hit ? hit.id : null;
+    const exact = monitors.find((m) => m.uuid === token);
+    if (exact) return exact.id;
+    const byName = monitors.find((m) => m.name === token || m.name.toLowerCase().includes(token.toLowerCase()));
+    return byName ? byName.id : null;
   };
   const update = (id, patch) => setAssignments(assignments.map((a) => a.id === id ? { ...a, ...patch } : a));
   const add = (monitor = "main") => {
     const id = "a" + Date.now();
     setAssignments([...assignments, { id, workspace: "", monitor }]);
+    setSelected(id);
+  };
+  const pin = (workspace, monitor) => {
+    const existing = assignments.find((a) => a.workspace === workspace);
+    if (existing) {
+      update(existing.id, { monitor });
+      setSelected(existing.id);
+      return;
+    }
+    const id = "a" + Date.now();
+    setAssignments([...assignments, { id, workspace, monitor }]);
     setSelected(id);
   };
   const remove = () => {
@@ -3573,6 +3591,29 @@ function MonitorsTab({ monitors, assignments, setAssignments }) {
   const toggleMonitor = (id) => setSelectedMonitor((cur) => cur === id ? null : id);
   const activeMonitor = monitors.find((m) => m.id === selectedMonitor) || null;
   const pinnedHere = activeMonitor ? assignments.filter((a) => resolveMonitorId(a.monitor) === activeMonitor.id) : [];
+  const assignedNames = new Set(assignments.map((a) => a.workspace));
+  const unpinned = workspaces.filter((w, i) => workspaces.indexOf(w) === i && !assignedNames.has(w));
+  const movable = activeMonitor ? assignments.filter((a) => a.workspace && resolveMonitorId(a.monitor) !== activeMonitor.id) : [];
+  const pinToken = activeMonitor ? activeMonitor.uuid || activeMonitor.name : null;
+  const pinMenuItems = [
+    ...unpinned.map((w) => ({ label: w, mono: true, onClick: () => {
+      pin(w, pinToken);
+      setPinMenuOpen(false);
+    } })),
+    ...movable.length > 0 ? [
+      ...unpinned.length > 0 ? [{ divider: true }] : [],
+      { label: "Pinned elsewhere \u2014 move here", disabled: true },
+      ...movable.map((a) => ({ label: a.workspace, mono: true, onClick: () => {
+        pin(a.workspace, pinToken);
+        setPinMenuOpen(false);
+      } }))
+    ] : [],
+    { divider: true },
+    { label: "Other\u2026", onClick: () => {
+      add(pinToken);
+      setPinMenuOpen(false);
+    } }
+  ];
   return /* @__PURE__ */ React.createElement("div", { className: "tab-column" }, /* @__PURE__ */ React.createElement("div", { className: "form-page" }, /* @__PURE__ */ React.createElement("section", { className: "monitors-section" }, /* @__PURE__ */ React.createElement(SectionLabel, { title: "Connected monitors", sf: "display.2", style: { padding: "0 var(--space-2)" } }), /* @__PURE__ */ React.createElement("div", { className: "card-surface monitors-surface" }, monitors.length === 0 ? /* @__PURE__ */ React.createElement(
     ContentUnavailable,
     {
@@ -3580,17 +3621,24 @@ function MonitorsTab({ monitors, assignments, setAssignments }) {
       title: "No monitors detected",
       message: "Monitors appear here as soon as macOS reports one \u2014 their UUIDs are what pins a workspace to a physical panel."
     }
-  ) : /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "monitor-diagram-wrap" }, /* @__PURE__ */ React.createElement(MonitorArrangement, { monitors, selected: selectedMonitor, onSelect: toggleMonitor })), /* @__PURE__ */ React.createElement("div", { className: "monitor-detail" }, activeMonitor ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(Icon, { sf: "display", size: 13, style: { color: "var(--label-tertiary)", flex: "0 0 auto" } }), /* @__PURE__ */ React.createElement("span", null, /* @__PURE__ */ React.createElement("strong", { style: { color: "var(--label)", fontWeight: "var(--weight-medium)" } }, activeMonitor.name), pinnedHere.length === 0 ? " \u2014 no workspaces pinned here yet." : " \u2014 pinned:"), pinnedHere.map((a) => /* @__PURE__ */ React.createElement(
+  ) : /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "monitor-diagram-wrap" }, /* @__PURE__ */ React.createElement(MonitorArrangement, { monitors, selected: selectedMonitor, onSelect: toggleMonitor, height: 150 })), /* @__PURE__ */ React.createElement("div", { className: "monitor-detail" }, activeMonitor ? /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 5, width: "100%" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, position: "relative" } }, /* @__PURE__ */ React.createElement(Icon, { sf: "display", size: 13, style: { color: "var(--label-tertiary)", flex: "0 0 auto" } }), /* @__PURE__ */ React.createElement("strong", { style: { color: "var(--label)", fontWeight: "var(--weight-medium)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, activeMonitor.name), /* @__PURE__ */ React.createElement("span", { style: { color: "var(--label-secondary)" } }, activeMonitor.resolution), activeMonitor.uuid && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("span", { className: "mono", style: { fontSize: "var(--text-caption)", color: "var(--label-secondary)" } }, activeMonitor.uuid.slice(0, 8), "\u2026"), /* @__PURE__ */ React.createElement(CopyButton, { value: activeMonitor.uuid, help: "Copy monitor UUID\n" + activeMonitor.uuid + "\nA DisplayLink monitor reports no vendor or serial, so its UUID is the only thing that pins a workspace to that exact panel." })), /* @__PURE__ */ React.createElement("span", { style: { flex: 1 } }), /* @__PURE__ */ React.createElement(
+    Button,
+    {
+      onClick: () => setPinMenuOpen((v) => !v),
+      title: "Pins to this display; the assignments table can change how it matches."
+    },
+    "Pin a workspace here"
+  ), pinMenuOpen && /* @__PURE__ */ React.createElement(MenuPanel, { items: pinMenuItems, style: { position: "absolute", top: "100%", right: 0, zIndex: 30, marginTop: 4 } })), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" } }, pinnedHere.length === 0 ? /* @__PURE__ */ React.createElement("span", null, "No workspaces pinned here yet.") : /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("span", null, "Pinned here:"), pinnedHere.map((a) => /* @__PURE__ */ React.createElement(
     "button",
     {
       key: a.id,
       type: "button",
       className: "workspace-chip",
       onClick: () => setSelected(a.id),
-      title: "Edit " + (a.workspace ? "\u201C" + a.workspace + "\u201D" : "this assignment")
+      title: "Select the assignment for " + (a.workspace ? "\u201C" + a.workspace + "\u201D" : "this row") + " in the table below"
     },
-    a.workspace ? "\u201C" + a.workspace + "\u201D" : "(unnamed)"
-  )), /* @__PURE__ */ React.createElement("span", { style: { flex: 1 } }), /* @__PURE__ */ React.createElement(Button, { onClick: () => add(activeMonitor.uuid || activeMonitor.name) }, "Pin a workspace here")) : /* @__PURE__ */ React.createElement("span", null, "Select a monitor above to see what\u2019s pinned to it, or pin a new workspace to it directly.")), /* @__PURE__ */ React.createElement("div", { className: "monitor-list" }, monitors.map((m, i) => /* @__PURE__ */ React.createElement("div", { key: m.id, className: "monitor-row" + (m.id === selectedMonitor ? " is-selected" : "") }, /* @__PURE__ */ React.createElement("span", { className: "mono", style: { fontSize: "var(--text-caption)", color: "var(--label-tertiary)", width: 14, textAlign: "right" } }, i + 1), /* @__PURE__ */ React.createElement("span", { style: { color: "var(--label-secondary)", width: 26, display: "grid", placeItems: "center" } }, /* @__PURE__ */ React.createElement(Icon, { sf: "display", size: 17 })), /* @__PURE__ */ React.createElement("span", { style: { display: "flex", flexDirection: "column", gap: 1, minWidth: 0 } }, /* @__PURE__ */ React.createElement("span", { style: { display: "flex", alignItems: "center", gap: 6 } }, /* @__PURE__ */ React.createElement("span", { style: { fontWeight: "var(--weight-medium)" } }, m.name), m.isMain && /* @__PURE__ */ React.createElement(Badge, { tone: "muted", help: "AeroSpork's main display \u2014 the monitor the \u201Cmain\u201D pattern matches." }, "main")), /* @__PURE__ */ React.createElement("span", { style: { fontSize: "var(--text-callout)", color: "var(--label-secondary)" } }, m.resolution)), /* @__PURE__ */ React.createElement("span", { style: { flex: 1 } }), /* @__PURE__ */ React.createElement("span", { className: "mono", style: { fontSize: "var(--text-caption)", color: "var(--label-tertiary)" } }, m.uuid.slice(0, 8), "\u2026"), /* @__PURE__ */ React.createElement(CopyButton, { value: m.uuid, help: "Copy display UUID\n" + m.uuid }))))))), /* @__PURE__ */ React.createElement("section", { className: "assignments-section" }, /* @__PURE__ */ React.createElement(SectionLabel, { title: "Workspace assignments", sf: "arrow.triangle.branch", style: { padding: "0 var(--space-2)" } }), /* @__PURE__ */ React.createElement("div", { className: "card-surface assignments-surface" }, /* @__PURE__ */ React.createElement(
+    a.workspace || "(unnamed)"
+  ))))) : /* @__PURE__ */ React.createElement("span", null, "Select a monitor above to see and change what's pinned to it."))))), /* @__PURE__ */ React.createElement("section", { className: "assignments-section" }, /* @__PURE__ */ React.createElement(SectionLabel, { title: "Workspace assignments", sf: "arrow.triangle.branch", style: { padding: "0 var(--space-2)" } }), /* @__PURE__ */ React.createElement("div", { className: "card-surface assignments-surface" }, /* @__PURE__ */ React.createElement(
     DataTable,
     {
       selected,
@@ -3603,7 +3651,7 @@ function MonitorsTab({ monitors, assignments, setAssignments }) {
         // `circle` glyph: a near-invisible marker, not a visible icon.
         { key: "handle", title: "", width: "20px", render: () => /* @__PURE__ */ React.createElement("span", { style: { display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: "var(--label-tertiary)" } }) },
         { key: "workspace", title: "Workspace", width: "140px", render: (r) => /* @__PURE__ */ React.createElement(TextField, { mono: true, value: r.workspace, placeholder: "name", onChange: (v) => update(r.id, { workspace: v }), style: { width: "100%" } }) },
-        { key: "monitor", title: "Monitor", render: (r) => /* @__PURE__ */ React.createElement("span", { style: { display: "flex", gap: 6, alignItems: "center" } }, /* @__PURE__ */ React.createElement(Select, { value: r.monitor, options: monitorOptions, onChange: (v) => update(r.id, { monitor: v }), style: { flex: 1 } }), r.complex && /* @__PURE__ */ React.createElement(Badge, { help: "Written with more detail than this editor can show \u2014 a fallback list of monitors, or a fingerprint keyed on more than its UUID. Any structured save in this window is refused until this changes; edit it in Raw TOML." }, "complex")) }
+        { key: "monitor", title: "Monitor", render: (r) => /* @__PURE__ */ React.createElement("span", { style: { display: "flex", gap: 6, alignItems: "center" } }, /* @__PURE__ */ React.createElement(Select, { value: r.monitor, options: monitorOptions(r.monitor), onChange: (v) => update(r.id, { monitor: v }) }), r.complex && /* @__PURE__ */ React.createElement(Badge, { help: "Written with more detail than this editor can show \u2014 a fallback list of monitors, or a fingerprint keyed on more than its UUID. Any structured save in this window is refused until this changes; edit it in Raw TOML." }, "complex")) }
       ],
       rows: assignments,
       emptyState: /* @__PURE__ */ React.createElement(
@@ -3624,7 +3672,7 @@ function MonitorsTab({ monitors, assignments, setAssignments }) {
       removeHelp: "Remove the selected assignment",
       onAdd: () => add(),
       onRemove: selected ? remove : null,
-      hint: "Hardware fingerprints already in your config are preserved \u2014 they just show up here under the monitor's name. A DisplayLink monitor reports no vendor or serial, so its UUID is the only thing that pins a workspace to that exact monitor. A workspace name listed here also stays available \u2014 in the menu bar, in app switching \u2014 even with no windows on it; a name bound to a key (Keys tab) does the same."
+      hint: "Hardware fingerprints already in your config are preserved \u2014 they show up here under the monitor's name. A workspace named here stays available even with no windows on it."
     }
   )))));
 }
@@ -4296,6 +4344,8 @@ window.AS_DATA = {
     { id: 'm2', name: 'DELL U2720Q', resolution: '2560 × 1440 pt', uuid: 'AAAAAAAA-0000-4000-8000-000000000001', rect: { x: 1728, y: 0, width: 2560, height: 1440 } },
     { id: 'm3', name: 'DisplayLink Monitor', resolution: '1920 × 1080 pt', uuid: 'CCCCCCCC-0000-4000-8000-000000000003', rect: { x: 4288, y: 360, width: 1920, height: 1080 } },
   ],
+  // What `workspaces = [...]` defines after range expansion \u2014 the pin menu offers the unpinned ones.
+  workspaces: ["1", "2", "3", "web", "media", "chat"],
   assignments: [
     { id: 'a1', workspace: '1', monitor: 'main' },
     { id: 'a2', workspace: 'web', monitor: 'AAAAAAAA-0000-4000-8000-000000000001' },

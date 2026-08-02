@@ -92,6 +92,10 @@ public struct ConfigurationWindow: View {
         // Wide enough that the Window Rules split view has room for a table AND a form; tall enough
         // that a grouped Form shows more than two sections before it starts scrolling.
         .frame(minWidth: 780, idealWidth: 880, minHeight: 520, idealHeight: 620)
+        // `.windowResizability(.contentMinSize)` on the scene is not enough: a `Settings` scene
+        // window ships without `.resizable` in its styleMask (verified: AXSize not settable), so
+        // the minimums above were theoretical. The styleMask is the ground truth; set it there.
+        .background(ResizableWindowEnforcer(minSize: NSSize(width: 780, height: 520)))
         // Structured panes apply live (debounced), so there is no Save button -- that is the macOS
         // convention, and it is only safe because an untouched section is never rewritten. The Raw
         // TOML tab has its own explicit Apply, since half-typed TOML is invalid most of the time.
@@ -121,5 +125,57 @@ public struct ConfigurationWindow: View {
 
     private func paneLabel(_ pane: SettingsPane) -> some View {
         Label(pane.title, systemImage: pane.symbol)
+    }
+}
+
+/// Makes the hosting window user-resizable. Invisible; sits in the window's view hierarchy only to
+/// reach the `NSWindow`, because a SwiftUI `Settings` scene ignores `windowResizability` at the
+/// styleMask level and an overflowing pane in a fixed window is unrecoverable. Re-applied on every
+/// update in case SwiftUI re-asserts the mask on a pane switch.
+private struct ResizableWindowEnforcer: NSViewRepresentable {
+    let minSize: NSSize
+
+    final class EnforcerView: NSView {
+        var minSize = NSSize.zero
+        private var observer: NSObjectProtocol?
+
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            guard let window else { return }
+            enforce()
+            // The scene re-asserts its own styleMask after this view lands in the window, so a
+            // one-shot insert is silently undone. Watching window updates and re-inserting only
+            // when the bit is missing wins that fight without churning the mask every pass.
+            if observer == nil {
+                observer = NotificationCenter.default.addObserver(
+                    forName: NSWindow.didUpdateNotification,
+                    object: window,
+                    queue: .main,
+                ) { [weak self] _ in
+                    MainActor.assumeIsolated { self?.enforceIfNeeded() }
+                }
+            }
+        }
+
+        private func enforceIfNeeded() {
+            if let window, !window.styleMask.contains(.resizable) { enforce() }
+        }
+
+        func enforce() {
+            guard let window else { return }
+            window.styleMask.insert(.resizable)
+            window.contentMinSize = minSize
+        }
+    }
+
+    func makeNSView(context: Context) -> EnforcerView {
+        let view = EnforcerView()
+        view.minSize = minSize
+        return view
+    }
+
+    func updateNSView(_ view: EnforcerView, context: Context) {
+        view.minSize = minSize
+        view.enforce()
     }
 }

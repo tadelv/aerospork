@@ -13,6 +13,8 @@ window.AS_DATA = {
     { id: 'm2', name: 'DELL U2720Q', resolution: '2560 × 1440 pt', uuid: 'AAAAAAAA-0000-4000-8000-000000000001', rect: { x: 1728, y: 0, width: 2560, height: 1440 } },
     { id: 'm3', name: 'DisplayLink Monitor', resolution: '1920 × 1080 pt', uuid: 'CCCCCCCC-0000-4000-8000-000000000003', rect: { x: 4288, y: 360, width: 1920, height: 1080 } },
   ],
+  // What `workspaces = [...]` defines after range expansion — the pin menu offers the unpinned ones.
+  workspaces: ['1', '2', '3', 'web', 'media', 'chat'],
   assignments: [
     { id: 'a1', workspace: '1', monitor: 'main' },
     { id: 'a2', workspace: 'web', monitor: 'AAAAAAAA-0000-4000-8000-000000000001' },

@@ -1,34 +1,48 @@
-const { SectionLabel, CopyButton, Icon, DataTable, ListActionBar, TextField, Select, ContentUnavailable, Badge, Button, MonitorArrangement } = window.AeroSporkDesignSystem_078bd7;
+const { SectionLabel, CopyButton, Icon, DataTable, ListActionBar, TextField, Select, ContentUnavailable, Badge, Button, MonitorArrangement, MenuPanel } = window.AeroSporkDesignSystem_078bd7;
 
-function MonitorsTab({ monitors, assignments, setAssignments }) {
+function MonitorsTab({ monitors, assignments, setAssignments, workspaces = [] }) {
   const [selected, setSelected] = React.useState(null);
   const [selectedMonitor, setSelectedMonitor] = React.useState(null);
+  const [pinMenuOpen, setPinMenuOpen] = React.useState(false);
 
-  const monitorOptions = [
-    { value: 'main', label: 'Main' },
-    { value: 'secondary', label: 'Non-main' },
-    { separator: true },
-    ...monitors.map((m, i) => ({ value: String(i + 1), label: `Position ${i + 1} — left to right` })),
-    { separator: true },
-    ...monitors.flatMap((m) => [
-      // The plain name only needs disambiguating when a UUID sibling is offered right below it.
-      { value: m.name, label: m.uuid ? m.name + ' — matches by name' : m.name },
-      ...(m.uuid ? [{ value: m.uuid, label: m.name + ' — exact display' }] : []),
-    ]),
+  // Auto-select the main (or only) monitor: the pin menu is reachable in zero clicks on a
+  // laptop, and visible selection is what teaches that the schematic is clickable.
+  React.useEffect(() => {
+    if (selectedMonitor == null && monitors.length > 0) {
+      setSelectedMonitor((monitors.find((m) => m.isMain) || monitors[0]).id);
+    }
+  }, []);
+
+  // One monitor, one option: the position number ties each entry to the schematic, and the token
+  // is uuid-when-available, same as the pin menu. A token some earlier config wrote (main,
+  // secondary, a position, a regex) stays selectable as the row's own preserved entry.
+  const monitorTokens = new Set(monitors.map((m) => m.uuid || m.name));
+  const legacyTokenLabel = (token) => {
+    if (token === 'main') return 'Main display';
+    if (token === 'secondary') return 'Non-main display';
+    if (/^[1-9]\d*$/.test(token)) return 'Position ' + token;
+    return token;
+  };
+  const monitorOptions = (current) => [
+    ...monitors.map((m, i) => ({ value: m.uuid || m.name, label: `${i + 1} · ${m.name}` })),
+    ...(current && !monitorTokens.has(current)
+      ? [{ separator: true }, { value: current, label: legacyTokenLabel(current) }]
+      : []),
   ];
 
-  // Mirrors MonitorDescriptionEx.resolveMonitor (Sources/AppBundle/model/MonitorDescriptionEx.swift)
-  // for the four token shapes this editor itself ever writes — main / secondary / position /
-  // exact name / UUID. It does not attempt arbitrary regex patterns; those only exist in
-  // hand-written Raw TOML, which is exactly what the `complex` badge already flags below.
+  // Mirrors ConfigurationViewModel.monitorRow(forToken:) — the runtime treats a name token as a
+  // case-insensitive substring match, so exact equality here would deny pins the runtime
+  // resolves. Metacharacter regexes get no chip; the `complex` badge owns those.
   const resolveMonitorId = (token) => {
     if (!token) return null;
-    if (token === 'main') return monitors.find((m) => m.isMain)?.id ?? null;
+    if (token === 'main') return (monitors.find((m) => m.isMain) || monitors[0])?.id ?? null;
     if (token === 'secondary') return monitors.length === 2 ? (monitors.find((m) => !m.isMain)?.id ?? null) : null;
     const seq = Number(token);
     if (Number.isInteger(seq) && String(seq) === token && seq >= 1) return monitors[seq - 1]?.id ?? null;
-    const hit = monitors.find((m) => m.uuid === token || m.name === token);
-    return hit ? hit.id : null;
+    const exact = monitors.find((m) => m.uuid === token);
+    if (exact) return exact.id;
+    const byName = monitors.find((m) => m.name === token || m.name.toLowerCase().includes(token.toLowerCase()));
+    return byName ? byName.id : null;
   };
 
   const update = (id, patch) => setAssignments(assignments.map((a) => (a.id === id ? { ...a, ...patch } : a)));
@@ -37,11 +51,37 @@ function MonitorsTab({ monitors, assignments, setAssignments }) {
     setAssignments([...assignments, { id, workspace: '', monitor }]);
     setSelected(id);
   };
+  const pin = (workspace, monitor) => {
+    const existing = assignments.find((a) => a.workspace === workspace);
+    if (existing) { update(existing.id, { monitor }); setSelected(existing.id); return; }
+    const id = 'a' + Date.now();
+    setAssignments([...assignments, { id, workspace, monitor }]);
+    setSelected(id);
+  };
   const remove = () => { setAssignments(assignments.filter((a) => a.id !== selected)); setSelected(null); };
   const toggleMonitor = (id) => setSelectedMonitor((cur) => (cur === id ? null : id));
 
   const activeMonitor = monitors.find((m) => m.id === selectedMonitor) || null;
   const pinnedHere = activeMonitor ? assignments.filter((a) => resolveMonitorId(a.monitor) === activeMonitor.id) : [];
+  const assignedNames = new Set(assignments.map((a) => a.workspace));
+  const unpinned = workspaces.filter((w, i) => workspaces.indexOf(w) === i && !assignedNames.has(w));
+  const movable = activeMonitor
+    ? assignments.filter((a) => a.workspace && resolveMonitorId(a.monitor) !== activeMonitor.id)
+    : [];
+  const pinToken = activeMonitor ? (activeMonitor.uuid || activeMonitor.name) : null;
+
+  const pinMenuItems = [
+    ...unpinned.map((w) => ({ label: w, mono: true, onClick: () => { pin(w, pinToken); setPinMenuOpen(false); } })),
+    ...(movable.length > 0
+      ? [
+          ...(unpinned.length > 0 ? [{ divider: true }] : []),
+          { label: 'Pinned elsewhere — move here', disabled: true },
+          ...movable.map((a) => ({ label: a.workspace, mono: true, onClick: () => { pin(a.workspace, pinToken); setPinMenuOpen(false); } })),
+        ]
+      : []),
+    { divider: true },
+    { label: 'Other…', onClick: () => { add(pinToken); setPinMenuOpen(false); } },
+  ];
 
   return (
     <div className="tab-column">
@@ -55,46 +95,47 @@ function MonitorsTab({ monitors, assignments, setAssignments }) {
             ) : (
               <>
                 <div className="monitor-diagram-wrap">
-                  <MonitorArrangement monitors={monitors} selected={selectedMonitor} onSelect={toggleMonitor} />
+                  <MonitorArrangement monitors={monitors} selected={selectedMonitor} onSelect={toggleMonitor} height={150} />
                 </div>
                 <div className="monitor-detail">
                   {activeMonitor ? (
-                    <>
-                      <Icon sf="display" size={13} style={{ color: 'var(--label-tertiary)', flex: '0 0 auto' }} />
-                      <span>
-                        <strong style={{ color: 'var(--label)', fontWeight: 'var(--weight-medium)' }}>{activeMonitor.name}</strong>
-                        {pinnedHere.length === 0 ? ' — no workspaces pinned here yet.' : ' — pinned:'}
-                      </span>
-                      {pinnedHere.map((a) => (
-                        <button key={a.id} type="button" className="workspace-chip" onClick={() => setSelected(a.id)}
-                          title={'Edit ' + (a.workspace ? '“' + a.workspace + '”' : 'this assignment')}>
-                          {a.workspace ? '“' + a.workspace + '”' : '(unnamed)'}
-                        </button>
-                      ))}
-                      <span style={{ flex: 1 }} />
-                      <Button onClick={() => add(activeMonitor.uuid || activeMonitor.name)}>Pin a workspace here</Button>
-                    </>
-                  ) : (
-                    <span>Select a monitor above to see what’s pinned to it, or pin a new workspace to it directly.</span>
-                  )}
-                </div>
-                <div className="monitor-list">
-                  {monitors.map((m, i) => (
-                    <div key={m.id} className={'monitor-row' + (m.id === selectedMonitor ? ' is-selected' : '')}>
-                      <span className="mono" style={{ fontSize: 'var(--text-caption)', color: 'var(--label-tertiary)', width: 14, textAlign: 'right' }}>{i + 1}</span>
-                      <span style={{ color: 'var(--label-secondary)', width: 26, display: 'grid', placeItems: 'center' }}><Icon sf="display" size={17} /></span>
-                      <span style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0 }}>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <span style={{ fontWeight: 'var(--weight-medium)' }}>{m.name}</span>
-                          {m.isMain && <Badge tone="muted" help="AeroSpork's main display — the monitor the “main” pattern matches.">main</Badge>}
-                        </span>
-                        <span style={{ fontSize: 'var(--text-callout)', color: 'var(--label-secondary)' }}>{m.resolution}</span>
-                      </span>
-                      <span style={{ flex: 1 }} />
-                      <span className="mono" style={{ fontSize: 'var(--text-caption)', color: 'var(--label-tertiary)' }}>{m.uuid.slice(0, 8)}…</span>
-                      <CopyButton value={m.uuid} help={'Copy display UUID\n' + m.uuid} />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 5, width: '100%' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, position: 'relative' }}>
+                        <Icon sf="display" size={13} style={{ color: 'var(--label-tertiary)', flex: '0 0 auto' }} />
+                        <strong style={{ color: 'var(--label)', fontWeight: 'var(--weight-medium)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{activeMonitor.name}</strong>
+                        <span style={{ color: 'var(--label-secondary)' }}>{activeMonitor.resolution}</span>
+                        {activeMonitor.uuid && (
+                          <>
+                            <span className="mono" style={{ fontSize: 'var(--text-caption)', color: 'var(--label-secondary)' }}>{activeMonitor.uuid.slice(0, 8)}…</span>
+                            <CopyButton value={activeMonitor.uuid} help={'Copy monitor UUID\n' + activeMonitor.uuid + '\nA DisplayLink monitor reports no vendor or serial, so its UUID is the only thing that pins a workspace to that exact panel.'} />
+                          </>
+                        )}
+                        <span style={{ flex: 1 }} />
+                        <Button onClick={() => setPinMenuOpen((v) => !v)}
+                          title="Pins to this display; the assignments table can change how it matches.">Pin a workspace here</Button>
+                        {pinMenuOpen && (
+                          <MenuPanel items={pinMenuItems} style={{ position: 'absolute', top: '100%', right: 0, zIndex: 30, marginTop: 4 }} />
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                        {pinnedHere.length === 0 ? (
+                          <span>No workspaces pinned here yet.</span>
+                        ) : (
+                          <>
+                            <span>Pinned here:</span>
+                            {pinnedHere.map((a) => (
+                              <button key={a.id} type="button" className="workspace-chip" onClick={() => setSelected(a.id)}
+                                title={'Select the assignment for ' + (a.workspace ? '“' + a.workspace + '”' : 'this row') + ' in the table below'}>
+                                {a.workspace || '(unnamed)'}
+                              </button>
+                            ))}
+                          </>
+                        )}
+                      </div>
                     </div>
-                  ))}
+                  ) : (
+                    <span>Select a monitor above to see and change what's pinned to it.</span>
+                  )}
                 </div>
               </>
             )}
@@ -115,7 +156,7 @@ function MonitorsTab({ monitors, assignments, setAssignments }) {
                 { key: 'workspace', title: 'Workspace', width: '140px', render: (r) => <TextField mono value={r.workspace} placeholder="name" onChange={(v) => update(r.id, { workspace: v })} style={{ width: '100%' }} /> },
                 { key: 'monitor', title: 'Monitor', render: (r) => (
                   <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                    <Select value={r.monitor} options={monitorOptions} onChange={(v) => update(r.id, { monitor: v })} style={{ flex: 1 }} />
+                    <Select value={r.monitor} options={monitorOptions(r.monitor)} onChange={(v) => update(r.id, { monitor: v })} />
                     {r.complex && <Badge help="Written with more detail than this editor can show — a fallback list of monitors, or a fingerprint keyed on more than its UUID. Any structured save in this window is refused until this changes; edit it in Raw TOML.">complex</Badge>}
                   </span>
                 ) },
@@ -126,7 +167,7 @@ function MonitorsTab({ monitors, assignments, setAssignments }) {
                 actionTitle="Add assignment" onAction={() => add()} />} />
             <ListActionBar addHelp="Pin a workspace to a monitor" removeHelp="Remove the selected assignment"
               onAdd={() => add()} onRemove={selected ? remove : null}
-              hint="Hardware fingerprints already in your config are preserved — they just show up here under the monitor's name. A DisplayLink monitor reports no vendor or serial, so its UUID is the only thing that pins a workspace to that exact monitor. A workspace name listed here also stays available — in the menu bar, in app switching — even with no windows on it; a name bound to a key (Keys pane) does the same." />
+              hint="Hardware fingerprints already in your config are preserved — they show up here under the monitor's name. A workspace named here stays available even with no windows on it." />
           </div>
         </section>
       </div>

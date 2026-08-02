@@ -236,9 +236,9 @@ enum ConfigurationWriter {
     /// (`'\\[Debug'` is an ordinary window-title matcher), and one in a comment. A bracket in a
     /// string left the depth stuck above zero, and since the scan `continue`s while the depth is
     /// positive, every later line was skipped and `unsupportedShapeReason` returned nil for the
-    /// rest of the file -- disabling the fingerprint refusal, whose own comment records that its
-    /// absence damaged a real config. A bracket in a comment did the mirror opposite and refused a
-    /// file that was fine.
+    /// rest of the file -- disabling every later refusal (at the time that included the
+    /// since-retired fingerprint refusal, whose absence had damaged a real config). A bracket in
+    /// a comment did the mirror opposite and refused a file that was fine.
     ///
     /// Deliberately not a TOML parser: it tracks the quoting well enough that a value cannot lie
     /// about structure, which is all the caller needs.
@@ -372,40 +372,17 @@ enum ConfigurationWriter {
                 return "[keys] contains a dotted key ('\(key)'), which this editor cannot add to or remove from. Use the Raw TOML tab."
             }
 
-            // A monitor assignment carrying more than this editor can express.
-            //
-            // The view model collapses a whole `MonitorDescription` to one token, and
-            // `formatMonitorValue` can only re-emit a `uuid`, a monitor index, or a `name`. So
-            // rewriting `[monitors]` turns
-            //     2 = { fingerprint = { display_name = 'ACME Display 32 (1)', width = 3840, height = 2160 } }
-            // into
-            //     2 = { fingerprint = { name = 'ACME Display 32 (1)' } }
-            // -- silently dropping exactly the fields that tell two identical panels apart.
-            //
-            // This shipped, and it damaged a real config: a save rewrote both DELL entries down to
-            // bare names. The existing guard only refused the *sub-table* spelling
-            // (`[workspace-to-monitor-force-assignment.2.fingerprint]`), which is the form nobody
-            // writes; the inline form above is the one the docs show and the migration emits.
-            //
-            // Anything richer than a single `name`/`uuid` is refused rather than degraded.
-            if section == "monitors" || section == "workspace-to-monitor-force-assignment",
-               value.contains("fingerprint")
-            {
-                let fields = ["display_name", "display-name", "width", "height", "vendor", "model", "serial"]
-                if let extra = fields.first(where: { value.contains($0) }) {
-                    return "Monitor assignment '\(key)' pins a display by '\(extra)', which this editor cannot represent and would replace with just a name. Use the Raw TOML tab."
-                }
-            }
-
-            // A list of candidates is tried in order until one resolves. The view model keeps only
-            // `.first`, and editing ANY assignment re-serialises the whole section -- so one edit
-            // silently drops every other row's fallbacks too. Same class as the fingerprint case
-            // above, and the same answer: refuse rather than degrade.
-            if section == "monitors" || section == "workspace-to-monitor-force-assignment",
-               value.hasPrefix("[")
-            {
-                return "Monitor assignment '\(key)' lists fallback monitors, and this editor keeps only the first. Use the Raw TOML tab."
-            }
+            // Rich fingerprints and fallback lists inside the assignment sections are no longer
+            // refused: every row carries the `[MonitorDescription]` it loaded as, and
+            // `formatMonitorValue` re-emits an untouched row from that, field for field -- so a
+            // save can no longer degrade a sibling's `width`/`height` disambiguation or truncate
+            // its fallback list. (This section used to refuse both, after a save rewrote two
+            // physically identical DELL entries down to bare names. The row the user actually
+            // edits is still replaced by their picked token; the badge in the pane says so.)
+            // The *sub-table* spelling (`[workspace-to-monitor-force-assignment.2.fingerprint]`)
+            // stays refused by the managed-section sub-table rule above: it is its own section
+            // header, which the whole-section rewrite would leave behind as a conflicting
+            // duplicate.
 
             // A key inside a rewritten section that we do not re-emit would simply vanish.
             if let emitted = emittedKeysBySection[section] {
@@ -619,9 +596,45 @@ enum ConfigurationWriter {
         guard !rows.isEmpty else { return }
         var block = ["", isV2 ? "[monitors]" : "[workspace-to-monitor-force-assignment]"]
         for r in rows.sorted(by: { $0.workspace < $1.workspace }) {
-            block.append("\(tomlKey(r.workspace)) = \(formatMonitorValue(r.monitor))")
+            block.append("\(tomlKey(r.workspace)) = \(formatMonitorValue(r))")
         }
         appendBlock(&lines, block)
+    }
+
+    /// Do no harm: while the token still equals what this row loaded as, the user has not edited
+    /// its monitor — re-emit the loaded descriptions faithfully. The single token is lossy (a
+    /// regex and a fingerprint name collapse to the same string, a fallback list to its first
+    /// entry), so serializing an untouched row from its token is how editing workspace A silently
+    /// rewrote workspace B's regex as a literal name that matches nothing.
+    private static func formatMonitorValue(_ r: ConfigurationViewModel.WorkspaceAssignmentRow) -> String {
+        if let loaded = r.loadedDescriptions, !loaded.isEmpty, r.monitor == r.loadedToken {
+            let values = loaded.map(formatMonitorDescription)
+            return values.count == 1 ? values[0] : "[" + values.joined(separator: ", ") + "]"
+        }
+        return formatMonitorValue(r.monitor)
+    }
+
+    private static func formatMonitorDescription(_ d: MonitorDescription) -> String {
+        switch d {
+            case .main: quoted("main")
+            case .secondary: quoted("secondary")
+            case .sequenceNumber(let n): String(n)
+            // A bare string is parsed as a regex; this one arrived as a regex, so it stays one.
+            case .pattern(let raw, _): quoted(raw)
+            case .fingerprint(let data): formatFingerprint(data)
+        }
+    }
+
+    private static func formatFingerprint(_ data: MonitorFingerprintPatternData) -> String {
+        var fields: [String] = []
+        if let v = data.vendorID { fields.append("vendor = \(v)") }
+        if let m = data.modelID { fields.append("model = \(m)") }
+        if let s = data.serialNumber { fields.append("serial = \(quoted(s))") }
+        if let n = data.displayNamePattern { fields.append("name = \(quoted(n))") }
+        if let w = data.widthPixels { fields.append("width = \(w)") }
+        if let h = data.heightPixels { fields.append("height = \(h)") }
+        if let u = data.displayUUID { fields.append("uuid = \(quoted(u))") }
+        return "{ fingerprint = { \(fields.joined(separator: ", ")) } }"
     }
 
     private static func formatMonitorValue(_ token: String) -> String {

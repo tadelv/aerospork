@@ -32,10 +32,9 @@ body { margin: 0; background: #2b2f3a; display: grid; place-items: center; min-h
 .monitors-surface { display: flex; flex-direction: column; }
 .monitor-diagram-wrap { padding: var(--space-14) var(--space-16) var(--space-12); display: flex; justify-content: center; }
 .monitor-detail { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); min-height: 18px; padding: 0 var(--space-16) var(--space-12); font: var(--weight-regular) var(--text-callout)/1.4 var(--font-system); color: var(--label-secondary); }
-.monitor-list { border-top: var(--divider); overflow-y: auto; overflow-x: hidden; max-height: 148px; padding: var(--space-10) var(--space-16) var(--space-14); display: flex; flex-direction: column; gap: 8px; }
-.monitor-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--radius-row); background: var(--fill-subtle); font-size: var(--text-default); box-sizing: border-box; }
-.monitor-row.is-selected { background: var(--accent-selection-fill); box-shadow: inset 0 0 0 1px var(--accent); }
-.workspace-chip { font: var(--weight-medium) var(--text-callout)/1 var(--font-mono); color: var(--accent); background: var(--accent-selection-fill); border: none; border-radius: var(--radius-pill); padding: 2px var(--space-6); cursor: pointer; }
+/* Chip text is not accent-on-accent-wash: that measures ~3.3:1 in light mode, under the 4.5:1
+   floor for caption text. Same fix as Badge — primary at 72% over the tinted fill. */
+.workspace-chip { font: var(--weight-medium) var(--text-callout)/1 var(--font-mono); color: color-mix(in srgb, var(--label) 72%, transparent); background: var(--accent-selection-fill); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); border-radius: var(--radius-pill); padding: 2px var(--space-7, 7px); cursor: pointer; }
 .workspace-chip:hover { filter: brightness(0.95); }
 .assignments-section { display: flex; flex-direction: column; gap: var(--space-6); flex: 1; min-height: 220px; }
 .assignments-surface { flex: 1; min-height: 0; display: flex; flex-direction: column; }

@@ -519,6 +519,60 @@ final class ConfigTest: XCTestCase {
         assertEquals(errors, [])
     }
 
+    /// Editing workspace A must not re-spell workspace B. The row's single token is lossy -- a
+    /// regex and a fingerprint name collapse to the same string, a fallback list to its first
+    /// entry -- so the writer re-emits untouched rows from the descriptions they loaded as.
+    /// Without that, pinning one workspace silently rewrote a sibling's `'dell|acme'` regex as a
+    /// literal fingerprint name that matches nothing.
+    func testWriterEditingOneAssignmentPreservesSiblingSemantics() {
+        let base = """
+            [workspace-to-monitor-force-assignment]
+            2 = { fingerprint = { display_name = 'ACME Display 32 (1)', width = 3840, height = 2160 } }
+            5 = ['secondary', 'dell']
+            6 = 'dell|acme'
+            """
+        let vm = ConfigurationViewModel()
+        defer { vm.cancelPendingAutoSave() }
+        vm.loadAssignments(fromText: base)
+        vm.markLoaded()
+        vm.setAssignment(workspace: "9", monitorToken: "main") // the only edit
+
+        let out = ConfigurationWriter.render(baseText: base, from: vm)
+        let (config, errors) = parseConfigForTest(out)
+        assertEquals(errors, [])
+        let (baseConfig, baseErrors) = parseConfigForTest(base)
+        assertEquals(baseErrors, [])
+        for workspace in ["2", "5", "6"] {
+            assertEquals(
+                config.workspaceToMonitorForceAssignment[workspace],
+                baseConfig.workspaceToMonitorForceAssignment[workspace],
+            )
+        }
+        assertEquals(config.workspaceToMonitorForceAssignment["9"], [MonitorDescription.main])
+    }
+
+    /// The pin menu writes `uuid ?? name`. Both shapes must survive the writer -> parser round
+    /// trip as themselves -- the UUID as the exact-display fingerprint, the name as a name
+    /// fingerprint -- and neither may come back branded `complex`, because both are this
+    /// editor's own output.
+    func testWriterPinTokensRoundTripWithoutTurningComplex() {
+        let uuid = "AAAAAAAA-0000-4000-8000-000000000001"
+        let vm = ConfigurationViewModel()
+        defer { vm.cancelPendingAutoSave() }
+        vm.markLoaded()
+        vm.setAssignment(workspace: "3", monitorToken: uuid)
+        vm.setAssignment(workspace: "web", monitorToken: "DELL U3223QE (1)")
+
+        let out = ConfigurationWriter.render(baseText: "start-at-login = false", from: vm)
+        XCTAssertTrue(out.contains("{ fingerprint = { uuid = '\(uuid)' } }"), "uuid pin lost its fingerprint form:\n\(out)")
+        XCTAssertTrue(out.contains("{ fingerprint = { name = 'DELL U3223QE (1)' } }"), "name pin lost its fingerprint form:\n\(out)")
+
+        let vm2 = ConfigurationViewModel()
+        vm2.loadAssignments(fromText: out)
+        assertEquals(vm2.assignments.map(\.monitor), [uuid, "DELL U3223QE (1)"])
+        assertEquals(vm2.assignments.map(\.isComplex), [false, false])
+    }
+
     /// Multi-command bindings used to round-trip through the view model joined by ", " and be
     /// re-emitted as `key = 'a, b'` -- one bogus command that fails to parse.
     func testWriterMultiCommandBindingRoundTrips() {
@@ -788,20 +842,23 @@ final class ConfigTest: XCTestCase {
     /// returned nil for the rest of the file, including the fingerprint check whose own comment
     /// records that its absence "shipped, and it damaged a real config".
     func testABracketInsideAStringDoesNotBlindTheShapeGuard() {
+        // The detector is the sub-table refusal (the fingerprint refusal it originally used has
+        // been retired -- untouched rows are preserved now, not refused). The property under test
+        // is unchanged: a guard AFTER the bracket-carrying line must still fire.
         let config = """
             [[on-window-detected]]
             if.window-title-regex-substring = '\\[Debug'
             run = ['layout floating']
 
-            [monitors]
-            2 = { fingerprint = { display_name = 'ACME Display 32 (1)', width = 3840, height = 2160 } }
+            [workspace-to-monitor-force-assignment.2.fingerprint]
+            uuid = '11111111-2222-3333-4444-555555555555'
             """
         let reason = ConfigurationWriter.unsupportedShapeReason(config)
         XCTAssertNotNil(
             reason,
-            "the fingerprint refusal was skipped: a bracket in a string disabled every guard after it",
+            "the sub-table refusal was skipped: a bracket in a string disabled every guard after it",
         )
-        XCTAssertTrue(reason?.contains("width") == true || reason?.contains("display_name") == true, reason ?? "nil")
+        XCTAssertTrue(reason?.contains("sub-table") == true, reason ?? "nil")
     }
 
     /// And the mirror image: a bracket in a comment must not refuse a perfectly good config.
@@ -864,18 +921,25 @@ final class ConfigTest: XCTestCase {
         assertEquals(config.onWindowDetected.count, 1)
     }
 
-    /// A fallback list is tried in order until one monitor resolves, and the view model keeps only
-    /// the first. Since editing any assignment re-serialises the whole section, degrading instead of
-    /// refusing would silently truncate every other row too.
-    func testAMonitorFallbackListIsRefusedRatherThanTruncated() {
+    /// A fallback list is tried in order until one monitor resolves. It used to be refused because
+    /// the view model keeps only `.first`; now the row remembers the full list it loaded as, so an
+    /// edit to a *different* row re-emits it whole.
+    func testAMonitorFallbackListIsPreservedRatherThanTruncated() {
         let config = """
             [workspace-to-monitor-force-assignment]
             1 = 'main'
             2 = ['secondary', 'built-in']
             """
-        let reason = ConfigurationWriter.unsupportedShapeReason(config)
-        XCTAssertNotNil(reason, "a fallback list would be silently reduced to its first entry")
-        XCTAssertTrue(reason?.contains("fallback") == true, reason ?? "nil")
+        XCTAssertNil(ConfigurationWriter.unsupportedShapeReason(config))
+
+        let vm = ConfigurationViewModel()
+        defer { vm.cancelPendingAutoSave() }
+        vm.loadAssignments(fromText: config)
+        vm.markLoaded()
+        vm.setAssignment(workspace: "1", monitorToken: "3") // edit the OTHER row
+
+        let out = ConfigurationWriter.render(baseText: config, from: vm)
+        XCTAssertTrue(out.contains("['secondary', 'built-in']"), "the fallback list was truncated:\n\(out)")
     }
 
     /// Saving the same edit repeatedly must not grow the file.

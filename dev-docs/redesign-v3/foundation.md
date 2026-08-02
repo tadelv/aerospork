@@ -49,6 +49,11 @@ is painted on older releases.
   awareness in the composer.
 - **Monitors:** a true-to-arrangement schematic, left-to-right positions, the main-display state,
   position/name/exact-display picker options, and an explicit complex-value marker.
+  *Revised after live 4-monitor use:* the schematic is now the monitor selector (click to select,
+  detail strip with UUID copy and pinned-workspace chips, a "Pin a workspace here" menu), the
+  redundant monitor list is gone, and the assignments table is the single scroll authority. The
+  contact sheets below predate this revision for the Monitors pane; the kit's `MonitorsTab.jsx`
+  is its current reference.
 - **Events:** execution order, real command examples, inherited-environment consequences, and the
   documented PATH example.
 - **Window Rules:** an application chooser, all three startup timing states, guided layout/workspace
@@ -64,3 +69,8 @@ test, not a scaled-down composition: content scrolls rather than clipping fixed 
 
 The checked contact sheets are `mockups/{light,dark}-{ideal,compact}.png`. They are the approved
 pre-implementation reference; production stays authoritative for behavior and accessibility.
+
+Resizability shipped later than this document first claimed: a SwiftUI `Settings` scene defaults
+to locking the window at its ideal size, so until `.windowResizability(.contentMinSize)` was added
+to the scene, the 780×520 minimum was theoretical. Settings windows do not autosave their frame —
+the window reopens at the 880×620 ideal — and macOS 13.0–13.2 resizability behavior is untested.

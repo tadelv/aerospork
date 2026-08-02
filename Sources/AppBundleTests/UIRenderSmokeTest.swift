@@ -127,7 +127,16 @@ final class UIRenderSmokeTest: XCTestCase {
                 rect: CGRect(x: -1920, y: 180, width: 1920, height: 1080),
             ),
         ]
-        render(MonitorArrangementView(monitors: rows), "Monitor arrangement")
+        // Selected branch on purpose: it exercises the accent fill, the ring, and the main-bar
+        // overlay, which the unselected render never builds.
+        render(
+            MonitorArrangementView(
+                monitors: rows,
+                selectedToken: rows[0].uuid ?? rows[0].name,
+                onSelect: { _ in },
+            ),
+            "Monitor arrangement",
+        )
     }
 
     /// The empty case is the one that traps: a `Table` or `List` built from an empty collection, and

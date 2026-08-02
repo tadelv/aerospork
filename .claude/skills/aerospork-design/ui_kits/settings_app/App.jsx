@@ -39,7 +39,7 @@ function SettingsApp({ framed = true, initialTab = 'general', banner = null, wid
         {tab === 'general' && <GeneralTab s={settings} set={set} />}
         {tab === 'gaps' && <GapsTab s={settings} set={set} />}
         {tab === 'keys' && <KeysTab bindings={bindings} setBindings={setBindings} />}
-        {tab === 'monitors' && <MonitorsTab monitors={D.monitors} assignments={assignments} setAssignments={setAssignments} />}
+        {tab === 'monitors' && <MonitorsTab monitors={D.monitors} assignments={assignments} setAssignments={setAssignments} workspaces={D.workspaces} />}
         {tab === 'events' && <EventsTab events={events} setEvents={setEvents} env={env} setEnv={setEnv} inherit={inherit} setInherit={setInherit} />}
         {tab === 'rules' && <RulesTab rules={rules} setRules={setRules} />}
         {tab === 'raw' && <RawTomlTab toml={toml} setToml={setToml} original={D.toml} />}

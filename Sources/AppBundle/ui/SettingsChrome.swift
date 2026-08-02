@@ -201,13 +201,64 @@ struct ListActionBar: View {
             .padding(.bottom, hint == nil ? 7 : 3)
 
             if let hint {
+                // Two lines is the ceiling for pinned chrome: an uncapped hint grew to 60-75pt at
+                // 780pt and pushed list content off-screen. The full text lives in the tooltip.
                 SettingsHint(hint)
+                    .lineLimit(2)
+                    .help(hint)
                     .padding(.horizontal, 14)
                     .padding(.bottom, 9)
             }
         }
         .background(.bar)
     }
+}
+
+/// A clickable workspace pill: Badge's shape, a Button's behavior. `help` is mandatory and doubles
+/// as the accessibility label — the visible text is a workspace name like "3", which is meaningless
+/// announced alone. Text keeps Badge's measured `.primary` blend: accent-on-accent-wash reads
+/// on-brand but measures ~3.3:1 in light mode, under the 4.5:1 floor for caption text.
+struct WorkspaceChip: View {
+    let name: String
+    let help: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(name)
+                .font(.system(.caption, design: .monospaced).weight(.medium))
+                .foregroundStyle(.primary.opacity(0.72))
+                .padding(.horizontal, 7)
+                .padding(.vertical, 2)
+                .background(Capsule().fill(Color.accentColor.opacity(0.14)))
+                .overlay(Capsule().strokeBorder(Color.accentColor.opacity(0.35), lineWidth: 1))
+        }
+        .buttonStyle(.plain)
+        .settingsHitTarget()
+        .help(help)
+        .accessibilityLabel(help)
+    }
+}
+
+extension View {
+    /// 24×24 is the WCAG 2.5.8 floor; caption-size pills and 14pt icon buttons are visually right
+    /// but physically too small, so the hit shape grows without moving a pixel.
+    func settingsHitTarget() -> some View {
+        frame(minWidth: 24, minHeight: 24).contentShape(Rectangle())
+    }
+}
+
+/// Posts a VoiceOver announcement for state that changes without a focus move — the detail strip
+/// swapping when a monitor is selected would otherwise be silent.
+@MainActor func settingsAnnounce(_ message: String) {
+    NSAccessibility.post(
+        element: NSApp as Any,
+        notification: .announcementRequested,
+        userInfo: [
+            .announcement: message,
+            .priority: NSAccessibilityPriorityLevel.high.rawValue,
+        ],
+    )
 }
 
 /// `ContentUnavailableView` is macOS 14+; this app supports 13.

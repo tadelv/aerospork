@@ -27,5 +27,9 @@ struct aerosporkApp: App {
         Settings {
             AppBundle.ConfigurationWindow()
         }
+        // Without this, a Settings scene resolves to .contentSize and the window is silently
+        // fixed at its ideal 880×620 — the 780×520 minimums in ConfigurationWindow are inert
+        // and an overflowing pane has no recovery. .contentMinSize makes them the real floor.
+        .windowResizability(.contentMinSize)
     }
 }

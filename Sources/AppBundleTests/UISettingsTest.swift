@@ -204,6 +204,97 @@ final class UISettingsTest: XCTestCase {
         XCTAssertFalse(vm.hasUnsavedChanges, "setting the already-linked value should not schedule a save")
     }
 
+    // MARK: - Monitor pinning
+
+    func testUnpinnedDefinedWorkspacesAreDefinedMinusAssigned() {
+        let vm = ConfigurationViewModel()
+        vm.definedWorkspaces = ["1", "2", "2", "3"]
+        vm.assignments = [.init(workspace: "2", monitor: "main")]
+        XCTAssertEqual(vm.unpinnedDefinedWorkspaces, ["1", "3"], "dedupe, config order, assigned excluded")
+    }
+
+    private static func twoMonitors() -> [ConfigurationViewModel.MonitorRow] {
+        [
+            ConfigurationViewModel.MonitorRow(
+                name: "DELL U3223QE (1)",
+                resolution: "3840 × 2160",
+                uuid: "AAAAAAAA-0000-4000-8000-000000000001",
+                position: 1,
+                isMain: true,
+                rect: CGRect(x: 0, y: 0, width: 2560, height: 1440),
+            ),
+            ConfigurationViewModel.MonitorRow(
+                name: "LG HDR 4K",
+                resolution: "3840 × 2160",
+                uuid: nil,
+                position: 2,
+                isMain: false,
+                rect: CGRect(x: 2560, y: 0, width: 1920, height: 1080),
+            ),
+        ]
+    }
+
+    /// The detail strip's chips must resolve every token shape this editor itself writes, with
+    /// the runtime's semantics: a name is a case-insensitive substring match, `secondary` only
+    /// means anything with exactly two monitors, and a metacharacter regex resolves to nothing
+    /// (the `complex` badge owns those).
+    func testAssignmentsPinnedToAMonitorResolveEveryEditorToken() {
+        let vm = ConfigurationViewModel()
+        vm.liveMonitors = Self.twoMonitors()
+        let dell = vm.liveMonitors[0]
+        let lg = vm.liveMonitors[1]
+        vm.assignments = [
+            .init(workspace: "a", monitor: "main"),
+            .init(workspace: "b", monitor: "secondary"),
+            .init(workspace: "c", monitor: "1"),
+            .init(workspace: "d", monitor: "lg hdr"),
+            .init(workspace: "e", monitor: dell.uuid!),
+            .init(workspace: "f", monitor: "dell.*"),
+        ]
+
+        XCTAssertEqual(vm.assignments(pinnedTo: dell).map(\.workspace), ["a", "c", "e"])
+        XCTAssertEqual(vm.assignments(pinnedTo: lg).map(\.workspace), ["b", "d"])
+        XCTAssertNil(vm.monitorRow(forToken: "dell.*"), "a metacharacter regex must not fake-resolve")
+
+        // `secondary` is only defined for exactly two monitors -- with three, its chip must
+        // vanish rather than lie.
+        vm.liveMonitors.append(ConfigurationViewModel.MonitorRow(
+            name: "Sidecar",
+            resolution: "2224 × 1668",
+            uuid: nil,
+            position: 3,
+            isMain: false,
+            rect: CGRect(x: -2224, y: 0, width: 2224, height: 1668),
+        ))
+        XCTAssertNil(vm.monitorRow(forToken: "secondary"))
+    }
+
+    func testPinUnpinRoundTripThroughTheMenuFlow() {
+        let vm = ConfigurationViewModel()
+        defer { vm.cancelPendingAutoSave() }
+        vm.liveMonitors = Self.twoMonitors()
+        let dell = vm.liveMonitors[0]
+        vm.definedWorkspaces = ["1", "2", "3"]
+
+        let id = vm.setAssignment(workspace: "3", monitorToken: dell.uuid!)
+        XCTAssertEqual(vm.assignments(pinnedTo: dell).map(\.id), [id])
+        XCTAssertEqual(vm.unpinnedDefinedWorkspaces, ["1", "2"])
+
+        vm.hasUnsavedChanges = false
+        vm.setAssignment(workspace: "3", monitorToken: dell.uuid!)
+        XCTAssertFalse(vm.hasUnsavedChanges, "re-pinning to the same monitor must not schedule a save")
+
+        vm.removeAssignment(id: id)
+        vm.cancelPendingAutoSave()
+        XCTAssertEqual(vm.unpinnedDefinedWorkspaces, ["1", "2", "3"], "unpinning returns the workspace to the menu")
+
+        let emptyRow = vm.addAssignment(monitorToken: dell.uuid!)
+        XCTAssertEqual(
+            vm.assignments.first { $0.id == emptyRow }?.monitor, dell.uuid!,
+            "Other… must create the row already pinned to the selected monitor",
+        )
+    }
+
     // MARK: - Menu bar label
 
     /// The mode chip and a workspace chip can carry the same text (`[R]` mode next to workspace

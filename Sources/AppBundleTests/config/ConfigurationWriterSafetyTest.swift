@@ -242,6 +242,13 @@ final class ConfigurationWriterSafetyTest: XCTestCase {
 /// The damage this guard exists to prevent, taken verbatim from a real config it destroyed.
 @MainActor
 final class MonitorFingerprintNotDegradedTest: XCTestCase {
+    private func errors(_ toml: String) -> [String] {
+        switch parseConfig(toml) {
+            case .success: return []
+            case .failure(let e): return e.map(\.description)
+        }
+    }
+
     /// Two physically identical panels. `display_name` alone cannot tell them apart on reconnect --
     /// the `(1)`/`(2)` suffixes are assigned by connection order -- so the config pins them by
     /// resolution as well. The view model can only hold one token per assignment, and
@@ -253,19 +260,39 @@ final class MonitorFingerprintNotDegradedTest: XCTestCase {
         3 = { fingerprint = { display_name = 'ACME Display 32 (2)', height = 2160, width = 3840 } }
         """
 
-    func testARicherFingerprintIsRefusedNotDegraded() {
-        let reason = ConfigurationWriter.unsupportedShapeReason(Self.realConfig)
-        XCTAssertNotNil(reason, "a fingerprint the editor cannot represent must be refused:\n\(Self.realConfig)")
-        XCTAssertTrue(reason?.contains("Raw TOML") == true, reason ?? "")
+    /// This config used to be refused outright. Now every row remembers the descriptions it
+    /// loaded as, so a save re-emits an untouched row faithfully — the resolution fields that
+    /// tell the two identical panels apart must survive an edit to a *different* row.
+    func testARicherFingerprintIsPreservedNotRefused() {
+        XCTAssertNil(
+            ConfigurationWriter.unsupportedShapeReason(Self.realConfig),
+            "a preservable fingerprint must no longer be refused",
+        )
+
+        let vm = ConfigurationViewModel()
+        defer { vm.cancelPendingAutoSave() }
+        vm.loadAssignments(fromText: Self.realConfig)
+        vm.markLoaded()
+        vm.setAssignment(workspace: "9", monitorToken: "AAAAAAAA-0000-4000-8000-000000000001")
+
+        let out = ConfigurationWriter.render(baseText: Self.realConfig, from: vm)
+        assertEquals(errors(out), [])
+        for row in ["2", "3"] {
+            XCTAssertTrue(
+                out.contains("name = 'ACME Display 32 (\(row == "2" ? 1 : 2))'") &&
+                    out.contains("width = 3840") && out.contains("height = 2160"),
+                "sibling row \(row) lost its disambiguating fields:\n\(out)",
+            )
+        }
     }
 
-    /// The v1 spelling of the same section is equally affected.
+    /// The v1 spelling of the same section preserves the same way.
     func testTheV1SectionNameIsCoveredToo() {
         let v1 = """
             [workspace-to-monitor-force-assignment]
             2 = { fingerprint = { display_name = 'ACME Display 32 (1)', width = 3840, height = 2160 } }
             """
-        XCTAssertNotNil(ConfigurationWriter.unsupportedShapeReason(v1))
+        XCTAssertNil(ConfigurationWriter.unsupportedShapeReason(v1))
     }
 
     /// The guard has to stay narrow: a fingerprint the editor CAN represent must remain editable,
