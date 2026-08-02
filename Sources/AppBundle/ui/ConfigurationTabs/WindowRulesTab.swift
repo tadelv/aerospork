@@ -316,7 +316,7 @@ struct WindowRulesTab: View {
         panel.allowedContentTypes = [.application]
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
-        panel.begin { response in
+        let complete: (NSApplication.ModalResponse) -> Void = { response in
             guard response == .OK, let url = panel.url, let bundleID = Bundle(url: url)?.bundleIdentifier else { return }
             Task { @MainActor in
                 guard let i = viewModel.windowRules.firstIndex(where: { $0.id == ruleID }) else { return }
@@ -324,6 +324,16 @@ struct WindowRulesTab: View {
                 viewModel.markAsModified()
                 viewModel.scheduleAutoSave()
             }
+        }
+        // An accessory app cannot bring a detached open panel forward: `begin` shows it behind
+        // whatever is frontmost, which reads as the button doing nothing while the invisible
+        // panel swallows every click. A sheet attaches to the settings window instead, which
+        // needs no app activation at all.
+        if let window = NSApp.keyWindow {
+            panel.beginSheetModal(for: window, completionHandler: complete)
+        } else {
+            NSApp.activate(ignoringOtherApps: true)
+            panel.begin(completionHandler: complete)
         }
     }
 }
