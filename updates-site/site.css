@@ -2,16 +2,12 @@
    `style-src 'self'` -- with an inline stylesheet the only ways to allow it are 'unsafe-inline',
    which defeats the point, or a hash that silently breaks the site on the next edit. */
 
+/* Dark by default: the palette every visitor gets, regardless of OS appearance. The light
+   palette lives on in git history if the site ever grows a toggle. */
 :root {
-  color-scheme: light dark;
-  --fg: #1c202c; --dim: #5b6070; --bg: #fff; --card: #f4f5f7; --link: #0064e1; --rule: #e2e4ea;
-  --ok: #2c9c5a;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --fg: #e6e8ee; --dim: #9aa0b0; --bg: #14161c; --card: #1e2129; --link: #5e9eff; --rule: #2c303a;
-    --ok: #48c07a;
-  }
+  color-scheme: dark;
+  --fg: #e6e8ee; --dim: #9aa0b0; --bg: #14161c; --card: #1e2129; --link: #5e9eff; --rule: #2c303a;
+  --ok: #48c07a;
 }
 
 * { box-sizing: border-box }
@@ -50,21 +46,20 @@ footer {
 .head img { width: 56px; height: 56px; flex: none; border-radius: 12px }
 .head h1 { margin: 0 }
 
-.links { display: flex; flex-wrap: wrap; gap: .6rem; margin-left: auto }
+.links { display: flex; flex-wrap: wrap; gap: .15rem; margin-left: auto }
 .links .btn {
   display: inline-flex; align-items: center; gap: .45rem;
-  padding: .45rem .95rem; border: 1px solid var(--rule); border-radius: 8px;
-  background: var(--card); color: var(--fg); font-weight: 600; font-size: .95rem;
-  transition: border-color .12s, background .12s;
+  padding: .4rem .7rem; border-radius: 7px;
+  color: var(--dim); font-weight: 500; font-size: .95rem;
+  transition: color .12s, background .12s;
 }
-.links .btn svg { width: 15px; height: 15px; flex: none; color: var(--dim) }
-.links .btn:hover svg { color: var(--fg) }
+.links .btn svg { width: 15px; height: 15px; flex: none }
 .links .btn .glyph {
   fill: none; stroke: currentColor; stroke-width: 1.8;
   stroke-linecap: round; stroke-linejoin: round;
 }
 .links .btn .glyph circle { fill: currentColor; stroke: none }
-.links .btn:hover { text-decoration: none; border-color: var(--link) }
+.links .btn:hover { text-decoration: none; color: var(--fg); background: var(--card) }
 .links .btn:focus-visible { outline: 2px solid var(--link); outline-offset: 2px }
 
 /* A command with a copy button parked inside it */
