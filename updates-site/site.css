@@ -44,18 +44,26 @@ footer {
   color: var(--dim); font-size: .9rem;
 }
 
-/* Header: the app icon beside the page title */
-.head { display: flex; align-items: center; gap: .8rem; margin-bottom: .3rem }
+/* Header: the app icon beside the page title, primary links pushed to the right edge.
+   flex-wrap drops the links onto their own row when a phone can't fit both. */
+.head { display: flex; flex-wrap: wrap; align-items: center; gap: .8rem; margin-bottom: .3rem }
 .head img { width: 56px; height: 56px; flex: none; border-radius: 12px }
 .head h1 { margin: 0 }
 
-/* The primary links row under the tagline */
-.links { display: flex; flex-wrap: wrap; gap: .6rem; margin: 0 0 2.2rem }
+.links { display: flex; flex-wrap: wrap; gap: .6rem; margin-left: auto }
 .links .btn {
+  display: inline-flex; align-items: center; gap: .45rem;
   padding: .45rem .95rem; border: 1px solid var(--rule); border-radius: 8px;
   background: var(--card); color: var(--fg); font-weight: 600; font-size: .95rem;
   transition: border-color .12s, background .12s;
 }
+.links .btn svg { width: 15px; height: 15px; flex: none; color: var(--dim) }
+.links .btn:hover svg { color: var(--fg) }
+.links .btn .glyph {
+  fill: none; stroke: currentColor; stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.links .btn .glyph circle { fill: currentColor; stroke: none }
 .links .btn:hover { text-decoration: none; border-color: var(--link) }
 .links .btn:focus-visible { outline: 2px solid var(--link); outline-offset: 2px }
 
