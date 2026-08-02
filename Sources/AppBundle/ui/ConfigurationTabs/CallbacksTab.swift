@@ -13,7 +13,7 @@ struct CallbacksTab: View {
                 icon: "play.circle",
                 // The help used to be a grey row *inside* the box, indistinguishable from a
                 // command. Section footers are where macOS puts this, and they stay out of the way.
-                help: "Runs once, after AeroSpork finishes launching.",
+                help: "Runs once, after AeroSpork finishes launching. Multiple commands run in order, top to bottom.",
                 keyPath: \.afterStartupCommands,
             )
             commandSection(
@@ -26,23 +26,28 @@ struct CallbacksTab: View {
                 "Focused monitor changed",
                 icon: "display.2",
                 help: "Only when focus moves to a different monitor.",
+                placeholder: "move-mouse monitor-lazy-center",
                 keyPath: \.onFocusedMonitorChanged,
             )
             commandSection(
                 "Focus changed",
                 icon: "scope",
                 help: "Any focus change at all: window, workspace or monitor. Fires the most often — keep it cheap.",
+                placeholder: "move-mouse window-lazy-center",
                 keyPath: \.onFocusChanged,
             )
 
             Section {
                 Toggle("Inherit AeroSpork's environment", isOn: viewModel.binding(\.execInheritEnvVars))
+                if viewModel.execInheritEnvVars {
+                    SettingsHint("Every command on this page runs with AeroSpork's full environment, including anything sensitive in it. Turn this off and list only what you need below.")
+                }
                 ForEach(viewModel.execEnvVars) { row in
                     HStack(spacing: 8) {
                         SettingsField("Variable name", prompt: "PATH", text: envBinding(row.id, \.name))
                             .frame(width: 150)
-                        SettingsField("Variable value", prompt: "/opt/homebrew/bin:/usr/bin", text: envBinding(row.id, \.value))
-                        removeButton {
+                        SettingsField("Variable value", prompt: "/opt/homebrew/bin:/opt/homebrew/sbin:${PATH}", text: envBinding(row.id, \.value))
+                        IconButton(systemImage: "minus.circle", label: row.name.isEmpty ? "Remove variable" : "Remove “\(row.name)”", role: .destructive) {
                             viewModel.execEnvVars.removeAll { $0.id == row.id }
                             viewModel.markAsModified()
                             viewModel.scheduleAutoSave()
@@ -56,7 +61,7 @@ struct CallbacksTab: View {
             } header: {
                 SectionLabel("Environment for exec commands", "terminal")
             } footer: {
-                Text("`exec-and-forget` and every command above run with this environment. `PATH` is the one people usually need.")
+                Text("`exec-and-forget` and every command above run with this environment. `PATH` is the one people usually need. Commands with a window or workspace target also get `AEROSPORK_WINDOW_ID` or `AEROSPORK_WORKSPACE`; check exact values with `aerospork list-exec-env-vars`.")
             }
         }
         .formStyle(.grouped)
@@ -66,6 +71,7 @@ struct CallbacksTab: View {
         _ title: String,
         icon: String,
         help: String,
+        placeholder: String = "exec-and-forget open -a Terminal",
         keyPath: ReferenceWritableKeyPath<ConfigurationViewModel, [ConfigurationViewModel.CommandRow]>,
     ) -> some View {
         Section {
@@ -74,8 +80,8 @@ struct CallbacksTab: View {
             }
             ForEach(viewModel[keyPath: keyPath]) { row in
                 HStack(spacing: 8) {
-                    SettingsField("Command", prompt: "exec-and-forget open -a Terminal", text: commandBinding(keyPath, row.id))
-                    removeButton {
+                    SettingsField("Command", prompt: placeholder, text: commandBinding(keyPath, row.id))
+                    IconButton(systemImage: "minus.circle", label: row.command.isEmpty ? "Remove command" : "Remove “\(row.command)”", role: .destructive) {
                         viewModel[keyPath: keyPath].removeAll { $0.id == row.id }
                         viewModel.markAsModified()
                         viewModel.scheduleAutoSave()
@@ -97,14 +103,6 @@ struct CallbacksTab: View {
         Button(action: action) { Label(title, systemImage: "plus.circle") }
             .buttonStyle(.borderless)
             .foregroundStyle(Color.accentColor)
-    }
-
-    private func removeButton(_ action: @escaping () -> Void) -> some View {
-        Button(role: .destructive, action: action) { Image(systemName: "minus.circle") }
-            .buttonStyle(.borderless)
-            .foregroundStyle(.secondary)
-            .help("Remove")
-            .accessibilityLabel("Remove")
     }
 
     private func commandBinding(

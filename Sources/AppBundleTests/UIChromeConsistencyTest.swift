@@ -1,7 +1,7 @@
 @testable import AppBundle
 import XCTest
 
-/// The settings window is seven tabs written at seven different times, and the failure mode is
+/// The settings window is seven panes written at seven different times, and the failure mode is
 /// always the same one: a tab needs a small piece of chrome, does not find it, and grows its own.
 /// That is how the window ended up with two badges at two paddings, three hand-rolled +/- rows and
 /// a status readout whose colour was decided per call site.
@@ -45,6 +45,18 @@ final class UIChromeConsistencyTest: XCTestCase {
             XCTAssertFalse(
                 code.contains("Capsule()"),
                 "\(path):\(line) builds its own capsule badge -- use Badge(_:tone:help:) from SettingsChrome: \(code)",
+            )
+        }
+    }
+
+    /// A symbol-only `Button` invented in a pane skips `IconButton`'s one-string help/accessibility
+    /// contract -- the exact route by which the window once grew three remove buttons. Scoped to
+    /// bare `Button`s on one line; a `Menu` label is a different shape this rule does not claim.
+    func testTabsUseIconButtonForSymbolOnlyButtons() throws {
+        try forEachCodeLine { path, line, code in
+            XCTAssertFalse(
+                code.contains("label: { Image(systemName:"),
+                "\(path):\(line) hand-rolls a symbol-only button -- use IconButton from SettingsChrome: \(code)",
             )
         }
     }
@@ -104,6 +116,18 @@ final class UIChromeConsistencyTest: XCTestCase {
             XCTAssertFalse(
                 code.contains("\"exclamationmark.triangle.fill\""),
                 "\(path):\(line) hardcodes the warning symbol -- use StatusLabel.Kind.warning: \(code)",
+            )
+        }
+    }
+
+    /// `testNoTabRollsItsOwnBadge` only catches a hand-rolled `Capsule()`; it missed a bare `Text`
+    /// used to mark the exact same "this row is generated" concept `Badge` already exists for --
+    /// same file, two implementations, one with no `.help()` and no accessibility label.
+    func testNoTabMarksOriginWithBareText() throws {
+        try forEachCodeLine { path, line, code in
+            XCTAssertFalse(
+                code.contains("Text(\"(generated)\")"),
+                "\(path):\(line) marks a row's origin with bare text -- use Badge(_:tone:help:) from SettingsChrome: \(code)",
             )
         }
     }

@@ -4,11 +4,33 @@ import Common
 import Foundation
 import XCTest
 
-/// The UI is not headless-renderable, so these cover the parts of it that are actually logic:
-/// the key-notation codec behind the shortcut recorder, tray item identity, and the deployment
-/// floor that decides whether a control renders at all.
+/// Logic behind the settings surface that is useful to assert without UI automation: navigation
+/// metadata, editor behavior, key notation, tray identity, branding, and the deployment floor.
 @MainActor
 final class UISettingsTest: XCTestCase {
+    // MARK: - Pane navigation
+
+    func testSettingsPaneMetadataIsCompleteAndStable() {
+        let panes = ConfigurationWindow.SettingsPane.allCases
+        XCTAssertEqual(panes.map(\.rawValue), [
+            "general", "gaps", "keys", "monitors", "events", "windowRules", "rawToml",
+        ])
+        XCTAssertEqual(panes.map(\.title), [
+            "General", "Gaps", "Keys", "Monitors", "Events", "Window Rules", "Raw TOML",
+        ])
+        XCTAssertTrue(panes.allSatisfy { !$0.symbol.isEmpty })
+        XCTAssertEqual(Set(panes.map(\.symbol)).count, panes.count)
+        for pane in panes {
+            // A misspelled or too-new SF Symbol renders a blank toolbar icon, silently. This can
+            // only catch a deployment-floor violation when run on the floor OS, but it catches a
+            // bad name everywhere.
+            XCTAssertNotNil(
+                NSImage(systemSymbolName: pane.symbol, accessibilityDescription: nil),
+                "\(pane.rawValue) pane symbol \"\(pane.symbol)\" is not a resolvable SF Symbol on this OS",
+            )
+        }
+    }
+
     // MARK: - Key recorder
 
     /// Every Swift file of the settings UI. Asserts non-empty, so a wrong path cannot make the
@@ -65,6 +87,121 @@ final class UISettingsTest: XCTestCase {
         assertEquals(KeyNotation.pretty("ctrl-alt-cmd-space"), "⌃⌥⌘space")
         // An unknown leading token must survive rather than vanish.
         assertEquals(KeyNotation.pretty("hyper-h"), "hyper-h")
+    }
+
+    // MARK: - Raw TOML editor
+
+    func testRawTomlSectionNavigationKeepsDocumentOrder() {
+        let headers = RawTomlTab.sections(in: """
+            title = '[not-a-header]'
+            [gaps] # visible section
+            inner.horizontal = 8
+              [[on-window-detected]]
+            ["display]rules"] # a quoted key can contain the closing glyph
+            [['literal]key']]
+            # [commented-out]
+            broken [keys]
+            [broken] trailing text
+            """)
+        XCTAssertEqual(headers.map(\.line), [2, 4, 5, 6])
+        XCTAssertEqual(headers.map(\.label), [
+            "[gaps]", "[[on-window-detected]]", "[\"display]rules\"]", "[['literal]key']]",
+        ])
+    }
+
+    func testRawTomlHighlightingIsRestrainedAndQuoteAware() {
+        let textView = NSTextView()
+        textView.string = "[gaps]\nkey = 'a # value' # comment\n"
+        TomlSyntaxHighlighter.apply(to: textView)
+        let source = textView.string as NSString
+
+        func color(at token: String, occurrence: Int = 1) -> NSColor? {
+            var search = NSRange(location: 0, length: source.length)
+            var result = NSRange(location: NSNotFound, length: 0)
+            for _ in 0 ..< occurrence {
+                result = source.range(of: token, options: [], range: search)
+                guard result.location != NSNotFound else { return nil }
+                let next = NSMaxRange(result)
+                search = NSRange(location: next, length: source.length - next)
+            }
+            return textView.textStorage?.attribute(.foregroundColor, at: result.location, effectiveRange: nil) as? NSColor
+        }
+
+        XCTAssertEqual(color(at: "[gaps]"), NSColor.controlAccentColor)
+        XCTAssertEqual(color(at: "key"), NSColor.labelColor)
+        XCTAssertEqual(color(at: "#", occurrence: 1), NSColor.secondaryLabelColor, "a hash inside a string is not a comment")
+        XCTAssertEqual(color(at: "#", occurrence: 2), NSColor.tertiaryLabelColor)
+    }
+
+    func testRawTomlHighlightingIgnoresCommentsInsideMultilineStrings() {
+        let textView = NSTextView()
+        textView.string = "value = \"\"\"first # value\nstill # value\n\"\"\" # comment\n"
+        TomlSyntaxHighlighter.apply(to: textView)
+        let source = textView.string as NSString
+        var search = NSRange(location: 0, length: source.length)
+        var colors: [NSColor?] = []
+        for _ in 0 ..< 3 {
+            let hash = source.range(of: "#", options: [], range: search)
+            XCTAssertNotEqual(hash.location, NSNotFound)
+            colors.append(textView.textStorage?.attribute(
+                .foregroundColor,
+                at: hash.location,
+                effectiveRange: nil,
+            ) as? NSColor)
+            let next = NSMaxRange(hash)
+            search = NSRange(location: next, length: source.length - next)
+        }
+        XCTAssertEqual(colors[0], NSColor.secondaryLabelColor)
+        XCTAssertEqual(colors[1], NSColor.secondaryLabelColor)
+        XCTAssertEqual(colors[2], NSColor.tertiaryLabelColor)
+    }
+
+    // MARK: - Guided controls
+
+    func testGuidedWindowRuleActionsParseAndComposeWithoutLosingIntent() {
+        let action = parseGuidedWindowAction("move-node-to-workspace 3 ; layout floating")
+        XCTAssertEqual(action.layout, .floating)
+        XCTAssertEqual(action.workspace, "3")
+        XCTAssertFalse(action.isCustom)
+        XCTAssertEqual(composeGuidedWindowAction(action), "layout floating ; move-node-to-workspace 3")
+
+        let custom = parseGuidedWindowAction("layout tiling ; exec-and-forget open -a Finder")
+        XCTAssertEqual(custom.layout, .tiling)
+        XCTAssertTrue(custom.isCustom, "guided controls must not overwrite an unrepresentable command")
+        XCTAssertEqual(
+            composeGuidedWindowAction(custom), "layout tiling ; exec-and-forget open -a Finder",
+            "the unrepresentable part must survive composition verbatim, not just flag itself",
+        )
+    }
+
+    func testLinkedGapSettersUpdateEveryEdgeAndAvoidNoOpSaves() {
+        let vm = ConfigurationViewModel()
+        defer { vm.cancelPendingAutoSave() }
+
+        vm.innerGapsHorizontal = 4
+        vm.innerGapsVertical = 9
+        vm.setInnerGaps(12)
+        XCTAssertEqual([vm.innerGapsHorizontal, vm.innerGapsVertical], [12, 12])
+        XCTAssertTrue(vm.hasUnsavedChanges)
+
+        vm.hasUnsavedChanges = false
+        vm.setInnerGaps(12)
+        XCTAssertFalse(vm.hasUnsavedChanges, "setting the already-linked value should not schedule a save")
+
+        vm.outerGapsTop = 1
+        vm.outerGapsBottom = 2
+        vm.outerGapsLeft = 3
+        vm.outerGapsRight = 4
+        vm.setOuterGaps(16)
+        XCTAssertEqual(
+            [vm.outerGapsTop, vm.outerGapsBottom, vm.outerGapsLeft, vm.outerGapsRight],
+            [16, 16, 16, 16],
+        )
+        XCTAssertTrue(vm.hasUnsavedChanges)
+
+        vm.hasUnsavedChanges = false
+        vm.setOuterGaps(16)
+        XCTAssertFalse(vm.hasUnsavedChanges, "setting the already-linked value should not schedule a save")
     }
 
     // MARK: - Menu bar label

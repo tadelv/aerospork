@@ -18,6 +18,8 @@ struct GeneralSettingsTab: View {
                     .help("Plug in a dock and your pinned workspaces go back to the monitors you assigned them. Off, they stay wherever they landed when the monitor went away.")
             } header: {
                 SectionLabel("Startup & behaviour", "power")
+            } footer: {
+                Text("Automatically unhiding macOS hidden apps undoes ⌘H so a hidden window keeps tiling. Moving workspaces on monitor connect puts each one back on the monitor you pinned it to; off, a workspace stays wherever it landed when that monitor disappeared.")
             }
 
             Section {
@@ -31,7 +33,7 @@ struct GeneralSettingsTab: View {
                 ))
                 .disabled(viewModel.appVisibility.dockIconIsForced)
             } header: {
-                SectionLabel("Appearance", "menubar.rectangle")
+                SectionLabel("Menu bar & Dock", "menubar.rectangle")
             } footer: {
                 Text(viewModel.appVisibility.dockIconIsForced
                     ? "Both icons off would leave no way into Settings, so the Dock icon is kept. `aerospork open-settings` opens this window from anywhere if you would rather use a shortcut."
@@ -56,7 +58,7 @@ struct GeneralSettingsTab: View {
             } header: {
                 SectionLabel("Layout", "rectangle.split.3x1")
             } footer: {
-                Text("Auto gives wide monitors a horizontal split and tall monitors a vertical one. The accordion peek is how much of the window behind stays visible; 0 stacks them exactly.")
+                Text("Auto gives wide monitors a horizontal split and tall monitors a vertical one. The accordion peek is how much of the window behind stays visible; 0 stacks them exactly. It applies to any accordion container, not just new workspaces.")
             }
 
             Section {

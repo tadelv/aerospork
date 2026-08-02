@@ -42,6 +42,12 @@ import TOMLKit
 /// emits keys that the canonical `parseConfig` accepts.
 @MainActor
 enum ConfigurationWriter {
+    struct ValidationDiagnostic: Equatable {
+        let message: String
+        let line: Int?
+        let column: Int?
+    }
+
     /// Writes text that has ALREADY been rendered and validated. Taking the final string rather
     /// than re-rendering means the bytes that were validated are exactly the bytes that land on
     /// disk -- previously `validate` and `write` rendered separately from a re-read base file.
@@ -78,11 +84,15 @@ enum ConfigurationWriter {
     /// chronologically as plain strings, and `.backup` last so nothing mistakes one for a config.
     private static let backupSuffix = ".backup"
 
-    private static func timestamp(_ date: Date) -> String {
-        let f = DateFormatter()
-        f.dateFormat = "yyyyMMdd-HHmmss"
-        return f.string(from: date)
-    }
+    private static let backupTimestampFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.dateFormat = "yyyyMMdd-HHmmss"
+        return formatter
+    }()
+
+    private static func timestamp(_ date: Date) -> String { backupTimestampFormatter.string(from: date) }
 
     /// Copies `target` aside and prunes to `backupsToKeep`. Best-effort: a config we could not back
     /// up is not a reason to refuse the user's edit, and the pre-write validation already ran.
@@ -182,6 +192,25 @@ enum ConfigurationWriter {
             case .success: return nil
             case .failure(let errors): return errors.map(\.description).joined(separator: "\n")
         }
+    }
+
+    /// Validation shaped for an editor. TOMLKit already knows the exact source location for
+    /// syntax errors; keep it structured instead of making the view scrape numbers back out of a
+    /// localized error string. Semantic config errors still carry their key path in `message` and
+    /// intentionally have no pretend source position.
+    static func diagnostic(_ text: String) -> ValidationDiagnostic? {
+        do {
+            _ = try TOMLTable(string: text)
+        } catch let error as TOMLParseError {
+            return ValidationDiagnostic(
+                message: error.debugDescription,
+                line: error.source.begin.line,
+                column: error.source.begin.column,
+            )
+        } catch {
+            return ValidationDiagnostic(message: error.localizedDescription, line: nil, column: nil)
+        }
+        return validate(text).map { ValidationDiagnostic(message: $0, line: nil, column: nil) }
     }
 
     /// TOML has many equivalent spellings for the same data. This writer edits *lines*, so it only

@@ -106,6 +106,30 @@ final class UIRenderSmokeTest: XCTestCase {
         render(RawTomlTab(viewModel: ConfigurationViewModel()), "Raw TOML (empty)")
     }
 
+    /// The connected-monitor list is empty on a headless runner, so render the geometry primitive
+    /// directly with an asymmetric arrangement. That exercises scaling, negative origins, unequal
+    /// panel sizes, ordering labels, and the highlighted main-display branch.
+    func testMonitorArrangementRendersAsymmetricGeometry() {
+        let rows = [
+            ConfigurationViewModel.MonitorRow(
+                name: "Studio Display",
+                resolution: "2560 × 1440",
+                uuid: "AAAAAAAA-0000-4000-8000-000000000001",
+                position: 2,
+                isMain: true,
+                rect: CGRect(x: 0, y: 0, width: 2560, height: 1440),
+            ),
+            ConfigurationViewModel.MonitorRow(
+                name: "DisplayLink",
+                resolution: "1920 × 1080",
+                uuid: "BBBBBBBB-0000-4000-8000-000000000002",
+                position: 1,
+                rect: CGRect(x: -1920, y: 180, width: 1920, height: 1080),
+            ),
+        ]
+        render(MonitorArrangementView(monitors: rows), "Monitor arrangement")
+    }
+
     /// The empty case is the one that traps: a `Table` or `List` built from an empty collection, and
     /// the "no bindings yet" placeholder path that only appears on a fresh config.
     func testTabsRenderWithAnEmptyViewModel() {

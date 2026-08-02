@@ -2,6 +2,49 @@ import Common
 import SwiftUI
 
 struct KeyBindingsTab: View {
+    private struct BindingCategory: Identifiable {
+        let id: String
+        let title: String
+        let icon: String
+        let commandPrefixes: Set<String>
+    }
+
+    private struct OtherModeMatch: Identifiable {
+        let mode: String
+        let binding: ConfigurationViewModel.DisplayBinding
+
+        var id: String { "\(mode)\u{0}\(binding.key)\u{0}\(binding.command)" }
+    }
+
+    private static let categories = [
+        BindingCategory(
+            id: "focus", title: "Focus", icon: "scope",
+            commandPrefixes: ["focus", "focus-monitor", "focus-back-and-forth"],
+        ),
+        BindingCategory(
+            id: "move", title: "Move & workspace", icon: "rectangle.3.group",
+            commandPrefixes: [
+                "move", "move-mouse", "move-node-to-monitor", "move-node-to-workspace",
+                "move-workspace-to-monitor", "summon-workspace", "workspace", "workspace-back-and-forth",
+            ],
+        ),
+        BindingCategory(
+            id: "layout", title: "Layout & resize", icon: "rectangle.split.2x1",
+            commandPrefixes: [
+                "balance-sizes", "flatten-workspace-tree", "fullscreen", "join-with", "layout",
+                "macos-native-fullscreen", "macos-native-minimize", "resize", "split",
+            ],
+        ),
+        BindingCategory(
+            id: "system", title: "Mode & system", icon: "gearshape",
+            commandPrefixes: [
+                "close", "close-all-windows-but-current", "config", "enable", "exec-and-forget", "mode",
+                "open-settings", "reload-config", "trigger-binding", "volume",
+            ],
+        ),
+        BindingCategory(id: "other", title: "Other", icon: "ellipsis", commandPrefixes: []),
+    ]
+
     @ObservedObject var viewModel: ConfigurationViewModel
     @State private var selectedMode = mainModeId
     @State private var newKey = ""
@@ -13,15 +56,43 @@ struct KeyBindingsTab: View {
     @State private var addingMode = false
     @State private var query = ""
 
+    /// A segmented control's width is the sum of its segments' intrinsic widths and cannot shrink
+    /// below that. The stock config (2 modes) fits comfortably at the 880pt ideal width; the old
+    /// `.fixedSize()`-only version overflowed the 780pt minimum at 9. 5 is the point past which a
+    /// realistic mode name (5-10 chars) plus segment padding starts crowding the filter box before
+    /// that ceiling, so it is where this switches to a bounded-width menu instead of trying to keep
+    /// shrinking a control that has a hard floor.
+    static func modePickerIsSegmented(count: Int) -> Bool { count <= 5 }
+
     private var allRows: [ConfigurationViewModel.DisplayBinding] { viewModel.displayBindings(mode: selectedMode) }
 
     /// A real keymap is 40-80 bindings -- and under config v2 most of them are *generated*, so the
     /// list is longer than anything written in the file. Scrolling it looking for "the one that
     /// moves a window to monitor 2" is the single slowest thing in this window.
     private var rows: [ConfigurationViewModel.DisplayBinding] {
-        let needle = query.trimmingCharacters(in: .whitespaces).lowercased()
+        let needle = normalizedQuery
         guard !needle.isEmpty else { return allRows }
         return allRows.filter { $0.key.lowercased().contains(needle) || $0.command.lowercased().contains(needle) }
+    }
+
+    private var normalizedQuery: String {
+        query.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+    }
+
+    /// Search is global even though editing remains scoped to the selected mode. A shortcut can
+    /// otherwise look missing simply because the user forgot which mode owns it.
+    private var otherModeMatches: [OtherModeMatch] {
+        guard !normalizedQuery.isEmpty else { return [] }
+        return viewModel.allModeNames
+            .filter { $0 != selectedMode }
+            .flatMap { mode in
+                viewModel.displayBindings(mode: mode).compactMap { binding in
+                    guard binding.key.lowercased().contains(normalizedQuery)
+                        || binding.command.lowercased().contains(normalizedQuery)
+                    else { return nil }
+                    return OtherModeMatch(mode: mode, binding: binding)
+                }
+            }
     }
 
     var body: some View {
@@ -41,13 +112,23 @@ struct KeyBindingsTab: View {
         HStack(spacing: 10) {
             if viewModel.allModeNames.isEmpty {
                 Text("No modes").foregroundStyle(.secondary)
-            } else {
+            } else if Self.modePickerIsSegmented(count: viewModel.allModeNames.count) {
                 Picker("Mode", selection: $selectedMode) {
                     ForEach(viewModel.allModeNames, id: \.self) { Text($0).tag($0) }
                 }
                 .pickerStyle(.segmented)
                 .labelsHidden()
                 .fixedSize()
+            } else {
+                // A segmented control has a hard per-segment width floor and cannot shrink past
+                // it -- past this many modes it overflows the window no matter what its neighbours
+                // give up. `.menu` is bounded to one control's width regardless of option count.
+                Picker("Mode", selection: $selectedMode) {
+                    ForEach(viewModel.allModeNames, id: \.self) { Text($0).tag($0) }
+                }
+                .pickerStyle(.menu)
+                .labelsHidden()
+                .frame(maxWidth: 150)
             }
 
             // One menu instead of two naked +/- buttons whose meaning ("add a *mode*, not a
@@ -93,8 +174,7 @@ struct KeyBindingsTab: View {
                     .frame(minWidth: 70, idealWidth: 150, maxWidth: 150)
                     .accessibilityLabel("Filter bindings")
                 if !query.isEmpty {
-                    Button { query = "" } label: { Image(systemName: "xmark.circle.fill") }
-                        .buttonStyle(.borderless)
+                    IconButton(systemImage: "xmark.circle.fill", label: "Clear search") { query = "" }
                         .foregroundStyle(.tertiary)
                 }
             }
@@ -119,22 +199,106 @@ struct KeyBindingsTab: View {
                 message: "Your config binds nothing and generates nothing. Record a shortcut below to add the first binding.",
             )
         } else if rows.isEmpty {
+            let matchingModeSet = Set(otherModeMatches.map(\.mode))
+            let matchingModes = viewModel.allModeNames.filter { matchingModeSet.contains($0) }
             ContentUnavailableViewCompat(
                 icon: query.isEmpty ? "keyboard" : "magnifyingglass",
                 title: query.isEmpty ? "“\(selectedMode)” has no bindings" : "No matches",
-                message: query.isEmpty
-                    ? "Record a shortcut below to add the first one."
-                    : "Nothing in “\(selectedMode)” matches “\(query)”.",
+                message: noMatchesMessage(matchingModes: matchingModes),
                 // The query is whatever the user typed; markdown would render `*foo*` as italic foo
                 // rather than the text they are actually searching for.
                 messageIsMarkdown: query.isEmpty,
+                actionTitle: noMatchesActionTitle(matchingModes: matchingModes),
+                action: {
+                    if matchingModes.count == 1, let mode = matchingModes.first {
+                        selectedMode = mode
+                    } else {
+                        query = ""
+                    }
+                },
             )
         } else {
             List {
-                ForEach(rows) { row($0) }
+                if normalizedQuery.isEmpty {
+                    let populated = Self.categories.filter { category in
+                        rows.contains { self.category(for: $0.command) == category.id }
+                    }
+                    if populated.count < 2 {
+                        ForEach(rows) { row($0) }
+                    } else {
+                        ForEach(populated) { category in
+                            let categoryRows = rows.filter { self.category(for: $0.command) == category.id }
+                            Section {
+                                ForEach(categoryRows) { row($0) }
+                            } header: {
+                                Label("\(category.title) — \(categoryRows.count)", systemImage: category.icon)
+                            }
+                        }
+                    }
+                } else {
+                    if !rows.isEmpty {
+                        Section("In \(selectedMode)") {
+                            ForEach(rows) { row($0) }
+                        }
+                    }
+                    if !otherModeMatches.isEmpty {
+                        Section("In other modes — \(otherModeMatches.count)") {
+                            ForEach(otherModeMatches) { otherModeRow($0) }
+                        }
+                    }
+                }
             }
             .listStyle(.inset)
         }
+    }
+
+    private func noMatchesMessage(matchingModes: [String]) -> String {
+        guard !query.isEmpty else { return "Record a shortcut below to add the first one." }
+        let base = "Nothing in “\(selectedMode)” matches “\(query)”."
+        if matchingModes.count == 1, let mode = matchingModes.first { return "\(base) It’s bound in “\(mode)” instead." }
+        if matchingModes.count > 1 { return "\(base) It’s bound in other modes." }
+        return base
+    }
+
+    private func noMatchesActionTitle(matchingModes: [String]) -> String? {
+        guard !query.isEmpty else { return nil }
+        if matchingModes.count == 1, let mode = matchingModes.first { return "Go to “\(mode)”" }
+        return "Clear filter"
+    }
+
+    private func category(for command: String) -> String {
+        let prefix = command
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .split { $0.isWhitespace }
+            .first
+            .map(String.init) ?? ""
+        return Self.categories.first { !$0.commandPrefixes.isEmpty && $0.commandPrefixes.contains(prefix) }?.id
+            ?? "other"
+    }
+
+    private func otherModeRow(_ match: OtherModeMatch) -> some View {
+        HStack(spacing: 8) {
+            Text(match.mode)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .frame(width: 90, alignment: .leading)
+            Text(KeyNotation.pretty(match.binding.key))
+                .font(.system(.body, design: .monospaced))
+                .lineLimit(1)
+                .frame(width: 140, alignment: .leading)
+            Text(match.binding.command)
+                .font(.system(.body, design: .monospaced))
+                .lineLimit(1)
+                .truncationMode(.middle)
+            Spacer(minLength: 8)
+            if match.binding.origin == .generated {
+                Badge("generated", help: "Generated from mod and workspaces. It is not written in your config file.")
+            }
+            Button("Go") { selectedMode = match.mode }
+                .buttonStyle(.borderless)
+                .accessibilityLabel("Show this binding in \(match.mode)")
+        }
+        .help("\(match.mode): \(match.binding.command)")
     }
 
     /// An editable row is one the writer owns. A generated or `[keys]` row is shown read-only with
@@ -145,17 +309,20 @@ struct KeyBindingsTab: View {
         HStack(spacing: 8) {
             if let rowId = b.rowId {
                 KeyRecorderField(notation: key(rowId, b.key), isRecording: recorder(b.key), showsClear: false)
-                    .frame(width: 150, height: 22)
+                    .frame(width: 170, height: 22)
                 SettingsField("Command", prompt: "focus left", text: command(rowId, b.command))
                     .accessibilityLabel("Command for \(b.key)")
-                Button { remove(rowId) } label: { Image(systemName: "minus.circle") }
-                    .buttonStyle(.borderless)
-                    .help("Remove this binding")
-                    .accessibilityLabel("Remove \(b.key)")
+                IconButton(systemImage: "doc.on.doc", label: "Duplicate “\(b.command)”") { duplicate(b) }
+                IconButton(systemImage: "minus.circle", label: "Remove “\(b.key)”", role: .destructive) {
+                    remove(rowId)
+                }
             } else {
                 Text(KeyNotation.pretty(b.key))
                     .font(.system(.body, design: .monospaced))
-                    .frame(width: 150, alignment: .leading)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .help(KeyNotation.pretty(b.key))
+                    .frame(width: 170, alignment: .leading)
                 Text(b.command)
                     .font(.system(.body, design: .monospaced))
                     .foregroundStyle(.secondary)
@@ -168,6 +335,7 @@ struct KeyBindingsTab: View {
                 // Generated bindings appear nowhere in the config file, so without this the tab
                 // shows dozens of rows the user cannot find when they go looking.
                 Badge("generated", help: "Generated from mod and workspaces. It is not written in your config file.")
+                IconButton(systemImage: "doc.on.doc", label: "Duplicate “\(b.command)”") { duplicate(b) }
                 Button("Override") { override(b) }
                     .buttonStyle(.borderless)
                     .accessibilityLabel("Override \(b.key)")
@@ -238,8 +406,20 @@ struct KeyBindingsTab: View {
                     .padding(.top, 7)
             }
 
+            if let otherModeSummary {
+                StatusLabel(otherModeSummary, kind: .neutral)
+                    .padding(.horizontal, 14)
+                    .padding(.top, 7)
+            }
+
             // One bottom strip, not a composer bar plus a separate footer bar under it.
+            // `summary` grows with the keymap (mod-generated count, written count, both trailing
+            // sentences) and the tab has no ScrollView wrapping modeBar+composer, so an unbounded
+            // hint could push the composer past the window edge. Capped at two lines with the full
+            // text on hover/VoiceOver instead.
             SettingsHint(summary)
+                .lineLimit(2)
+                .help(summary)
                 .padding(.horizontal, 14)
                 .padding(.top, 7)
                 .padding(.bottom, 10)
@@ -262,7 +442,7 @@ struct KeyBindingsTab: View {
                 .lineLimit(1)
                 .truncationMode(.middle)
             if conflict.origin == .generated {
-                Text("(generated)").font(.callout).foregroundStyle(.secondary)
+                Badge("generated", help: "Generated from mod and workspaces. It is not written in your config file.")
             }
             Button("Show") { query = conflict.key }
                 .buttonStyle(.borderless)
@@ -282,7 +462,7 @@ struct KeyBindingsTab: View {
         let separator = ConfigurationViewModel.commandSeparator.trimmingCharacters(in: .whitespaces)
         return parts.joined(separator: ", ") +
             (generated > 0 ? ". Generated bindings have no line to edit — Override copies one here first." : "") +
-            " Chain commands with `\(separator)`."
+            " Chain commands with `\(separator)`. A workspace named by a binding stays available even with no windows."
     }
 
     /// Only clear the fields when the binding was actually taken. Clearing unconditionally is how
@@ -299,6 +479,28 @@ struct KeyBindingsTab: View {
     private func override(_ b: ConfigurationViewModel.DisplayBinding) {
         guard viewModel.addBinding(mode: selectedMode, key: b.key, command: b.command) else { return }
         viewModel.scheduleAutoSave()
+    }
+
+    private func duplicate(_ binding: ConfigurationViewModel.DisplayBinding) {
+        newKey = ""
+        newCommand = binding.command
+        recording = false
+    }
+
+    private var otherModeOwners: [String] {
+        guard !newKey.isEmpty else { return [] }
+        return viewModel.allModeNames.filter { mode in
+            mode != selectedMode && viewModel.existingBinding(mode: mode, key: newKey) != nil
+        }
+    }
+
+    private var otherModeSummary: String? {
+        let owners = otherModeOwners
+        guard !owners.isEmpty else { return nil }
+        if owners.count == 1 { return "Also bound in “\(owners[0])” mode." }
+        let named = owners.prefix(2).map { "“\($0)”" }.joined(separator: ", ")
+        let remainder = owners.count > 2 ? ", and \(owners.count - 2) more" : ""
+        return "Also bound in \(named)\(remainder) modes."
     }
 
     private func commitMode() {
@@ -334,12 +536,9 @@ private struct KeyRecorderField: View {
         Recorder(notation: $notation, isRecording: $isRecording)
             .overlay(alignment: .trailing) {
                 if showsClear, !notation.isEmpty {
-                    Button { notation = "" } label: { Image(systemName: "xmark.circle.fill") }
-                        .buttonStyle(.borderless)
+                    IconButton(systemImage: "xmark.circle.fill", label: "Clear this shortcut") { notation = "" }
                         .foregroundStyle(.tertiary)
                         .padding(.trailing, 4)
-                        .help("Clear")
-                        .accessibilityLabel("Clear this shortcut")
                 }
             }
     }
@@ -424,14 +623,19 @@ private struct KeyRecorderField: View {
                 .paragraphStyle: paragraph,
             ]
             let size = (text as NSString).size(withAttributes: attrs)
-            // `draw(in:)`, not `draw(at:)`: without a bounding rect AppKit clips at the view edge
-            // mid-glyph with no ellipsis, and a binding like `alt-shift-leftSquareBracket` is wider
-            // than the 150pt field.
             let inset: CGFloat = 8
+            let rect = NSRect(x: inset, y: (bounds.height - size.height) / 2,
+                              width: max(0, bounds.width - inset * 2), height: size.height)
+            // `draw(with:options:attributes:context:)`, not `draw(in:withAttributes:)`: the latter
+            // ignores `paragraph.lineBreakMode` entirely and hard-clips at the rect edge mid-glyph
+            // with no ellipsis, so a binding like `alt-shift-leftSquareBracket` sheared off instead
+            // of truncating. This overload honours the paragraph style. The 3-arg sibling without
+            // `context:` does too, but is in `NSStringDrawingDeprecated`.
             (text as NSString).draw(
-                in: NSRect(x: inset, y: (bounds.height - size.height) / 2,
-                           width: max(0, bounds.width - inset * 2), height: size.height),
-                withAttributes: attrs,
+                with: rect,
+                options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine],
+                attributes: attrs,
+                context: nil,
             )
         }
     }

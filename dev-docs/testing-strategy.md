@@ -5,11 +5,13 @@ test the hard parts (real windows, multi-monitor, DisplayLink) without flaking,
 and the tooling/skills to build and maintain to keep it honest over time.
 
 > **Toolchain gotcha, read first.** This app is bound to the macOS SDK, not just a
-> Swift version. On macOS 27 the only working toolchain is Xcode 27 beta 2 (Swift
-> 6.4); a mismatched SDK makes `swift build` **hang silently**. Every build/test
-> script must preflight the toolchain (see §8). Build/test with:
+> Swift version. The current macOS 27 development environment uses Xcode 27 beta 2
+> (Swift 6.4); a mismatched SDK can make `swift build` **hang silently**. Use the
+> repository wrappers. If Swiftly is installed but the `.swift-version` toolchain is not, or the
+> selected Xcode SDK is the intended toolchain, use the documented `xcrun` escape hatch:
 > ```
-> DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer xcrun swift test
+> ./run-swift-test.sh                         # normal pinned-toolchain path
+> AEROSPORK_SWIFT=xcrun ./run-swift-test.sh   # selected-Xcode path
 > ```
 
 ---
@@ -42,13 +44,14 @@ headless and reusable:
 1. **CI runs the suite but not the seams below.** `.github/workflows/ci.yml` runs `run-tests.sh` on
    `macos-latest`; what it cannot cover is anything needing a real window server (see §"CI
    strategy").
-2. **The fork's marquee new code is untested.** `ConfigurationWriter` (line-surgery TOML
-   editing) and the settings GUI are guarded by automated writer tests in `ConfigTest.swift` (they replaced `test-settings-ui.sh`, which was a *manual,
-   interactive* checklist whose Test 1 is "did keybindings survive a Save?" i.e. a real
-   data-loss bug now guarded by a human pressing Enter. Same for the other revamp code:
-   `Key` Carbon mapping, `SystemVolume` and `ConfigFileWatcher` still have no tests.
-   `UnixSocket` framing and `MonitorFingerprint` UUID matching since gained them
-   (`UnixSocketTest`, `MonitorFingerprintTest`).
+2. ~~**The fork's marquee new code is untested.**~~ The config writer now has no-op,
+   round-trip, safety, backup, and fuzz coverage. Settings has source invariants, pane/view-model
+   logic tests, complete empty/loaded render smoke, direct monitor-arrangement rendering, Raw TOML
+   section/highlighting/diagnostic tests, and shared-chrome consistency checks. These are headless
+   and deterministic; they do not replace a visual review of native AppKit/SwiftUI pixels. The
+   remaining pure-code gaps include `Key` Carbon mapping, `SystemVolume`, and `ConfigFileWatcher`.
+   Unix-socket framing and MonitorFingerprint UUID matching are covered by `SocketCodecTest`,
+   `UnixSocketTest`, and `MonitorFingerprintTest`.
 3. ~~**Layout geometry is unreachable in tests.**~~ Fixed. `LayoutTestWindow` overrides
    `setAxFrame`/`setAxTopLeftCorner` to record the rect instead of hitting `Window`'s base
    `die("Not implemented")`, and `LayoutRecursiveTest` runs `layoutWorkspace()` headlessly
@@ -69,15 +72,16 @@ only with real AX/monitors, e2e/manual.
 | Layer | What | Runs where | Cadence | Catches |
 |---|---|---|---|---|
 | **Static** | swiftformat, swiftlint, `generate.sh --all` + uncommitted check, **toolchain preflight** | Any Mac / CI | every commit | style drift, stale generated files, wrong-SDK builds |
-| **Unit (headless)** | existing tree/command/config/socket XCTest; **+ new** config round-trip/fuzz, socket framing, fingerprint/UUID, Key mapping; **+ layout golden-rects** (after §4 seam) | Any Mac / CI | every commit / PR | layout math, command logic, config parse+write data loss, window-kind heuristics, IPC framing |
+| **Unit (headless)** | tree/command/config/socket XCTest; config round-trip/fuzz; fingerprint/UUID; layout geometry; Settings logic/source/render smoke | Any Mac / CI | every commit / PR | layout math, command logic, config parse+write data loss, settings body traps and invariants, window-kind heuristics, IPC framing |
 | **Integration (live socket/CLI)** | `run-e2e.sh`: launch debug app → `enable on` → issue commands → assert on `list-* --json` | self-hosted Mac (AX granted) | on merge + nightly | server/CLI wiring, framing over a real socket, refresh-session sync |
 | **E2E (real windows + virtual displays)** | spawn stock-app windows, tile, assert live rects; multi-monitor via BetterDisplay | self-hosted / dev Mac | nightly / on-demand | real AX quirks, tiling real windows, monitor arrangement, workspace assignment |
-| **Manual** | DisplayLink hardware (`uuid` fingerprint, flap timing), SwiftUI settings smoke, first-run permission UX | one dev Mac w/ dongle | per release | hardware-only fingerprinting, GUI regressions, permission flow |
+| **Manual** | DisplayLink hardware (`uuid` fingerprint, flap timing), Settings visual/interaction review, first-run permission UX | one dev Mac w/ dongle | per release | hardware-only fingerprinting, native-control pixel/interaction regressions, permission flow |
 
 **CI feasibility:** most meaningful tests are headless and belong in CI.
 The AX/multi-monitor slice needs a real Mac; DisplayLink needs the physical dongle.
-GitHub-*hosted* runners can't even build this until a stable macOS-27 + Xcode-27 image
-ships. CI now runs `run-tests.sh` on a hosted `macos-latest` runner.
+CI runs `run-tests.sh` on a hosted `macos-latest` runner; it does not need macOS 27 to verify the
+macOS 13 deployment floor. OS-27-specific visual behavior stays in the manual release pass until a
+matching hosted image exists.
 
 ---
 
@@ -94,9 +98,10 @@ before believing a row.
 
 | Test | Target | Why |
 |---|---|---|
-| **default-config parses** | `parseConfig(String(contentsOf: defaultConfigUrl), isUserConfig:false)` → `assertSucc` + spot-check values | Today it's only *implicitly* exercised (setUp `die()`s if it breaks). The shipped default must always parse; make it an explicit named guarantee. `config/Config.swift:23-38` |
-| **UnixSocket framing** | `sendMessage`/`recvMessage` loopback: empty / 1-byte / >64KiB payloads; `recvMessage` → nil on peer close; partial-read/EINTR via `socketpair(2)` into `UnixSocketConnection(fd:)` | Replaced BlueSocket; a framing bug = silent IPC corruption. `Common/util/UnixSocket.swift:40,60,85,93` |
-| **ConfigurationWriter round-trip + fuzz** | Feed base TOML (incl. `default-config.toml` and the keybinding/gaps cases from `test-settings-ui.sh`) through `write(from:)`, re-`parseConfig`; assert (a) managed keys changed, (b) comments/order/unknown sections survive, (c) `write→parse→write` is a fixed point. Add a small property fuzzer over valid VM states. | The marquee new code, a proven data-loss class, currently guarded by a human. **Done:** `test-settings-ui.sh` is deleted; its Tests 1–2 now live in `ConfigTest.swift` as the byte-identical no-op invariant plus per-bug regressions. `config/ConfigurationWriter.swift:57-194` |
+| ✅ **default-config parses** | `ConfigV2Test.testShippedDefaultIsV2AndParses` plus `ConfigurationWriterSafetyTest.testShippedDefaultConfigIsEditable` | The shipped default and its structured-edit path are explicit guarantees. |
+| ✅ **UnixSocket framing** | `SocketCodecTest` and `UnixSocketTest`: codec, loopback, EOF, and framing boundaries | Replaced BlueSocket; a framing bug would be silent IPC corruption. |
+| ✅ **ConfigurationWriter round-trip + fuzz** | `ConfigTest`, `ConfigurationWriterSafetyTest`, and `ConfigSafetyWriterFuzzTest` | Managed changes parse, comments/order/unknown sections survive, no-op is byte-identical, and save paths are exercised over generated valid states. |
+| ✅ **Settings structure and editor behavior** | `UIRenderSmokeTest`, `UISettingsTest`, `UIChromeConsistencyTest`, `UIKeysBindingsTest`, and `ConfigTest` | All panes evaluate in loaded/empty states; pane metadata, shared chrome, editor sections/highlighting, and exact source diagnostics are regression-tested without a live window server. |
 
 ### P1 — cheap, protects the DisplayLink/hotkey revamp
 
@@ -108,9 +113,10 @@ before believing a row.
 
 ### P2/P3 — needs a seam or is low-ROI
 
-- **Layout geometry** (gap math, accordion padding, fullscreen rect) — blocked on the §4
-  seam; then high-value golden-rect tests.
-- **ConfigurationViewModel.** separable logic testable; SwiftUI lifecycle is not.
+- **Layout geometry** has headless coverage through `LayoutTestWindow` and
+  `LayoutRecursiveTest`; expand canonical cases as layout behavior changes.
+- **ConfigurationViewModel** has focused coverage in the UI and config test files. SwiftUI scene
+  lifecycle and native-control pixels remain outside the headless seam.
 - **SystemVolume** (CoreAudio HW) and **ConfigFileWatcher** (DispatchSource timing) — Hard,
   integration-style, low ROI; leave to the integration tier or skip.
 
@@ -180,7 +186,7 @@ tier). Bash is right — it's process orchestration, not logic.
 
 **Harness flow:**
 ```
-build-debug-app.sh                       # ad-hoc-signed .app so AX/didLaunch behave
+build-debug-app.sh                       # cert-signed when available; ad-hoc only as a fallback
 require-ax.sh                            # fail loud if Accessibility not granted (§10.6)
 open .debug/AeroSpork-Debug.app            # launch the menu-bar agent
 wait for /tmp/com.wbs.aerospork.debug-$USER.sock
@@ -218,9 +224,12 @@ the signature-change gating in `GlobalObserver.onMonitorConfigurationChanged`.
 - Gate hardware tests behind `AEROSPORK_DISPLAYLINK=1` + a preflight that detects the panel;
   otherwise skip with a logged reason. Keep a short manual DisplayLink checklist per release.
 
-**GUI:** the settings window's *logic* (round-trip) is covered headlessly by the
-ConfigurationWriter tests (§3). Visual/interaction smoke stays a per-release manual pass;
-don't invest in SwiftUI UI-automation — low ROI, high flake.
+**GUI:** settings persistence is covered by ConfigurationWriter tests; pane metadata and pure editor
+logic by `UISettingsTest`; shared-component rules by `UIChromeConsistencyTest`; and every pane body,
+including empty states and asymmetric monitor geometry, by `UIRenderSmokeTest`. Those tests catch
+body traps and structural regressions but cannot prove the pixels of a grouped Form in a real host
+window. Review the checked v3 light/dark ideal/compact mock matrix and run a visual/interaction pass
+on the current macOS release before shipping. SwiftUI UI automation remains low-value and flaky here.
 
 ---
 
@@ -284,9 +293,9 @@ harness, and the existing scripts (`build-debug-app.sh`,
 3. **ConfigurationWriter round-trip + fuzz.** XCTest,
    Config-writer coverage landed instead across `ConfigTest.swift`,
    `ConfigurationWriterSafetyTest.swift` and `ConfigSafetyWriterFuzzTest.swift`. *Done.*
-4. **Layout golden-rects.** extend XCTest under `Sources/AppBundleTests/layout/`, golden
-   JSON in `.../golden/`. Needs Seam A (§4). Snapshot computed rects for canonical trees
-   (h/v split, accordion, nested, 2-monitor); a diff is a layout regression, zero AX.
+4. **Layout golden-rects.** The seam and direct geometry assertions exist in
+   `LayoutRecursiveTest`; extend them with canonical nested and two-monitor cases as needed. A
+   checked JSON fixture is optional—the important property is zero AX and exact computed rects.
 5. **`run-e2e.sh` + `script/e2e/` helpers.** bash. §5. Integration tier.
 6. **`require-ax.sh`.** bash, `script/e2e/`. Check `AXIsProcessTrusted` for the debug
    bundle; if not granted, print exact steps / open the pane and exit non-zero so e2e fails
@@ -310,15 +319,15 @@ harness, and the existing scripts (`build-debug-app.sh`,
 **Phase 1 — headless value, no new seams (a day or two):**
 1. Toolchain preflight (`script/preflight-toolchain.sh`), wired into build/test scripts.
 2. ~~`.github/workflows/ci.yml`~~ done, on a hosted runner.
-3. P0 unit tests: default-config parses, UnixSocket framing, **ConfigurationWriter
-   round-trip + fuzz** (done: `test-settings-ui.sh` retired into `ConfigTest.swift`).
+3. ✅ P0 unit tests: default-config parsing, UnixSocket framing, and ConfigurationWriter
+   round-trip/fuzz (done; `test-settings-ui.sh` retired into XCTest).
 4. P1 unit tests: ✅ MonitorFingerprint UUID matching + fingerprint config parse (done);
    remaining — Key carbon mapping.
 
 **Phase 2, geometry and monitors (small seams):**
-5. Seam A (`TestWindow.setAxFrame` records rect) + layout golden-rect tests.
-6. Seam B (injectable monitors + `Monitor.fingerprint`) + multi-monitor / UUID-resolution
-   unit tests. Reset the two leaking globals in setUp.
+5. ✅ Seam A (`TestWindow.setAxFrame` records rect) + layout geometry tests.
+6. ✅ Seam B (injectable monitors + `Monitor.fingerprint`) + multi-monitor / UUID-resolution
+   unit tests and global test-state reset.
 
 **Phase 3 — live integration:**
 7. `require-ax.sh` + `run-e2e.sh` (launch → enable → spawn → command → assert `--json`).
@@ -328,12 +337,12 @@ harness, and the existing scripts (`build-debug-app.sh`,
 
 **Phase 4 — maintenance skills & the tail:**
 10. `capture-axdump.sh` + fixture-refresh doc.
-11. Manual DisplayLink checklist (per release); GUI smoke checklist.
+11. Manual DisplayLink checklist (per release); Settings mock-matrix and live-interaction review.
 12. Window-fixture spawner app — only if stock apps flake.
 
-**If you do nothing else:** Phase 1 items 1–3. CI running the tests that
-already exist, a preflight that kills the silent hang, and automated coverage of the config
-writer that a human currently babysits.
+**Highest-value remaining work:** toolchain preflight, Key/Carbon round-trip coverage, then a live
+socket/Accessibility integration harness. The writer and Settings regressions no longer depend on a
+human-only checklist.
 
 ---
 

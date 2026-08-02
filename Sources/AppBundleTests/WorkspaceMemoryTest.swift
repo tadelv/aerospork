@@ -29,7 +29,7 @@ final class WorkspaceMemoryTest: XCTestCase {
         )
     }
 
-    override func setUp() {
+    override func setUp() async throws {
         WorkspaceMemory.resetForTests()
         savedMonitors = testMonitors
         tempDir = URL(filePath: NSTemporaryDirectory()).appending(path: "wsmem-\(UUID().uuidString)")
@@ -48,7 +48,7 @@ final class WorkspaceMemoryTest: XCTestCase {
         ]
     }
 
-    override func tearDown() {
+    override func tearDown() async throws {
         testMonitors = savedMonitors
         WorkspaceMemory.resetForTests()
         try? FileManager.default.removeItem(at: tempDir)
@@ -388,7 +388,7 @@ final class WorkspaceMemoryTest: XCTestCase {
 
         // A headless suite has no windows at all, which is exactly the "nothing has appeared yet"
         // case: without the merge this save would write an empty map.
-        try withStartup {
+        withStartup {
             WorkspaceMemory.save()
             WorkspaceMemory.waitForWrites()
         }

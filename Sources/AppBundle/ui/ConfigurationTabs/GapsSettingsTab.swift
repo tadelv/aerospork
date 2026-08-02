@@ -3,6 +3,8 @@ import SwiftUI
 
 struct GapsSettingsTab: View {
     @ObservedObject var viewModel: ConfigurationViewModel
+    @State private var innerLinked = false
+    @State private var outerLinked = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -21,20 +23,65 @@ struct GapsSettingsTab: View {
                     )
                     .frame(height: 156)
                     .padding(.vertical, 4)
+                    // Purely visual Shape view: without this VoiceOver finds nothing here at all.
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("Gaps preview")
+                    .accessibilityValue(
+                        "Inner gaps \(viewModel.innerGapsHorizontal) horizontal, \(viewModel.innerGapsVertical) vertical. "
+                            + "Outer gaps \(viewModel.outerGapsTop) top, \(viewModel.outerGapsBottom) bottom, "
+                            + "\(viewModel.outerGapsLeft) left, \(viewModel.outerGapsRight) right.",
+                    )
+                } header: {
+                    SectionLabel("Preview", "eye")
+                } footer: {
+                    if viewModel.gapsHavePerMonitorOverrides {
+                        StatusLabel(
+                            "Some gaps have per-monitor rules in Raw TOML. Editing any value below replaces the whole section with flat numbers.",
+                            kind: .neutral,
+                        )
+                    }
                 }
 
                 Section {
-                    NumberField("Horizontal", value: viewModel.binding(\.innerGapsHorizontal))
-                    NumberField("Vertical", value: viewModel.binding(\.innerGapsVertical))
+                    Toggle("Same value for both", isOn: Binding(
+                        get: { innerLinked },
+                        set: { linked in
+                            innerLinked = linked
+                            if linked { viewModel.setInnerGaps(viewModel.innerGapsHorizontal) }
+                        },
+                    ))
+                    if innerLinked {
+                        NumberField("Horizontal & vertical", value: Binding(
+                            get: { viewModel.innerGapsHorizontal },
+                            set: { viewModel.setInnerGaps($0) },
+                        ))
+                    } else {
+                        NumberField("Horizontal", value: viewModel.binding(\.innerGapsHorizontal))
+                        NumberField("Vertical", value: viewModel.binding(\.innerGapsVertical))
+                    }
                 } header: {
                     SectionLabel("Between windows", "rectangle.split.2x1")
                 }
 
                 Section {
-                    NumberField("Top", value: viewModel.binding(\.outerGapsTop))
-                    NumberField("Bottom", value: viewModel.binding(\.outerGapsBottom))
-                    NumberField("Left", value: viewModel.binding(\.outerGapsLeft))
-                    NumberField("Right", value: viewModel.binding(\.outerGapsRight))
+                    Toggle("Same on all sides", isOn: Binding(
+                        get: { outerLinked },
+                        set: { linked in
+                            outerLinked = linked
+                            if linked { viewModel.setOuterGaps(viewModel.outerGapsTop) }
+                        },
+                    ))
+                    if outerLinked {
+                        NumberField("All sides", value: Binding(
+                            get: { viewModel.outerGapsTop },
+                            set: { viewModel.setOuterGaps($0) },
+                        ))
+                    } else {
+                        NumberField("Top", value: viewModel.binding(\.outerGapsTop))
+                        NumberField("Bottom", value: viewModel.binding(\.outerGapsBottom))
+                        NumberField("Left", value: viewModel.binding(\.outerGapsLeft))
+                        NumberField("Right", value: viewModel.binding(\.outerGapsRight))
+                    }
                 } header: {
                     SectionLabel("Around the screen", "rectangle.inset.filled")
                 } footer: {
@@ -52,6 +99,13 @@ struct GapsSettingsTab: View {
                 // array out in body font, which is the face this window reserves for prose.
                 "Per-monitor gaps, such as a list of values under `outer.top`, survive untouched until you change one of these — editing any gap rewrites the whole gaps section. Use Raw TOML for per-monitor rules.",
             )
+        }
+        .task(id: viewModel.loadGeneration) {
+            guard viewModel.loadGeneration > 0 else { return }
+            innerLinked = viewModel.innerGapsHorizontal == viewModel.innerGapsVertical
+            outerLinked = viewModel.outerGapsTop == viewModel.outerGapsBottom
+                && viewModel.outerGapsTop == viewModel.outerGapsLeft
+                && viewModel.outerGapsTop == viewModel.outerGapsRight
         }
     }
 }

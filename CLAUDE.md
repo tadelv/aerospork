@@ -108,7 +108,7 @@ Sources/
 │   ├── layout/            # Layout calculation engine
 │   ├── model/             # Monitors + fingerprinting (incl. DisplayLink UUID)
 │   ├── mouse/             # Mouse move/resize handling
-│   ├── ui/                # Menu bar + settings (SwiftUI `Settings` scene, 7 tabs incl. raw TOML)
+│   ├── ui/                # Menu bar + settings (native pane-toolbar `Settings`, 7 panes incl. Raw TOML)
 │   │                      #   SettingsChrome.swift owns every shared control; see the invariant below
 │   └── util/              # Utilities, extensions, macOS API wrappers (incl. volume via CoreAudio)
 ├── Cli/                   # Command-line client
@@ -128,13 +128,20 @@ Sources/
 
 **Config Hot-Reload**: `ConfigFileWatcher` watches the active config file (via `DispatchSource`) and reloads on change, so external editor edits and GUI saves apply without a manual `reload-config`. Self-writes from the settings GUI are suppressed for 500ms (`suppressNextSelfWrite`) so a single save doesn't reload twice.
 
-**Settings GUI**: a SwiftUI `Settings` scene (singleton: two windows can't race on the config file), seven tabs. Structured controls **apply live** on a 600ms debounce, per macOS convention; there is no Save button. That is only safe because of the writer invariant above. The Raw TOML tab is the exception. It applies explicitly, since half-typed TOML is invalid most of the time, and it is the guarantee that no config key is unreachable from the GUI.
+**Settings GUI**: a SwiftUI `Settings` scene (singleton: two windows can't race on the config file),
+with seven peer panes in the native macOS preferences toolbar. The selected pane is remembered.
+Structured controls **apply live** on a 600ms debounce, per macOS convention; there is no Save
+button. That is only safe because of the writer invariant above. Raw TOML is the exception: it
+applies explicitly, since half-typed TOML is invalid most of the time. Its AppKit editor provides
+native Find, horizontal scrolling, line numbers, restrained TOML highlighting, section navigation,
+cursor position, and exact parser diagnostics. It is the guarantee that no config key is unreachable
+from the GUI.
 
 > **Shared chrome invariant.** `SettingsChrome.swift` holds every shared settings control and is
-> the only copy of each: `NumberField`, `SettingsHint`, `SettingsFooter`, `ListActionBar`,
+> the only copy of each: `NumberField`, `SettingsHint`, `SettingsFooter`, `IconButton`, `PanelHeader`, `ListActionBar`,
 > `ContentUnavailableViewCompat`, `SectionLabel`, `Badge`, `StatusLabel`, `Banner`, `CodeEditor`,
-> `CopyButton`, `SettingsField`. A tab uses what is there rather than growing its own. Status symbols and tints come
-> from `StatusLabel.Kind` / `Banner.Kind`, never string literals in a tab.
+> `CopyButton`, `SettingsField`. A pane uses what is there rather than growing its own. Status symbols and tints come
+> from `StatusLabel.Kind` / `Banner.Kind`, never string literals in a pane.
 > `UIChromeConsistencyTest` enforces both rules. `dev-docs/architecture.md` explains why they exist.
 
 **In-app updates**: `ui/Updater.swift` wraps `SPUStandardUpdaterController`. Two things about it
@@ -174,7 +181,7 @@ and a fuzzy key would permute them silently.
 ## Design System
 
 `.claude/skills/aerospork-design/` is an invocable Agent Skill holding the design system: tokens,
-27 web components, three click-through UI kits (settings window, menu bar, CLI), 18 specimen cards,
+32 web components, three click-through UI kits (settings window, menu bar, CLI), 18 specimen cards,
 and the brand artwork. It was derived *from* `Sources/AppBundle/ui/`, so it documents the shipping
 UI rather than proposing a different one: the Swift is the source of truth, and the web components
 are a recreation for mocks and marketing.
@@ -298,7 +305,10 @@ The suite (`AppBundleTests` + `CommonTests`) is fully headless — it
 uses a fake window tree (`TestApp`/`TestWindow`) and a mock Accessibility layer
 (`AxUiElementMock` + captured `axDumps/` fixtures), so it needs no real windows or
 Accessibility permission. It covers tree operations, command logic, config parse/round-trip,
-window-kind heuristics, socket codec, and DisplayLink monitor-fingerprint (UUID) matching.
+window-kind heuristics, socket codec, DisplayLink monitor-fingerprint (UUID) matching, settings pane
+logic/source invariants, and loaded/empty render smoke for all seven panes. Native-control pixel
+review remains manual; headless `ImageRenderer` can force view evaluation but cannot faithfully
+rasterize a grouped `Form` without a window host.
 
 See **`dev-docs/testing-strategy.md`** for the full long-term plan: coverage gaps, the
 seams to add for headless layout/multi-monitor testing, the live-app e2e harness,

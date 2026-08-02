@@ -1,5 +1,46 @@
+import AppKit
 import Common
 import SwiftUI
+import UniformTypeIdentifiers
+
+struct GuidedWindowAction: Equatable {
+    enum Layout: String, Hashable { case unchanged, floating, tiling }
+    var layout: Layout = .unchanged
+    var workspace = ""
+    var isCustom = false
+    /// The parts the guided controls cannot represent, verbatim. The UI disables its setters when
+    /// `isCustom`, but the compose side must still round-trip them: losing a user's command may
+    /// never depend on every call site remembering a guard.
+    var customParts: [String] = []
+}
+
+func parseGuidedWindowAction(_ command: String) -> GuidedWindowAction {
+    var result = GuidedWindowAction()
+    for part in command.split(separator: ";").map({ $0.trimmingCharacters(in: .whitespaces) }).filter({ !$0.isEmpty }) {
+        switch part {
+            case "layout floating": result.layout = .floating
+            case "layout tiling": result.layout = .tiling
+            case _ where part.hasPrefix("move-node-to-workspace "):
+                result.workspace = String(part.dropFirst("move-node-to-workspace ".count)).trimmingCharacters(in: .whitespaces)
+            default:
+                result.isCustom = true
+                result.customParts.append(part)
+        }
+    }
+    return result
+}
+
+@MainActor func composeGuidedWindowAction(_ action: GuidedWindowAction) -> String {
+    var commands: [String] = []
+    switch action.layout {
+        case .unchanged: break
+        case .floating: commands.append("layout floating")
+        case .tiling: commands.append("layout tiling")
+    }
+    if !action.workspace.isEmpty { commands.append("move-node-to-workspace \(action.workspace)") }
+    commands.append(contentsOf: action.customParts)
+    return commands.joined(separator: ConfigurationViewModel.commandSeparator)
+}
 
 /// `[[on-window-detected]]` — assign windows to workspaces, float them, etc. when they appear.
 /// Typically the most-configured feature after keybindings, and previously invisible to the GUI.
@@ -23,9 +64,7 @@ struct WindowRulesTab: View {
 
     private var list: some View {
         VStack(alignment: .leading, spacing: 0) {
-            SectionLabel("Rules", "list.bullet")
-                .padding(.horizontal, 14)
-                .padding(.vertical, 10)
+            PanelHeader("All rules", "list.bullet")
             Divider()
             rulesTable
             ListActionBar(
@@ -65,6 +104,9 @@ struct WindowRulesTab: View {
     @ViewBuilder
     private func matchCell(_ rule: ConfigurationViewModel.WindowRuleRow) -> some View {
         HStack(spacing: 5) {
+            if !rule.appId.isEmpty {
+                ApplicationIcon(bundleIdentifier: rule.appId)
+            }
             // Monospace only for a real matcher, which is config text. "(any window)" is prose
             // describing an absence, and reading it as something pasteable is misleading.
             Text(summary(rule))
@@ -74,6 +116,8 @@ struct WindowRulesTab: View {
             // or a rule that only fires at startup looks identical to one that fires every time.
             if rule.duringStartup == true {
                 Badge("startup", tone: .muted, help: "Only applies while AeroSpork is starting up")
+            } else if rule.duringStartup == false {
+                Badge("runtime", tone: .muted, help: "Only applies after AeroSpork finishes starting up")
             }
         }
     }
@@ -84,7 +128,11 @@ struct WindowRulesTab: View {
             Form {
                 Section {
                     LabeledContent("App ID") {
-                        SettingsField("App ID", prompt: "com.apple.finder", text: field(i, \.appId))
+                        HStack(spacing: 8) {
+                            SettingsField("App ID", prompt: "com.apple.finder", text: field(i, \.appId))
+                            Button("Choose app…") { chooseApplication(for: viewModel.windowRules[i].id) }
+                                .fixedSize()
+                        }
                     }
                     LabeledContent("App name") {
                         SettingsField("App name", prompt: "^Finder$", text: field(i, \.appNameRegex))
@@ -94,7 +142,14 @@ struct WindowRulesTab: View {
                     }
                     LabeledContent("Workspace") {
                         SettingsField("Workspace", prompt: "3", text: field(i, \.workspace))
+                            .frame(maxWidth: 140)
                     }
+                    Picker("Startup timing", selection: startupTiming(i)) {
+                        Text("Any").tag("any")
+                        Text("Startup").tag("startup")
+                        Text("Runtime").tag("runtime")
+                    }
+                    .pickerStyle(.segmented)
                 } header: {
                     SectionLabel("Match when…", "line.3.horizontal.decrease.circle")
                 } footer: {
@@ -102,7 +157,26 @@ struct WindowRulesTab: View {
                 }
 
                 Section {
-                    LabeledContent("Command") {
+                    let guided = parseGuidedWindowAction(viewModel.windowRules[i].run)
+                    if guided.isCustom {
+                        HStack(spacing: 8) {
+                            Badge("custom", tone: .muted, help: "This command contains actions the guided controls cannot represent.")
+                            Button("Start over with guided controls") { setRun(i, "") }
+                                .buttonStyle(.borderless)
+                        }
+                    } else {
+                        Picker("Make the window", selection: guidedLayout(i)) {
+                            Text("Leave as is").tag(GuidedWindowAction.Layout.unchanged)
+                            Text("Float").tag(GuidedWindowAction.Layout.floating)
+                            Text("Tile").tag(GuidedWindowAction.Layout.tiling)
+                        }
+                        .pickerStyle(.segmented)
+                        LabeledContent("Move it to workspace") {
+                            SettingsField("Workspace", prompt: "don't move it", text: guidedWorkspace(i))
+                                .frame(maxWidth: 160)
+                        }
+                    }
+                    LabeledContent("Exact command") {
                         SettingsField("Command", prompt: "move-node-to-workspace 3", text: field(i, \.run))
                     }
                     Toggle("Keep checking later rules", isOn: Binding(
@@ -116,7 +190,7 @@ struct WindowRulesTab: View {
                 } header: {
                     SectionLabel("Then run", "bolt")
                 } footer: {
-                    Text("Chain commands with `\(ConfigurationViewModel.commandSeparator.trimmingCharacters(in: .whitespaces))`. By default a matching rule stops the search.")
+                    Text("Applied once, when the window appears. Chain commands with `\(ConfigurationViewModel.commandSeparator.trimmingCharacters(in: .whitespaces))`. By default a matching rule stops the search.")
                 }
             }
             .formStyle(.grouped)
@@ -170,5 +244,136 @@ struct WindowRulesTab: View {
                 viewModel.scheduleAutoSave()
             },
         )
+    }
+
+    private func startupTiming(_ i: Int) -> Binding<String> {
+        Binding(
+            get: {
+                guard viewModel.windowRules.indices.contains(i) else { return "any" }
+                return switch viewModel.windowRules[i].duringStartup {
+                    case true?: "startup"
+                    case false?: "runtime"
+                    case nil: "any"
+                }
+            },
+            set: { value in
+                guard viewModel.windowRules.indices.contains(i) else { return }
+                viewModel.windowRules[i].duringStartup = switch value {
+                    case "startup": true
+                    case "runtime": false
+                    default: nil
+                }
+                viewModel.markAsModified()
+                viewModel.scheduleAutoSave()
+            },
+        )
+    }
+
+    private func guidedLayout(_ i: Int) -> Binding<GuidedWindowAction.Layout> {
+        Binding(
+            get: {
+                guard viewModel.windowRules.indices.contains(i) else { return .unchanged }
+                return parseGuidedWindowAction(viewModel.windowRules[i].run).layout
+            },
+            set: { layout in
+                guard viewModel.windowRules.indices.contains(i) else { return }
+                var action = parseGuidedWindowAction(viewModel.windowRules[i].run)
+                guard !action.isCustom else { return }
+                action.layout = layout
+                setRun(i, composeGuidedWindowAction(action))
+            },
+        )
+    }
+
+    private func guidedWorkspace(_ i: Int) -> Binding<String> {
+        Binding(
+            get: {
+                guard viewModel.windowRules.indices.contains(i) else { return "" }
+                return parseGuidedWindowAction(viewModel.windowRules[i].run).workspace
+            },
+            set: { workspace in
+                guard viewModel.windowRules.indices.contains(i) else { return }
+                var action = parseGuidedWindowAction(viewModel.windowRules[i].run)
+                guard !action.isCustom else { return }
+                action.workspace = workspace.trimmingCharacters(in: .whitespaces)
+                setRun(i, composeGuidedWindowAction(action))
+            },
+        )
+    }
+
+    private func setRun(_ i: Int, _ command: String) {
+        guard viewModel.windowRules.indices.contains(i) else { return }
+        viewModel.windowRules[i].run = command
+        viewModel.markAsModified()
+        viewModel.scheduleAutoSave()
+    }
+
+    private func chooseApplication(for ruleID: ConfigurationViewModel.WindowRuleRow.ID) {
+        let panel = NSOpenPanel()
+        panel.title = "Choose an application"
+        panel.prompt = "Choose"
+        panel.directoryURL = URL(filePath: "/Applications")
+        panel.allowedContentTypes = [.application]
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        panel.begin { response in
+            guard response == .OK, let url = panel.url, let bundleID = Bundle(url: url)?.bundleIdentifier else { return }
+            Task { @MainActor in
+                guard let i = viewModel.windowRules.firstIndex(where: { $0.id == ruleID }) else { return }
+                viewModel.windowRules[i].appId = bundleID
+                viewModel.markAsModified()
+                viewModel.scheduleAutoSave()
+            }
+        }
+    }
+}
+
+@MainActor private enum ApplicationIconCache {
+    enum Entry { case image(NSImage), missing }
+    static var entries: [String: Entry] = [:]
+
+    static func image(for bundleIdentifier: String) -> NSImage? {
+        if let entry = entries[bundleIdentifier] {
+            if case .image(let image) = entry { return image }
+            return nil
+        }
+        // The key is whatever is in the App ID field, one entry per typed prefix, and this app
+        // runs for weeks. ponytail: dump-and-refill cap; entries repopulate in one 140ms debounce,
+        // so an LRU would be machinery for nothing.
+        if entries.count >= 256 { entries.removeAll(keepingCapacity: true) }
+        guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier) else {
+            entries[bundleIdentifier] = .missing
+            return nil
+        }
+        let image = NSWorkspace.shared.icon(forFile: url.path)
+        entries[bundleIdentifier] = .image(image)
+        return image
+    }
+}
+
+/// Resolves through LaunchServices only after typing settles, then caches both hits and misses.
+/// Looking up an application icon directly in a table cell body would query the on-disk app
+/// database on every settings autosave and every character typed into App ID.
+private struct ApplicationIcon: View {
+    let bundleIdentifier: String
+    @State private var image: NSImage?
+
+    var body: some View {
+        Group {
+            if let image {
+                Image(nsImage: image).resizable()
+            } else {
+                Image(systemName: "app.dashed").resizable().foregroundStyle(.tertiary)
+            }
+        }
+        .aspectRatio(contentMode: .fit)
+        .frame(width: 20, height: 20)
+        .accessibilityHidden(true)
+        .task(id: bundleIdentifier) {
+            image = nil
+            try? await Task.sleep(for: .milliseconds(140))
+            guard !Task.isCancelled else { return }
+            image = ApplicationIconCache.image(for: bundleIdentifier)
+        }
     }
 }

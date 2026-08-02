@@ -17,11 +17,11 @@ import XCTest
 final class OpenSettingsTest: XCTestCase {
     private var saved: (() -> Void)?
 
-    override func setUp() {
+    override func setUp() async throws {
         saved = settingsOpener
     }
 
-    override func tearDown() {
+    override func tearDown() async throws {
         settingsOpener = saved
     }
 

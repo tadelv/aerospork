@@ -100,17 +100,26 @@ Two surfaces, and neither is a window the app owns:
   down, never `N.square.fill` SF Symbols, which only exist for 0…50 and single capitals, so a
   workspace named `web` would have looked nothing like one named `3`. It follows the *menu bar's*
   appearance, which is not always the app's.
-- **A SwiftUI `Settings` scene** (`ConfigurationWindow.swift` + `ConfigurationTabs/`), seven tabs
-  over one `ConfigurationViewModel`. Structured tabs auto-save on a 600ms debounce; Raw TOML
-  applies explicitly. The view model is a lossy projection of the config, which is why the writer
-  guards each section on an `…Edited` flag; see the writer invariant in `CLAUDE.md`.
+- **A SwiftUI `Settings` scene** (`ConfigurationWindow.swift` + `ConfigurationTabs/`), seven peer
+  panes in the native macOS preference toolbar over one `ConfigurationViewModel`. The selection is
+  restored with `AppStorage`. Structured panes auto-save on a 600ms debounce; Raw TOML applies
+  explicitly. The view model is a lossy projection of the config, which is why the writer guards
+  each section on an `…Edited` flag; see the writer invariant in `CLAUDE.md`.
+
+The panes deliberately share navigation but not one generic layout. Forms use grouped native
+controls; editable collections use inset tables and a shared action bar; Raw TOML wraps `NSTextView`
+to retain native Find and undo while disabling prose substitutions. Its validation and highlighting
+are cancellable/debounced, filesystem metadata is cached for the window lifetime, and the line
+ruler's line-start index refreshes on the same 45ms debounce as highlighting before drawing only
+visible labels; the Ln/Col readout counts newlines in place (column is a UTF-16 offset), so it stays
+per-keystroke without a line-array rebuild.
 
 **`SettingsChrome.swift` owns every shared control.** `NumberField`, `SettingsHint`,
-`SettingsFooter`, `ListActionBar`, `ContentUnavailableViewCompat`, `SectionLabel`, `Badge`,
-`StatusLabel`, `Banner`, `CodeEditor`, `CopyButton`. Nothing there holds state or touches the
+`SettingsFooter`, `IconButton`, `PanelHeader`, `ListActionBar`, `ContentUnavailableViewCompat`,
+`SectionLabel`, `Badge`, `StatusLabel`, `Banner`, `CodeEditor`, `CopyButton`. Nothing there holds state or touches the
 config; it is presentation only.
 
-That file exists because of a specific decay pattern. The tabs were written at different times, and
+That file exists because of a specific decay pattern. The panes were written at different times, and
 each time one needed a small piece of chrome and didn't find it, it grew its own: three hand-rolled
 +/- rows, caveat text in three different places, and two badges at two paddings (6/2 and 5/1) where
 only one set a foreground colour or an accessibility label. `UIChromeConsistencyTest` scans `ui/`

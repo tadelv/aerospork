@@ -31,6 +31,7 @@ final class ConfigurationViewModel: ObservableObject {
     @Published var outerGapsBottom = 8
     @Published var outerGapsLeft = 8
     @Published var outerGapsRight = 8
+    @Published private(set) var gapsHavePerMonitorOverrides = false
 
     // Key bindings the writer manages: the `[mode.<name>.binding]` sections, plus anything the user
     // adds here. This list and ONLY this list is what `ConfigurationWriter.applyBindingDiff` writes.
@@ -69,10 +70,10 @@ final class ConfigurationViewModel: ObservableObject {
     // Raw TOML editor -- the guarantee that nothing in the config is unreachable from the GUI.
     @Published var rawToml = ""
 
-    /// Set ONLY by the Raw TOML tab's Apply button.
+    /// Set ONLY by the Raw TOML pane's Apply button.
     ///
     /// `rawTomlEdited` must never authorize a write on its own: an unapplied raw buffer used to
-    /// hijack unrelated structured edits, so flipping a toggle on another tab would commit the
+    /// hijack unrelated structured edits, so flipping a toggle on another pane would commit the
     /// half-finished raw text and silently discard the toggle.
     @Published var rawTomlApplyRequested = false
 
@@ -80,6 +81,9 @@ final class ConfigurationViewModel: ObservableObject {
     @Published var hasUnsavedChanges = false
     @Published var errorMessage: String?
     @Published var isSaving = false
+    /// Changes only after a complete reload. Views with non-persisted presentation state use this
+    /// to seed themselves once without recomputing while the user is typing.
+    @Published private(set) var loadGeneration = 0
 
     /// Snapshot of what was loaded, so the writer can tell a real edit from an untouched section.
     /// The fields above are a lossy projection of the config (per-monitor gaps collapse to their
@@ -216,6 +220,7 @@ final class ConfigurationViewModel: ObservableObject {
         let id = UUID()
         var workspace: String
         var monitor: String
+        var isComplex = false
     }
 
     struct MonitorRow: Identifiable {
@@ -223,6 +228,9 @@ final class ConfigurationViewModel: ObservableObject {
         var name: String
         var resolution: String
         var uuid: String?
+        var position = 1
+        var isMain = false
+        var rect = CGRect.zero
     }
 
     struct CommandRow: Identifiable, Equatable {
@@ -347,11 +355,27 @@ final class ConfigurationViewModel: ObservableObject {
         outerGapsBottom = gapValue(config.gaps.outer.bottom)
         outerGapsLeft = gapValue(config.gaps.outer.left)
         outerGapsRight = gapValue(config.gaps.outer.right)
+        gapsHavePerMonitorOverrides = [
+            config.gaps.inner.horizontal,
+            config.gaps.inner.vertical,
+            config.gaps.outer.top,
+            config.gaps.outer.bottom,
+            config.gaps.outer.left,
+            config.gaps.outer.right,
+        ].contains { value in
+            if case .perMonitor = value { true } else { false }
+        }
 
         assignments = config.workspaceToMonitorForceAssignment
             .sorted { $0.key < $1.key }
             .compactMap { workspace, descriptions in
-                descriptions.first.map { WorkspaceAssignmentRow(workspace: workspace, monitor: monitorToken($0)) }
+                descriptions.first.map {
+                    WorkspaceAssignmentRow(
+                        workspace: workspace,
+                        monitor: monitorToken($0),
+                        isComplex: descriptions.count > 1 || monitorDescriptionIsComplex($0),
+                    )
+                }
             }
 
         liveMonitors = loadMonitors()
@@ -384,6 +408,7 @@ final class ConfigurationViewModel: ObservableObject {
         markLoaded()
 
         hasUnsavedChanges = false
+        loadGeneration &+= 1
     }
 
     /// Record the current field values as the "loaded" baseline that edit detection compares
@@ -432,12 +457,31 @@ final class ConfigurationViewModel: ObservableObject {
         }
     }
 
+    private func monitorDescriptionIsComplex(_ description: MonitorDescription) -> Bool {
+        guard case .fingerprint(let data) = description else { return false }
+        // A UUID-only fingerprint maps losslessly to the picker's exact-display option. Every
+        // other fingerprint carries structure a single token cannot faithfully round-trip.
+        return data.displayUUID == nil || data.vendorID != nil || data.modelID != nil ||
+            data.serialNumber != nil || data.displayNamePattern != nil ||
+            data.widthPixels != nil || data.heightPixels != nil
+    }
+
     private func loadMonitors() -> [MonitorRow] {
-        sortedMonitors.map { monitor in
-            let fingerprint = (monitor as? LazyMonitor)?.fingerprint
+        sortedMonitors.enumerated().map { offset, monitor in
+            // `fingerprint` is part of the protocol. Downcasting discarded fingerprints from test
+            // and alternate monitor implementations and also performed a needless runtime cast per
+            // display whenever Settings reloaded.
+            let fingerprint = monitor.fingerprint
             let width = fingerprint?.widthPixels ?? Int(monitor.width)
             let height = fingerprint?.heightPixels ?? Int(monitor.height)
-            return MonitorRow(name: monitor.name, resolution: "\(width)×\(height)", uuid: fingerprint?.displayUUID)
+            return MonitorRow(
+                name: monitor.name,
+                resolution: "\(width)×\(height)",
+                uuid: fingerprint?.displayUUID,
+                position: offset + 1,
+                isMain: monitor.rect.topLeftCorner == .zero,
+                rect: CGRect(x: monitor.rect.minX, y: monitor.rect.minY, width: monitor.rect.width, height: monitor.rect.height),
+            )
         }
     }
 
@@ -722,6 +766,26 @@ final class ConfigurationViewModel: ObservableObject {
         markAsModified()
     }
 
+    func setInnerGaps(_ value: Int) {
+        guard innerGapsHorizontal != value || innerGapsVertical != value else { return }
+        innerGapsHorizontal = value
+        innerGapsVertical = value
+        markAsModified()
+        scheduleAutoSave()
+    }
+
+    func setOuterGaps(_ value: Int) {
+        guard outerGapsTop != value || outerGapsBottom != value || outerGapsLeft != value || outerGapsRight != value else {
+            return
+        }
+        outerGapsTop = value
+        outerGapsBottom = value
+        outerGapsLeft = value
+        outerGapsRight = value
+        markAsModified()
+        scheduleAutoSave()
+    }
+
     // MARK: - Saving
 
     func saveConfiguration() async {
@@ -772,7 +836,4 @@ final class ConfigurationViewModel: ObservableObject {
             errorMessage = "Failed to save configuration: \(error.localizedDescription)"
         }
     }
-
-    /// Live validation for the raw TOML tab, so errors surface while typing rather than on save.
-    var rawTomlError: String? { rawTomlEdited ? ConfigurationWriter.validate(rawToml) : nil }
 }

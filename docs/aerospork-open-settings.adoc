@@ -31,8 +31,9 @@ The command is allowed in config, so it can be bound to a key:
 alt-shift-comma = 'open-settings'
 ----
 
-Structured settings apply live as you change them. The *Raw TOML* tab is the exception: it applies
-explicitly, so half-typed TOML is never written.
+Structured settings apply live as you change them. The *Raw TOML* pane is the exception: it applies
+explicitly, so half-typed TOML is never written. The window remembers its selected pane. Raw TOML
+supports native Find, line numbers, section jumps, and parser errors that link to the failing line.
 
 // =========================================================== Options
 include::util/conditional-options-header.adoc[]

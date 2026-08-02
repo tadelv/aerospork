@@ -943,6 +943,17 @@ final class ConfigTest: XCTestCase {
         XCTAssertNotNil(ConfigurationWriter.validate("totally-unknown-key = 1"))
     }
 
+    func testWriterDiagnosticKeepsTheTomlSourceLocation() {
+        let diagnostic = ConfigurationWriter.diagnostic("accordion-padding = 30\n[gaps\ninner.horizontal = 8")
+        XCTAssertEqual(diagnostic?.line, 2)
+        XCTAssertNotNil(diagnostic?.column)
+        XCTAssertTrue(diagnostic?.message.contains("line 2") == true)
+
+        let semantic = ConfigurationWriter.diagnostic("totally-unknown-key = 1")
+        XCTAssertNotNil(semantic)
+        XCTAssertNil(semantic?.line)
+    }
+
     func testKeyNotationPrettyPrinting() {
         assertEquals(KeyNotation.pretty("alt-shift-h"), "⌥⇧h")
         assertEquals(KeyNotation.pretty("cmd-enter"), "⌘enter")

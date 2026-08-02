@@ -274,7 +274,7 @@ enum WorkspaceMemory {
         // writing it just destroys whatever was there.
         guard !state.session.isEmpty else { return }
         let url = fileUrl
-        let work = {
+        let work: @Sendable () -> Void = {
             guard let data = try? JSONEncoder().encode(state) else { return }
             try? data.write(to: url, options: .atomic)
             // 0600: this names every running app's bundle id and every monitor's UUID. Set after the

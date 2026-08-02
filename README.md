@@ -57,7 +57,7 @@ What that turned into, in this codebase:
 |---|---|
 | Language | Swift, 6.0 language mode (`Package.swift`); `.swift-version` pins toolchain 6.4 |
 | Minimum OS | macOS 13.0 (Ventura) |
-| UI | SwiftUI: a `MenuBarExtra` and a `Settings` scene |
+| UI | SwiftUI/AppKit: a `MenuBarExtra` and a native pane-toolbar `Settings` scene |
 | Third-party dependencies | TOMLKit (config parsing) and Sparkle (in-app updates) |
 | CLI/app IPC | POSIX `AF_UNIX` stream socket, length-prefixed framing (`Sources/Common/util/UnixSocket.swift`) |
 | Global hotkeys | Carbon `RegisterEventHotKey` (`config/HotkeyBinding.swift`) |
@@ -108,7 +108,7 @@ Debug builds skip Xcode entirely.
 **The config writer is line-based on purpose.** Re-serializing the whole file would be far simpler,
 and would destroy every comment plus anything the GUI cannot model, such as per-monitor gap arrays.
 Instead it rewrites only the keys you changed and refuses edits it cannot represent, pointing you at
-the raw TOML tab. That is what makes a GUI safe to put on top of a dotfile.
+the Raw TOML pane. That is what makes a GUI safe to put on top of a dotfile.
 
 ```
 Sources/
@@ -127,7 +127,7 @@ behave the same way. Only the deltas are listed.
 | | AeroSpace | AeroSpork |
 |---|:---:|:---:|
 | Monitor matching by hardware UUID / EDID | ❌ &nbsp;name, regex or number only | ✅ &nbsp;also pins DisplayLink panels |
-| Settings GUI | ❌ &nbsp;"will never provide a GUI for configuration" | ✅ &nbsp;7 tabs |
+| Settings GUI | ❌ &nbsp;"will never provide a GUI for configuration" | ✅ &nbsp;7 native panes |
 | Notarized builds | ❌ | ✅ &nbsp;signed, notarized, stapled |
 | Third-party dependencies | 4 | **2** |
 | Config schema | one syntax | v2 shorthand, older syntax still parses |
@@ -146,10 +146,12 @@ and `[on-window]` replace the longer upstream spellings. An existing config is m
 first launch, and only when the result is proven to parse to the same effective configuration;
 otherwise the file is left alone. The original is kept beside it as `*.pre-v2`.
 
-**Settings GUI.** Seven tabs over a comment-preserving writer that only rewrites the keys you
-changed, so opening Settings and changing nothing leaves the file byte-identical and editing one
-section never rewrites another. A raw TOML tab validates against the same parser the app uses at
-startup, so no config key is unreachable from the GUI.
+**Settings GUI.** Seven native preference panes in a compact macOS toolbar, over a
+comment-preserving writer that only rewrites the keys you changed. Opening Settings and changing
+nothing leaves the file byte-identical, and editing one section never rewrites another. The selected
+pane is remembered. Raw TOML validates against the same parser the app uses at startup and adds
+native Find, line numbers, restrained syntax highlighting, section navigation, cursor position, and
+clickable source diagnostics, so no config key is unreachable from the GUI.
 
 ### Coming from AeroSpace
 
@@ -218,8 +220,8 @@ alt-enter = "exec-and-forget open -na Ghostty"
 
 Run `aerospork list-monitors --format '%{monitor-fingerprint}'` to get the values to paste into
 `[monitors]`. Open the GUI from the menu bar icon, with **⌘,** while AeroSpork is frontmost, or via
-`aerospork open-settings`, which is also valid in config and so bindable. Structured tabs apply live
-on a 600ms debounce; the raw TOML tab has an explicit Apply, because half-typed TOML is invalid most
+`aerospork open-settings`, which is also valid in config and so bindable. Structured panes apply live
+on a 600ms debounce; Raw TOML has an explicit Apply, because half-typed TOML is invalid most
 of the time.
 
 ## CLI
@@ -264,11 +266,13 @@ The suite is headless, using a fake window tree and a mocked Accessibility layer
 windows and no Accessibility permission. `Package.swift` uses SE-0439 trailing commas, so the floor is
 Swift 6.1 (Xcode 16.3); `.swift-version` pins 6.4 for reproducibility.
 
-[`.claude/skills/aerospork-design/`](.claude/skills/aerospork-design/) holds the design system:
-tokens, components, three click-through UI kits and the brand artwork. It is derived from
+[`dev-docs/redesign-v3/`](dev-docs/redesign-v3/) records the implemented native-settings decision,
+the verified light/dark ideal/compact mock matrix, and the production mapping.
+[`.claude/skills/aerospork-design/`](.claude/skills/aerospork-design/) holds the living design system:
+tokens, 32 components, three click-through UI kits and the brand artwork. It is derived from
 `Sources/AppBundle/ui/`, so the Swift is the source of truth. Read it before adding a settings
 surface. `UIChromeConsistencyTest` enforces the two rules that matter: shared controls live in
-[`SettingsChrome.swift`](Sources/AppBundle/ui/SettingsChrome.swift) and a tab never grows its own
+[`SettingsChrome.swift`](Sources/AppBundle/ui/SettingsChrome.swift) and a pane never grows its own
 copy, and status symbols come from `StatusLabel.Kind` rather than string literals.
 
 [`CONTRIBUTING.md`](CONTRIBUTING.md) covers the gate and the invariants the tests enforce.

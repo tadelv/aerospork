@@ -302,6 +302,19 @@ final class UIKeysBindingsTest: XCTestCase {
         assertNil(vm.existingBinding(mode: mainModeId, key: "alt-enter", ignoring: rowId(vm, mainModeId, "alt-enter")))
     }
 
+    // MARK: - Mode picker sizing
+
+    /// A segmented control's width is the sum of its segments and cannot shrink below that; past
+    /// some mode count it overflows the window no matter what its neighbours give up, so the tab
+    /// switches to a bounded-width menu instead. Not view-renderable, so pinned here as the pure
+    /// decision the view defers to.
+    func testModePickerDegradesToAMenuPastFiveModes() {
+        XCTAssertTrue(KeyBindingsTab.modePickerIsSegmented(count: 1))
+        XCTAssertTrue(KeyBindingsTab.modePickerIsSegmented(count: 5))
+        XCTAssertFalse(KeyBindingsTab.modePickerIsSegmented(count: 6))
+        XCTAssertFalse(KeyBindingsTab.modePickerIsSegmented(count: 9))
+    }
+
     // MARK: - v1 is untouched
 
     /// v1 configs keep working exactly as before: everything is explicit, nothing is inherited.

@@ -27,8 +27,5 @@ struct aerosporkApp: App {
         Settings {
             AppBundle.ConfigurationWindow()
         }
-        .commands {
-            CommandGroup(replacing: .appInfo) {} // Remove default About menu
-        }
     }
 }

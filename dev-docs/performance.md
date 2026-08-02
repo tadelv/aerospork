@@ -124,6 +124,57 @@ broke anyone scripting the CLI.
    Do not re-add without (a) fixing the unconditional cancel so an overdue fire never kills a live
    refresh, and (b) a measurement showing starvation actually occurs.
 
+### 2026-08 Settings pass
+
+These are mechanically verified work eliminations, not end-to-end timing claims:
+
+9. **`RawTomlTab`.** validation now waits for 180 ms of quiet and uses SwiftUI task cancellation,
+   so a typing burst validates only its final buffer. Apply is disabled while validation is pending.
+   Syntax diagnostics retain TOMLKit's line and column instead of parsing them back out of display
+   copy. Syntactically valid text takes a second parse for AeroSpork's semantic validation, once per
+   settled burst; this replaces a semantic parse on every body evaluation.
+
+10. **`RawTomlTab` metadata.** config-path resolution and backup-directory enumeration moved out of
+    computed view properties and into window-lifetime state. Because `rawToml` publishes on every
+    keystroke, both file-system operations previously reran while typing. The backup list refreshes
+    after Apply, when it can actually change.
+
+11. **Date formatters.** backup filename formatters in `ConfigurationWriter` and `RawTomlTab` are
+    stable POSIX/Gregorian instances instead of fresh `DateFormatter`s per backup or menu label.
+
+12. **Monitor settings.** `ConfigurationViewModel` reads `Monitor.fingerprint` directly. The old
+    `as? LazyMonitor` cast discarded valid fingerprints from alternate implementations and paid a
+    runtime cast for every connected display.
+
+13. **Small no-op/allocation cleanup.** linked-gap setters return before publishing or scheduling an
+    autosave when all affected values already match; link-state detection compares four integers
+    directly instead of allocating a temporary `Set`; the monitor picker builds its known-token set
+    once per table construction and uses the row already supplied by `Table` instead of searching
+    the assignments array again for every cell.
+
+14. **Raw editor gutter.** Line starts are cached, and the cache rebuild rides the same 45 ms
+    typing-quiet debounce as highlighting, so a keystroke burst costs one document scan, not one
+    per key. Ruler redraws binary-search the first visible line and lay out only visible labels;
+    scrolling near the end of a long config no longer rescans every preceding line on every frame.
+    The Ln/Col readout counts newlines in place over the backing store — no substring copy of
+    everything above the cursor on every keystroke and arrow key.
+
+15. **Window-rule icons.** LaunchServices icon resolution waits for App ID typing to settle and
+    caches hits and misses by bundle identifier. Table body evaluation never queries the on-disk
+    application database directly. The cache is capped (dump-and-refill at 256 entries): its keys
+    are whatever was typed into App ID, and a menu-bar app's lifetime is weeks, not minutes.
+
+16. **Raw editor highlighting and navigation.** TOML styling waits for 45 ms of typing quiet, then
+    applies one linear, quote-aware pass rather than restyling inside the keystroke callback.
+    Section headers are collected with the already-debounced validation pass and reused by the jump
+    menu. Syntax diagnostics feed the ruler's existing visible-line draw, so the error marker adds no
+    second document scan while scrolling.
+
+The runtime refresh cancellation policy was audited but deliberately left unchanged. It is a
+correctness-sensitive tradeoff with a documented failed experiment above, not a safe micro-cleanup.
+The Settings work is covered by the macOS-13 compile, render smoke tests, config diagnostic test, and
+the complete suite; none of those establish a user-visible duration improvement.
+
 ## Why the benchmark is unreliable
 
 The obvious benchmark — drive N workspace switches through the CLI and time them — does not work
