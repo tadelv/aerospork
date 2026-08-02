@@ -49,6 +49,16 @@ footer {
 .head img { width: 56px; height: 56px; flex: none; border-radius: 12px }
 .head h1 { margin: 0 }
 
+/* The primary links row under the tagline */
+.links { display: flex; flex-wrap: wrap; gap: .6rem; margin: 0 0 2.2rem }
+.links .btn {
+  padding: .45rem .95rem; border: 1px solid var(--rule); border-radius: 8px;
+  background: var(--card); color: var(--fg); font-weight: 600; font-size: .95rem;
+  transition: border-color .12s, background .12s;
+}
+.links .btn:hover { text-decoration: none; border-color: var(--link) }
+.links .btn:focus-visible { outline: 2px solid var(--link); outline-offset: 2px }
+
 /* A command with a copy button parked inside it */
 .cmd { position: relative; margin: 0 0 1rem }
 .cmd pre { padding-right: 3.1rem }

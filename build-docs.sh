@@ -21,7 +21,10 @@ build-site() {
     cd .site
         # Delete "aerospork " prefifx in synopsis
         sed -E -i '' '/tag::synopsis/, /end::synopsis/ s/^(aerospork | {10})//' aerospork*
-        bundler exec asciidoctor ./guide.adoc ./commands.adoc ./goodies.adoc
+        # webfonts! drops the Google Fonts <link>: aerospork.app serves these pages under a CSP
+        # with no third-party origins, and the site promises no third-party requests at all.
+        # Asciidoctor's stylesheet falls back to system font stacks.
+        bundler exec asciidoctor -a webfonts! ./guide.adoc ./commands.adoc ./goodies.adoc
         rm -rf ./*.adoc
     cd - > /dev/null
 

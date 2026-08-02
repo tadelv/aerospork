@@ -186,20 +186,10 @@ if ! "$sparkle_bin/sign_update" --verify "$published" "$signature" > /dev/null 2
     exit 1
 fi
 
-# Resolved before use. `set -e` does not abort on a failure inside `$(...)` when the result is just
-# an argument, so a wrong Azure subscription -- the active one is global CLI state and can be changed
-# by anything else on the machine -- silently produced an empty token and the deploy failed after the
-# release was already public and the tag pushed.
-deployment_token="$(az staticwebapp secrets list --name aerospork-updates \
-    --resource-group aerospork-updates --query 'properties.apiKey' -o tsv)"
-if test -z "$deployment_token"; then
-    echo "!!! Could not read the Static Web App deployment token !!!" > /dev/stderr
-    echo "The active Azure subscription is '$(az account show --query name -o tsv 2>/dev/null)'." > /dev/stderr
-    echo "The appcast lives in 'billy MCT'; switch with: az account set --subscription <id>" > /dev/stderr
-    exit 1
-fi
-
-swa deploy updates-site --deployment-token "$deployment_token" --env production
+# Deploys the appcast together with the site pages and the built docs under /docs/, so the hosted
+# documentation always matches the newest published build. Token handling and its subscription
+# gotcha live in the script.
+./script/deploy-site.sh
 
 ################
 ### THE CASK ###
