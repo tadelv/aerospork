@@ -4,11 +4,14 @@
    (the icon, large plates) use the squircle mask instead. */
 
 :root {
-  --radius-tile: 4px;       /* the schematic window tiles in the gaps preview */
-  --radius-recorder: 5px;   /* the hand-drawn NSView key recorder */
-  --radius-field: 6px;      /* roundedBorder text fields, filter field */
-  --radius-card: 8px;       /* monitor rows, the gaps preview screen */
-  --radius-window: 10px;    /* macOS window corner */
+  --radius-tile: 4px;       /* the schematic window tiles in the gaps preview — unchanged: small,
+                                precise shapes stay small and precise */
+  --radius-recorder: 5px;   /* the hand-drawn NSView key recorder — unchanged */
+  --radius-field: 8px;      /* roundedBorder text fields, filter field (v3: was 6px) */
+  --radius-row: 8px;        /* inset list-row selection */
+  --radius-card: 10px;      /* monitor rows, FormSection cards (v3: was 8px) */
+  --radius-window: 14px;    /* macOS window corner (v3: was 10px, following the larger continuous
+                                corners macOS's own chrome moved to) */
   --radius-pill: 999px;     /* Capsule() — badges, the mode chip */
 
   --icon-corner-ratio: 0.225;  /* macOS squircle corner ratio used by the app icon */

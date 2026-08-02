@@ -8,7 +8,7 @@ export function Badge({ children, tone = 'default', help }) {
       display: 'inline-block', padding: '2px var(--space-6)',
       borderRadius: 'var(--radius-pill)',
       background: tone === 'muted' ? 'rgba(142,142,147,.2)' : 'var(--fill-strong)',
-      color: 'var(--label-secondary)', fontFamily: 'var(--font-system)',
+      color: 'color-mix(in srgb, var(--label) 72%, transparent)', fontFamily: 'var(--font-system)',
       fontSize: 'var(--text-caption2)', lineHeight: 1.3, whiteSpace: 'nowrap',
     }}>{children}</span>
   );

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Icon } from '../icons/Icon.jsx';
-
-const GLYPHS = { ctrl: '⌃', alt: '⌥', shift: '⇧', cmd: '⌘' };
+import { KeyCaps, GLYPHS } from './KeyCaps.jsx';
 
 /** aerospork notation ("alt-shift-h") rendered with real modifier glyphs ("⌥⇧h").
     Capitalized because only capitalized exports reach the design-system namespace. */
@@ -13,9 +12,11 @@ export function PrettyKey(notation = '') {
 }
 
 /* Click, then press a shortcut. Armed state is accent-tinted with a 2px accent border —
-   the same treatment the hand-drawn NSView uses. */
-export function KeyRecorderField({ notation = '', recording = false, onArm, onClear, showsClear = true, width = 150 }) {
-  const label = notation ? PrettyKey(notation) : (recording ? 'Press a shortcut…' : 'Click to record');
+   the same treatment the hand-drawn NSView uses. A filled, un-armed value renders as keycap
+   chips (bordered=false, since the field itself already draws the border) rather than one run-on
+   PrettyKey string — the same "one key, one cap" treatment as a read-only KeyCaps row. */
+export function KeyRecorderField({ notation = '', recording = false, onArm, onClear, showsClear = true, width = 170 }) {
+  const placeholder = recording ? 'Press a shortcut…' : 'Click to record';
   return (
     <div onClick={() => onArm && onArm(!recording)} style={{
       position: 'relative', width, height: 'var(--h-control)', boxSizing: 'border-box',
@@ -28,7 +29,9 @@ export function KeyRecorderField({ notation = '', recording = false, onArm, onCl
       font: 'var(--weight-regular) var(--text-default)/1 var(--font-mono)',
       color: notation ? 'var(--label)' : 'var(--label-placeholder)',
     }}>
-      <span style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>{label}</span>
+      <span style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
+        {notation ? <KeyCaps notation={notation} size={11} bordered={false} /> : placeholder}
+      </span>
       {showsClear && notation && (
         <button type="button" title="Clear"
           onClick={(e) => { e.stopPropagation(); onClear && onClear(); }}

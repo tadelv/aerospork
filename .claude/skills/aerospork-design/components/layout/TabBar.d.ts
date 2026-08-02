@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-/** Toolbar tab strip for a macOS settings window (SwiftUI TabView with .tabItem labels). */
+/** Stable top toolbar for the peer panes of a native macOS application Settings window. */
 export interface TabBarTab {
   id: string;
   label: string;

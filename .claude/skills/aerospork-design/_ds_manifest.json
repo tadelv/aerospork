@@ -1,1 +1,1428 @@
-{"namespace":"AeroSporkDesignSystem_078bd7","components":[{"name":"CodeEditor","sourcePath":"components/brand/CodeEditor.jsx"},{"name":"GapsPreview","sourcePath":"components/brand/GapsPreview.jsx"},{"name":"WindowChrome","sourcePath":"components/brand/WindowChrome.jsx"},{"name":"WorkspaceChips","sourcePath":"components/brand/WorkspaceChips.jsx"},{"name":"Button","sourcePath":"components/controls/Button.jsx"},{"name":"CopyButton","sourcePath":"components/controls/CopyButton.jsx"},{"name":"PrettyKey","sourcePath":"components/controls/KeyRecorderField.jsx"},{"name":"KeyRecorderField","sourcePath":"components/controls/KeyRecorderField.jsx"},{"name":"NumberField","sourcePath":"components/controls/NumberField.jsx"},{"name":"SegmentedPicker","sourcePath":"components/controls/SegmentedPicker.jsx"},{"name":"Select","sourcePath":"components/controls/Select.jsx"},{"name":"TextField","sourcePath":"components/controls/TextField.jsx"},{"name":"Toggle","sourcePath":"components/controls/Toggle.jsx"},{"name":"Badge","sourcePath":"components/feedback/Badge.jsx"},{"name":"Banner","sourcePath":"components/feedback/Banner.jsx"},{"name":"ContentUnavailable","sourcePath":"components/feedback/ContentUnavailable.jsx"},{"name":"StatusLabel","sourcePath":"components/feedback/StatusLabel.jsx"},{"name":"SF_TO_LUCIDE","sourcePath":"components/icons/Icon.jsx"},{"name":"ICON_SHAPES","sourcePath":"components/icons/Icon.jsx"},{"name":"Icon","sourcePath":"components/icons/Icon.jsx"},{"name":"BarStrip","sourcePath":"components/layout/BarStrip.jsx"},{"name":"DataTable","sourcePath":"components/layout/DataTable.jsx"},{"name":"FormSection","sourcePath":"components/layout/FormSection.jsx"},{"name":"LabeledContent","sourcePath":"components/layout/LabeledContent.jsx"},{"name":"ListActionBar","sourcePath":"components/layout/ListActionBar.jsx"},{"name":"MenuPanel","sourcePath":"components/layout/MenuPanel.jsx"},{"name":"SectionLabel","sourcePath":"components/layout/SectionLabel.jsx"},{"name":"SettingsFooter","sourcePath":"components/layout/SettingsFooter.jsx"},{"name":"SettingsHint","sourcePath":"components/layout/SettingsHint.jsx"},{"name":"TabBar","sourcePath":"components/layout/TabBar.jsx"}],"startingPoints":[{"name":"cli","path":"ui_kits/cli/index.html","previewPath":"ui_kits/cli/index.html","kind":"screen","section":"CLI","subtitle":"Terminal session with the aerospork CLI","viewport":"912x640"},{"name":"Button","path":"components/controls/Button.jsx","previewPath":"components/controls/controls.card.html","kind":"component","section":"Controls","subtitle":"macOS buttons, toggles, fields and pickers","viewport":"700x210"},{"name":"menu_bar","path":"ui_kits/menu_bar/index.html","previewPath":"ui_kits/menu_bar/index.html","kind":"screen","section":"Menu bar","subtitle":"Tiled desktop with the AeroSpork menu bar extra","viewport":"1088x688"},{"name":"FormSection","path":"components/layout/FormSection.jsx","previewPath":"components/layout/layout.card.html","kind":"component","section":"Settings","subtitle":"Grouped settings form section","viewport":"700x260"},{"name":"settings_app","path":"ui_kits/settings_app/index.html","previewPath":"ui_kits/settings_app/index.html","kind":"screen","section":"Settings","subtitle":"AeroSpork Settings window, all seven tabs","viewport":"936x676"},{"name":"WindowChrome","path":"components/brand/WindowChrome.jsx","previewPath":"components/brand/brand.card.html","kind":"component","section":"Settings","subtitle":"Framed macOS window shell","viewport":"700x420"}],"cards":[{"path":"assets/icon/AppIcon.html","group":"Brand","viewport":"700x260","subtitle":"Icon Composer layers: plate, glass panes, specular, rim — default / light / mono","name":"App icon"},{"path":"assets/icon/AppStoreHero.html","group":"Brand","viewport":"700x440","subtitle":"1440×900 marketing shot — icon, claim, and the tree layout as the motif","name":"App Store hero"},{"path":"assets/icon/Banner.html","group":"Brand","viewport":"700x350","subtitle":"1280×640 repo/App Store header — icon, wordmark, menu-bar chips","name":"README banner"},{"path":"guidelines/brand-icon-history.html","group":"Brand","viewport":"700x180","subtitle":"Left: the repo's generated icon. Right: this system's layered glass version","name":"Icon: shipped vs new"},{"path":"guidelines/brand-monitor-diagrams.html","group":"Brand","viewport":"700x230","subtitle":"The repo's own SVG explainers for good monitor arrangements","name":"Monitor diagrams"},{"path":"guidelines/brand-tiling-model.html","group":"Brand","viewport":"700x260","subtitle":"Product screenshots from the repo: horizontal and vertical accordion","name":"Tiling model"},{"path":"ui_kits/cli/index.html","group":"CLI","viewport":"912x640","subtitle":"The aerospork client — run a command to append its output","name":"Command line"},{"path":"guidelines/colors-brand.html","group":"Colors","viewport":"700x150","subtitle":"The app icon owns the only non-system colors in the product","name":"Brand palette"},{"path":"guidelines/colors-dark.html","group":"Colors","viewport":"700x180","subtitle":"Same tokens under [data-appearance=dark] — every surface and label flips","name":"Dark appearance"},{"path":"guidelines/colors-fills.html","group":"Colors","viewport":"700x150","subtitle":"Color.primary.opacity(…) fills, hairline separators, selection","name":"Fills & separators"},{"path":"guidelines/colors-labels.html","group":"Colors","viewport":"700x150","subtitle":"Four levels of text, defined as opacity on black — never as grey hexes","name":"Label hierarchy"},{"path":"guidelines/colors-status.html","group":"Colors","viewport":"700x150","subtitle":"Red = config not loaded, orange = warning, green = valid","name":"Status & banners"},{"path":"guidelines/colors-surfaces.html","group":"Colors","viewport":"700x170","subtitle":"Window, grouped canvas, control, text and translucent bar","name":"Surfaces"},{"path":"guidelines/colors-system.html","group":"Colors","viewport":"700x150","subtitle":"macOS semantic colors — light value / dark value","name":"System colors"},{"path":"components/brand/brand.card.html","group":"Components","viewport":"700x330","subtitle":"Menu bar workspace chips, gaps preview, TOML editor, window chrome","name":"Brand surfaces"},{"path":"components/controls/controls.card.html","group":"Components","viewport":"700x260","subtitle":"Buttons, toggle, fields, pickers, key recorder — the AppKit control set","name":"Controls"},{"path":"components/feedback/feedback.card.html","group":"Components","viewport":"700x330","subtitle":"Config banners, status labels, empty states, provenance badges","name":"Feedback"},{"path":"components/icons/icons.card.html","group":"Components","viewport":"700x240","subtitle":"SF Symbol names mapped to Lucide (substitution) — the app's whole glyph set","name":"Icons"},{"path":"components/layout/layout.card.html","group":"Components","viewport":"700x400","subtitle":"Grouped form section, bar strips, tab bar, table, +/- action bar, menu panel","name":"Layout"},{"path":"ui_kits/menu_bar/index.html","group":"Menu bar","viewport":"1088x688","subtitle":"The menu bar remote control over a tiled desktop — switch workspaces, pause tiling","name":"Menu bar & workspaces"},{"path":"ui_kits/settings_app/index.html","group":"Settings app","viewport":"936x676","subtitle":"The seven-tab Settings GUI — click through every tab","name":"Settings window"},{"path":"guidelines/spacing-chrome.html","group":"Spacing","viewport":"700x200","subtitle":"Bar padding, hairline dividers and the +/- strip glued to a table","name":"Chrome strips"},{"path":"guidelines/spacing-metrics.html","group":"Spacing","viewport":"700x180","subtitle":"Fixed widths and heights lifted straight from the SwiftUI source","name":"Control metrics"},{"path":"guidelines/spacing-radii.html","group":"Spacing","viewport":"700x160","subtitle":"Every rounded rect is a continuous squircle; CSS radius is the approximation","name":"Corner radii"},{"path":"guidelines/spacing-scale.html","group":"Spacing","viewport":"700x170","subtitle":"AppKit metrics, odd numbers included — do not round these to 4s","name":"Spacing scale"},{"path":"guidelines/type-in-use.html","group":"Type","viewport":"700x210","subtitle":"Section header, control label, unit, footer hint — one settings row group","name":"Hierarchy in use"},{"path":"guidelines/type-mono.html","group":"Type","viewport":"700x180","subtitle":"Anything the user could type into the config file is mono, at any size","name":"Monospaced = code"},{"path":"guidelines/type-rounded.html","group":"Type","viewport":"700x150","subtitle":"SF Rounded semibold appears in exactly one place: the workspace chips","name":"Rounded — menu bar only"},{"path":"guidelines/type-ui-scale.html","group":"Type","viewport":"700x210","subtitle":"San Francisco via the system font — the sizes macOS resolves the text styles to","name":"UI text scale"}],"templates":[],"hasThumbnailHtml":true,"globalCssPaths":["tokens/colors.css","tokens/typography.css","tokens/spacing.css","tokens/radius.css","tokens/elevation.css","tokens/motion.css","tokens/base.css","styles.css"],"tokens":[{"name":"--brand-plate-top","value":"#1c202c","kind":"color","definedIn":"tokens/colors.css"},{"name":"--brand-plate-bottom","value":"#10121a","kind":"color","definedIn":"tokens/colors.css"},{"name":"--brand-focused","value":"#5e9eff","kind":"color","definedIn":"tokens/colors.css"},{"name":"--brand-dimmed","value":"#4e566a","kind":"color","definedIn":"tokens/colors.css"},{"name":"--sys-blue","value":"#007aff","kind":"color","definedIn":"tokens/colors.css"},{"name":"--sys-red","value":"#ff3b30","kind":"color","definedIn":"tokens/colors.css"},{"name":"--sys-orange","value":"#ff9500","kind":"color","definedIn":"tokens/colors.css"},{"name":"--sys-green","value":"#34c759","kind":"color","definedIn":"tokens/colors.css"},{"name":"--sys-yellow","value":"#ffcc00","kind":"color","definedIn":"tokens/colors.css"},{"name":"--sys-gray","value":"#8e8e93","kind":"color","definedIn":"tokens/colors.css"},{"name":"--accent","value":"var(--sys-blue)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--label","value":"rgba(0, 0, 0, 0.85)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--label-secondary","value":"rgba(0, 0, 0, 0.5)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--label-tertiary","value":"rgba(0, 0, 0, 0.26)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--label-quaternary","value":"rgba(0, 0, 0, 0.1)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--label-placeholder","value":"rgba(0, 0, 0, 0.25)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--window-bg","value":"#ececec","kind":"color","definedIn":"tokens/colors.css"},{"name":"--grouped-bg","value":"#f2f2f4","kind":"color","definedIn":"tokens/colors.css"},{"name":"--control-bg","value":"#ffffff","kind":"color","definedIn":"tokens/colors.css"},{"name":"--text-bg","value":"#ffffff","kind":"font","definedIn":"tokens/colors.css"},{"name":"--bar-bg","value":"rgba(246, 246, 246, 0.82)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--selection","value":"#0064e1","kind":"color","definedIn":"tokens/colors.css"},{"name":"--selection-fg","value":"#ffffff","kind":"color","definedIn":"tokens/colors.css"},{"name":"--fill-subtle","value":"rgba(0, 0, 0, 0.045)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--fill","value":"rgba(0, 0, 0, 0.06)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--fill-strong","value":"rgba(0, 0, 0, 0.08)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--separator","value":"rgba(0, 0, 0, 0.1)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--border-control","value":"rgba(0, 0, 0, 0.16)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--text-body","value":"var(--label)","kind":"font","definedIn":"tokens/colors.css"},{"name":"--text-muted","value":"var(--label-secondary)","kind":"font","definedIn":"tokens/colors.css"},{"name":"--text-faint","value":"var(--label-tertiary)","kind":"font","definedIn":"tokens/colors.css"},{"name":"--surface-window","value":"var(--window-bg)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--surface-card","value":"var(--control-bg)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--surface-bar","value":"var(--bar-bg)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--surface-code","value":"var(--text-bg)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--status-error","value":"var(--sys-red)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--status-warning","value":"var(--sys-orange)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--status-ok","value":"var(--sys-green)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--banner-error-bg","value":"rgba(255, 59, 48, 0.13)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--banner-warning-bg","value":"rgba(255, 149, 0, 0.13)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--banner-error-strip-bg","value":"rgba(255, 59, 48, 0.1)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--tile-fill","value":"rgba(0, 122, 255, 0.28)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--tile-stroke","value":"rgba(0, 122, 255, 0.7)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--recorder-armed-fill","value":"rgba(0, 122, 255, 0.14)","kind":"color","definedIn":"tokens/colors.css"},{"name":"--sys-blue","value":"#0a84ff","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--sys-red","value":"#ff453a","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--sys-orange","value":"#ff9f0a","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--sys-green","value":"#30d158","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--sys-yellow","value":"#ffd60a","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--sys-gray","value":"#98989d","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--label","value":"rgba(255, 255, 255, 0.85)","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--label-secondary","value":"rgba(255, 255, 255, 0.55)","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--label-tertiary","value":"rgba(255, 255, 255, 0.25)","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--label-quaternary","value":"rgba(255, 255, 255, 0.1)","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--label-placeholder","value":"rgba(255, 255, 255, 0.25)","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--window-bg","value":"#323232","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--grouped-bg","value":"#1e1e1e","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--control-bg","value":"#3a3a3c","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--text-bg","value":"#1e1e1e","kind":"font","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--bar-bg","value":"rgba(46, 46, 46, 0.84)","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--selection","value":"#0a84ff","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--fill-subtle","value":"rgba(255, 255, 255, 0.05)","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--fill","value":"rgba(255, 255, 255, 0.08)","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--fill-strong","value":"rgba(255, 255, 255, 0.12)","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--separator","value":"rgba(255, 255, 255, 0.15)","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--border-control","value":"rgba(255, 255, 255, 0.2)","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--banner-error-bg","value":"rgba(255, 69, 58, 0.16)","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--banner-warning-bg","value":"rgba(255, 159, 10, 0.16)","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--banner-error-strip-bg","value":"rgba(255, 69, 58, 0.12)","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--tile-fill","value":"rgba(10, 132, 255, 0.28)","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--tile-stroke","value":"rgba(10, 132, 255, 0.7)","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--recorder-armed-fill","value":"rgba(10, 132, 255, 0.16)","kind":"color","definedIn":"tokens/colors.css","scope":"[data-appearance=\"dark\"]"},{"name":"--font-system","value":"-apple-system, BlinkMacSystemFont, system-ui, \"Helvetica Neue\", sans-serif","kind":"font","definedIn":"tokens/typography.css"},{"name":"--font-mono","value":"ui-monospace, \"SF Mono\", SFMono-Regular, Menlo, Monaco, monospace","kind":"font","definedIn":"tokens/typography.css"},{"name":"--font-rounded","value":"ui-rounded, -apple-system, system-ui, sans-serif","kind":"radius","definedIn":"tokens/typography.css"},{"name":"--text-large-title","value":"26px","kind":"font","definedIn":"tokens/typography.css"},{"name":"--text-title1","value":"22px","kind":"font","definedIn":"tokens/typography.css"},{"name":"--text-title2","value":"17px","kind":"font","definedIn":"tokens/typography.css"},{"name":"--text-title3","value":"15px","kind":"font","definedIn":"tokens/typography.css"},{"name":"--text-headline","value":"13px","kind":"font","definedIn":"tokens/typography.css"},{"name":"--text-default","value":"13px","kind":"font","definedIn":"tokens/typography.css"},{"name":"--text-callout","value":"12px","kind":"font","definedIn":"tokens/typography.css"},{"name":"--text-subheadline","value":"11px","kind":"font","definedIn":"tokens/typography.css"},{"name":"--text-footnote","value":"10px","kind":"font","definedIn":"tokens/typography.css"},{"name":"--text-caption","value":"10px","kind":"font","definedIn":"tokens/typography.css"},{"name":"--text-caption2","value":"10px","kind":"font","definedIn":"tokens/typography.css"},{"name":"--weight-regular","value":"400","kind":"font","definedIn":"tokens/typography.css"},{"name":"--weight-medium","value":"500","kind":"font","definedIn":"tokens/typography.css"},{"name":"--weight-semibold","value":"600","kind":"font","definedIn":"tokens/typography.css"},{"name":"--weight-light","value":"300","kind":"font","definedIn":"tokens/typography.css"},{"name":"--leading-tight","value":"1.2","kind":"font","definedIn":"tokens/typography.css"},{"name":"--leading-body","value":"1.35","kind":"font","definedIn":"tokens/typography.css"},{"name":"--leading-prose","value":"1.45","kind":"font","definedIn":"tokens/typography.css"},{"name":"--font-code","value":"var(--font-mono)","kind":"font","definedIn":"tokens/typography.css"},{"name":"--font-ui","value":"var(--font-system)","kind":"font","definedIn":"tokens/typography.css"},{"name":"--font-chip","value":"var(--font-rounded)","kind":"font","definedIn":"tokens/typography.css"},{"name":"--text-hint","value":"var(--text-callout)","kind":"font","definedIn":"tokens/typography.css"},{"name":"--text-label","value":"var(--text-default)","kind":"font","definedIn":"tokens/typography.css"},{"name":"--space-1","value":"1px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--space-2","value":"2px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--space-4","value":"4px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--space-5","value":"5px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--space-6","value":"6px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--space-7","value":"7px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--space-8","value":"8px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--space-9","value":"9px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--space-10","value":"10px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--space-11","value":"11px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--space-12","value":"12px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--space-14","value":"14px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--space-16","value":"16px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--space-24","value":"24px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--gap-row","value":"var(--space-8)","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--gap-tight","value":"var(--space-5)","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--pad-bar-x","value":"var(--space-14)","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--pad-bar-y","value":"var(--space-9)","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--pad-section-x","value":"var(--space-16)","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--pad-card-x","value":"var(--space-12)","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--pad-card-y","value":"var(--space-9)","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--pad-empty-state","value":"var(--space-24)","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--w-number-field","value":"58px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--w-recorder-row","value":"150px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--w-recorder-composer","value":"170px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--w-filter-field","value":"150px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--w-env-name","value":"150px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--h-control","value":"22px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--w-settings-min","value":"780px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--w-settings-ideal","value":"880px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--h-settings-min","value":"520px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--h-settings-ideal","value":"620px","kind":"spacing","definedIn":"tokens/spacing.css"},{"name":"--radius-tile","value":"4px","kind":"radius","definedIn":"tokens/radius.css"},{"name":"--radius-recorder","value":"5px","kind":"radius","definedIn":"tokens/radius.css"},{"name":"--radius-field","value":"6px","kind":"radius","definedIn":"tokens/radius.css"},{"name":"--radius-card","value":"8px","kind":"radius","definedIn":"tokens/radius.css"},{"name":"--radius-window","value":"10px","kind":"radius","definedIn":"tokens/radius.css"},{"name":"--radius-pill","value":"999px","kind":"radius","definedIn":"tokens/radius.css"},{"name":"--icon-corner-ratio","value":"0.225","kind":"radius","definedIn":"tokens/radius.css"},{"name":"--icon-inset-ratio","value":"0.055","kind":"spacing","definedIn":"tokens/radius.css"},{"name":"--border-hairline","value":"1px","kind":"spacing","definedIn":"tokens/radius.css"},{"name":"--border-recorder-armed","value":"2px","kind":"spacing","definedIn":"tokens/radius.css"},{"name":"--border-chip","value":"3px","kind":"spacing","definedIn":"tokens/radius.css"},{"name":"--divider","value":"var(--border-hairline) solid var(--separator)","kind":"color","definedIn":"tokens/elevation.css"},{"name":"--field-border","value":"var(--border-hairline) solid var(--border-control)","kind":"color","definedIn":"tokens/elevation.css"},{"name":"--shadow-none","value":"none","kind":"shadow","definedIn":"tokens/elevation.css"},{"name":"--shadow-popover","value":"0 10px 30px rgba(0, 0, 0, 0.22), 0 0 0 0.5px rgba(0, 0, 0, 0.14)","kind":"shadow","definedIn":"tokens/elevation.css"},{"name":"--shadow-menu","value":"0 12px 34px rgba(0, 0, 0, 0.28), 0 0 0 0.5px rgba(0, 0, 0, 0.16)","kind":"shadow","definedIn":"tokens/elevation.css"},{"name":"--shadow-window","value":"0 24px 70px rgba(0, 0, 0, 0.34), 0 0 0 0.5px rgba(0, 0, 0, 0.2)","kind":"shadow","definedIn":"tokens/elevation.css"},{"name":"--shadow-focus-ring","value":"0 0 0 3.5px rgba(0, 122, 255, 0.35)","kind":"shadow","definedIn":"tokens/elevation.css"},{"name":"--icon-shadow","value":"0 40px 80px rgba(0, 0, 0, 0.45)","kind":"shadow","definedIn":"tokens/elevation.css"},{"name":"--icon-specular","value":"linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 42%)","kind":"other","definedIn":"tokens/elevation.css","annotation":"other"},{"name":"--icon-bevel","value":"inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(0, 0, 0, 0.35)","kind":"shadow","definedIn":"tokens/elevation.css","annotation":"shadow"},{"name":"--glass-blur","value":"24px","kind":"spacing","definedIn":"tokens/elevation.css"},{"name":"--bar-blur","value":"20px","kind":"spacing","definedIn":"tokens/elevation.css"},{"name":"--ease-standard","value":"cubic-bezier(0.4, 0, 0.2, 1)","kind":"other","definedIn":"tokens/motion.css","annotation":"other"},{"name":"--dur-instant","value":"0ms","kind":"other","definedIn":"tokens/motion.css","annotation":"other"},{"name":"--dur-control","value":"120ms","kind":"other","definedIn":"tokens/motion.css","annotation":"other"},{"name":"--dur-appear","value":"180ms","kind":"other","definedIn":"tokens/motion.css","annotation":"other"},{"name":"--timing-refresh-debounce","value":"50ms","kind":"other","definedIn":"tokens/motion.css","annotation":"other"},{"name":"--timing-autosave-debounce","value":"600ms","kind":"other","definedIn":"tokens/motion.css","annotation":"other"},{"name":"--timing-copied-flash","value":"1400ms","kind":"other","definedIn":"tokens/motion.css","annotation":"other"}],"themes":[{"selector":"[data-appearance=\"dark\"]","label":"Appearance Dark"}],"fonts":[],"brandFonts":[],"source":"spa"}
+{
+ "namespace": "AeroSporkDesignSystem_078bd7",
+ "components": [
+  {
+   "name": "SAMPLE_APPS",
+   "sourcePath": "components/brand/AppIcon.jsx"
+  },
+  {
+   "name": "appDisplayName",
+   "sourcePath": "components/brand/AppIcon.jsx"
+  },
+  {
+   "name": "AppIcon",
+   "sourcePath": "components/brand/AppIcon.jsx"
+  },
+  {
+   "name": "CodeEditor",
+   "sourcePath": "components/brand/CodeEditor.jsx"
+  },
+  {
+   "name": "GapsPreview",
+   "sourcePath": "components/brand/GapsPreview.jsx"
+  },
+  {
+   "name": "MonitorArrangement",
+   "sourcePath": "components/brand/MonitorArrangement.jsx"
+  },
+  {
+   "name": "WindowChrome",
+   "sourcePath": "components/brand/WindowChrome.jsx"
+  },
+  {
+   "name": "WorkspaceChips",
+   "sourcePath": "components/brand/WorkspaceChips.jsx"
+  },
+  {
+   "name": "Button",
+   "sourcePath": "components/controls/Button.jsx"
+  },
+  {
+   "name": "CopyButton",
+   "sourcePath": "components/controls/CopyButton.jsx"
+  },
+  {
+   "name": "IconButton",
+   "sourcePath": "components/controls/IconButton.jsx"
+  },
+  {
+   "name": "KeyCaps",
+   "sourcePath": "components/controls/KeyCaps.jsx"
+  },
+  {
+   "name": "PrettyKey",
+   "sourcePath": "components/controls/KeyRecorderField.jsx"
+  },
+  {
+   "name": "KeyRecorderField",
+   "sourcePath": "components/controls/KeyRecorderField.jsx"
+  },
+  {
+   "name": "NumberField",
+   "sourcePath": "components/controls/NumberField.jsx"
+  },
+  {
+   "name": "SegmentedPicker",
+   "sourcePath": "components/controls/SegmentedPicker.jsx"
+  },
+  {
+   "name": "Select",
+   "sourcePath": "components/controls/Select.jsx"
+  },
+  {
+   "name": "TextField",
+   "sourcePath": "components/controls/TextField.jsx"
+  },
+  {
+   "name": "Toggle",
+   "sourcePath": "components/controls/Toggle.jsx"
+  },
+  {
+   "name": "Badge",
+   "sourcePath": "components/feedback/Badge.jsx"
+  },
+  {
+   "name": "Banner",
+   "sourcePath": "components/feedback/Banner.jsx"
+  },
+  {
+   "name": "ContentUnavailable",
+   "sourcePath": "components/feedback/ContentUnavailable.jsx"
+  },
+  {
+   "name": "StatusLabel",
+   "sourcePath": "components/feedback/StatusLabel.jsx"
+  },
+  {
+   "name": "SF_TO_LUCIDE",
+   "sourcePath": "components/icons/Icon.jsx"
+  },
+  {
+   "name": "ICON_SHAPES",
+   "sourcePath": "components/icons/Icon.jsx"
+  },
+  {
+   "name": "Icon",
+   "sourcePath": "components/icons/Icon.jsx"
+  },
+  {
+   "name": "BarStrip",
+   "sourcePath": "components/layout/BarStrip.jsx"
+  },
+  {
+   "name": "DataTable",
+   "sourcePath": "components/layout/DataTable.jsx"
+  },
+  {
+   "name": "FormSection",
+   "sourcePath": "components/layout/FormSection.jsx"
+  },
+  {
+   "name": "LabeledContent",
+   "sourcePath": "components/layout/LabeledContent.jsx"
+  },
+  {
+   "name": "ListActionBar",
+   "sourcePath": "components/layout/ListActionBar.jsx"
+  },
+  {
+   "name": "PanelHeader",
+   "sourcePath": "components/layout/PanelHeader.jsx"
+  },
+  {
+   "name": "MenuPanel",
+   "sourcePath": "components/layout/MenuPanel.jsx"
+  },
+  {
+   "name": "SectionLabel",
+   "sourcePath": "components/layout/SectionLabel.jsx"
+  },
+  {
+   "name": "SettingsFooter",
+   "sourcePath": "components/layout/SettingsFooter.jsx"
+  },
+  {
+   "name": "SettingsHint",
+   "sourcePath": "components/layout/SettingsHint.jsx"
+  },
+  {
+   "name": "TabBar",
+   "sourcePath": "components/layout/TabBar.jsx"
+  }
+ ],
+ "startingPoints": [
+  {
+   "name": "cli",
+   "path": "ui_kits/cli/index.html",
+   "previewPath": "ui_kits/cli/index.html",
+   "kind": "screen",
+   "section": "CLI",
+   "subtitle": "Terminal session with the aerospork CLI",
+   "viewport": "912x640"
+  },
+  {
+   "name": "Button",
+   "path": "components/controls/Button.jsx",
+   "previewPath": "components/controls/controls.card.html",
+   "kind": "component",
+   "section": "Controls",
+   "subtitle": "macOS buttons, toggles, fields and pickers",
+   "viewport": "700x210"
+  },
+  {
+   "name": "menu_bar",
+   "path": "ui_kits/menu_bar/index.html",
+   "previewPath": "ui_kits/menu_bar/index.html",
+   "kind": "screen",
+   "section": "Menu bar",
+   "subtitle": "Tiled desktop with the AeroSpork menu bar extra",
+   "viewport": "1088x688"
+  },
+  {
+   "name": "FormSection",
+   "path": "components/layout/FormSection.jsx",
+   "previewPath": "components/layout/layout.card.html",
+   "kind": "component",
+   "section": "Settings",
+   "subtitle": "Grouped settings form section",
+   "viewport": "700x260"
+  },
+  {
+   "name": "settings_app",
+   "path": "ui_kits/settings_app/index.html",
+   "previewPath": "ui_kits/settings_app/index.html",
+   "kind": "screen",
+   "section": "Settings",
+   "subtitle": "AeroSpork Settings window, all seven panes",
+   "viewport": "1116x676"
+  },
+  {
+   "name": "WindowChrome",
+   "path": "components/brand/WindowChrome.jsx",
+   "previewPath": "components/brand/brand.card.html",
+   "kind": "component",
+   "section": "Settings",
+   "subtitle": "Framed macOS window shell",
+   "viewport": "700x420"
+  }
+ ],
+ "cards": [
+  {
+   "path": "assets/icon/AppIcon.html",
+   "group": "Brand",
+   "viewport": "700x260",
+   "subtitle": "Icon Composer layers: plate, glass panes, specular, rim — default / light / mono",
+   "name": "App icon"
+  },
+  {
+   "path": "assets/icon/AppStoreHero.html",
+   "group": "Brand",
+   "viewport": "700x440",
+   "subtitle": "1440×900 marketing shot — icon, claim, and the tree layout as the motif",
+   "name": "App Store hero"
+  },
+  {
+   "path": "assets/icon/Banner.html",
+   "group": "Brand",
+   "viewport": "700x350",
+   "subtitle": "1280×640 repo/App Store header — icon, wordmark, menu-bar chips",
+   "name": "README banner"
+  },
+  {
+   "path": "guidelines/brand-icon-history.html",
+   "group": "Brand",
+   "viewport": "700x180",
+   "subtitle": "Left: the repo's generated icon. Right: this system's layered glass version",
+   "name": "Icon: shipped vs new"
+  },
+  {
+   "path": "guidelines/brand-monitor-diagrams.html",
+   "group": "Brand",
+   "viewport": "700x230",
+   "subtitle": "The repo's own SVG explainers for good monitor arrangements",
+   "name": "Monitor diagrams"
+  },
+  {
+   "path": "guidelines/brand-tiling-model.html",
+   "group": "Brand",
+   "viewport": "700x260",
+   "subtitle": "Product screenshots from the repo: horizontal and vertical accordion",
+   "name": "Tiling model"
+  },
+  {
+   "path": "ui_kits/cli/index.html",
+   "group": "CLI",
+   "viewport": "912x640",
+   "subtitle": "The aerospork client — run a command to append its output",
+   "name": "Command line"
+  },
+  {
+   "path": "guidelines/colors-brand.html",
+   "group": "Colors",
+   "viewport": "700x150",
+   "subtitle": "The app icon owns the only non-system colors in the product",
+   "name": "Brand palette"
+  },
+  {
+   "path": "guidelines/colors-dark.html",
+   "group": "Colors",
+   "viewport": "700x180",
+   "subtitle": "Same tokens under [data-appearance=dark] — every surface and label flips",
+   "name": "Dark appearance"
+  },
+  {
+   "path": "guidelines/colors-fills.html",
+   "group": "Colors",
+   "viewport": "700x150",
+   "subtitle": "Color.primary.opacity(…) fills, hairline separators, selection",
+   "name": "Fills & separators"
+  },
+  {
+   "path": "guidelines/colors-labels.html",
+   "group": "Colors",
+   "viewport": "700x150",
+   "subtitle": "Four levels of text, defined as opacity on black — never as grey hexes",
+   "name": "Label hierarchy"
+  },
+  {
+   "path": "guidelines/colors-status.html",
+   "group": "Colors",
+   "viewport": "700x150",
+   "subtitle": "Red = config not loaded, orange = warning, green = valid",
+   "name": "Status & banners"
+  },
+  {
+   "path": "guidelines/colors-surfaces.html",
+   "group": "Colors",
+   "viewport": "700x170",
+   "subtitle": "Window, grouped canvas, control, text and translucent bar",
+   "name": "Surfaces"
+  },
+  {
+   "path": "guidelines/colors-system.html",
+   "group": "Colors",
+   "viewport": "700x150",
+   "subtitle": "macOS semantic colors — light value / dark value",
+   "name": "System colors"
+  },
+  {
+   "path": "components/brand/brand.card.html",
+   "group": "Components",
+   "viewport": "700x330",
+   "subtitle": "Menu bar workspace chips, gaps preview, TOML editor, window chrome",
+   "name": "Brand surfaces"
+  },
+  {
+   "path": "components/controls/controls.card.html",
+   "group": "Components",
+   "viewport": "700x260",
+   "subtitle": "Buttons, toggle, fields, pickers, key recorder — the AppKit control set",
+   "name": "Controls"
+  },
+  {
+   "path": "components/feedback/feedback.card.html",
+   "group": "Components",
+   "viewport": "700x330",
+   "subtitle": "Config banners, status labels, empty states, provenance badges",
+   "name": "Feedback"
+  },
+  {
+   "path": "components/icons/icons.card.html",
+   "group": "Components",
+   "viewport": "700x240",
+   "subtitle": "SF Symbol names mapped to Lucide (substitution) — the app's whole glyph set",
+   "name": "Icons"
+  },
+  {
+   "path": "components/layout/layout.card.html",
+   "group": "Components",
+   "viewport": "700x400",
+   "subtitle": "Grouped form section, bar strips, tab bar, table, +/- action bar, menu panel",
+   "name": "Layout"
+  },
+  {
+   "path": "ui_kits/menu_bar/index.html",
+   "group": "Menu bar",
+   "viewport": "1088x688",
+   "subtitle": "The menu bar remote control over a tiled desktop — switch workspaces, pause tiling",
+   "name": "Menu bar & workspaces"
+  },
+  {
+   "path": "ui_kits/settings_app/index.html",
+   "group": "Settings app",
+   "viewport": "1116x676",
+   "subtitle": "The native seven-pane Settings GUI — inspect every pane",
+   "name": "Settings window"
+  },
+  {
+   "path": "guidelines/spacing-chrome.html",
+   "group": "Spacing",
+   "viewport": "700x200",
+   "subtitle": "Bar padding, hairline dividers and the +/- strip glued to a table",
+   "name": "Chrome strips"
+  },
+  {
+   "path": "guidelines/spacing-metrics.html",
+   "group": "Spacing",
+   "viewport": "700x180",
+   "subtitle": "Fixed widths and heights lifted straight from the SwiftUI source",
+   "name": "Control metrics"
+  },
+  {
+   "path": "guidelines/spacing-radii.html",
+   "group": "Spacing",
+   "viewport": "700x160",
+   "subtitle": "Every rounded rect is a continuous squircle; CSS radius is the approximation",
+   "name": "Corner radii"
+  },
+  {
+   "path": "guidelines/spacing-scale.html",
+   "group": "Spacing",
+   "viewport": "700x170",
+   "subtitle": "AppKit metrics, odd numbers included — do not round these to 4s",
+   "name": "Spacing scale"
+  },
+  {
+   "path": "guidelines/type-in-use.html",
+   "group": "Type",
+   "viewport": "700x210",
+   "subtitle": "Section header, control label, unit, footer hint — one settings row group",
+   "name": "Hierarchy in use"
+  },
+  {
+   "path": "guidelines/type-mono.html",
+   "group": "Type",
+   "viewport": "700x180",
+   "subtitle": "Anything the user could type into the config file is mono, at any size",
+   "name": "Monospaced = code"
+  },
+  {
+   "path": "guidelines/type-rounded.html",
+   "group": "Type",
+   "viewport": "700x150",
+   "subtitle": "SF Rounded semibold appears in exactly one place: the workspace chips",
+   "name": "Rounded — menu bar only"
+  },
+  {
+   "path": "guidelines/type-ui-scale.html",
+   "group": "Type",
+   "viewport": "700x210",
+   "subtitle": "San Francisco via the system font — the sizes macOS resolves the text styles to",
+   "name": "UI text scale"
+  }
+ ],
+ "templates": [],
+ "hasThumbnailHtml": true,
+ "globalCssPaths": [
+  "tokens/colors.css",
+  "tokens/typography.css",
+  "tokens/spacing.css",
+  "tokens/radius.css",
+  "tokens/elevation.css",
+  "tokens/motion.css",
+  "tokens/base.css",
+  "styles.css"
+ ],
+ "tokens": [
+  {
+   "name": "--brand-plate-top",
+   "value": "#1c202c",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--brand-plate-bottom",
+   "value": "#10121a",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--brand-focused",
+   "value": "#5e9eff",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--brand-dimmed",
+   "value": "#4e566a",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--sys-blue",
+   "value": "#007aff",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--sys-red",
+   "value": "#ff3b30",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--sys-orange",
+   "value": "#ff9500",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--sys-green",
+   "value": "#34c759",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--sys-yellow",
+   "value": "#ffcc00",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--sys-gray",
+   "value": "#8e8e93",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--accent",
+   "value": "var(--sys-blue)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--label",
+   "value": "rgba(0, 0, 0, 0.85)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--label-secondary",
+   "value": "rgba(0, 0, 0, 0.5)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--label-tertiary",
+   "value": "rgba(0, 0, 0, 0.26)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--label-quaternary",
+   "value": "rgba(0, 0, 0, 0.1)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--label-placeholder",
+   "value": "rgba(0, 0, 0, 0.25)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--window-bg",
+   "value": "#ececec",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--grouped-bg",
+   "value": "#f2f2f4",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--control-bg",
+   "value": "#ffffff",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--text-bg",
+   "value": "#ffffff",
+   "kind": "font",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--bar-bg",
+   "value": "rgba(246, 246, 246, 0.82)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--selection",
+   "value": "#0064e1",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--selection-fg",
+   "value": "#ffffff",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--fill-subtle",
+   "value": "rgba(0, 0, 0, 0.045)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--fill",
+   "value": "rgba(0, 0, 0, 0.06)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--fill-strong",
+   "value": "rgba(0, 0, 0, 0.08)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--separator",
+   "value": "rgba(0, 0, 0, 0.1)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--border-control",
+   "value": "rgba(0, 0, 0, 0.16)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--text-body",
+   "value": "var(--label)",
+   "kind": "font",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--text-muted",
+   "value": "var(--label-secondary)",
+   "kind": "font",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--text-faint",
+   "value": "var(--label-tertiary)",
+   "kind": "font",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--surface-window",
+   "value": "var(--window-bg)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--surface-card",
+   "value": "var(--control-bg)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--surface-bar",
+   "value": "var(--bar-bg)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--surface-code",
+   "value": "var(--text-bg)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--status-error",
+   "value": "var(--sys-red)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--status-warning",
+   "value": "var(--sys-orange)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--status-ok",
+   "value": "var(--sys-green)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--banner-error-bg",
+   "value": "rgba(255, 59, 48, 0.13)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--banner-warning-bg",
+   "value": "rgba(255, 149, 0, 0.13)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--banner-error-strip-bg",
+   "value": "rgba(255, 59, 48, 0.1)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--tile-fill",
+   "value": "rgba(0, 122, 255, 0.28)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--tile-stroke",
+   "value": "rgba(0, 122, 255, 0.7)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--recorder-armed-fill",
+   "value": "rgba(0, 122, 255, 0.14)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css"
+  },
+  {
+   "name": "--sys-blue",
+   "value": "#0a84ff",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--sys-red",
+   "value": "#ff453a",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--sys-orange",
+   "value": "#ff9f0a",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--sys-green",
+   "value": "#30d158",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--sys-yellow",
+   "value": "#ffd60a",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--sys-gray",
+   "value": "#98989d",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--label",
+   "value": "rgba(255, 255, 255, 0.85)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--label-secondary",
+   "value": "rgba(255, 255, 255, 0.55)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--label-tertiary",
+   "value": "rgba(255, 255, 255, 0.25)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--label-quaternary",
+   "value": "rgba(255, 255, 255, 0.1)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--label-placeholder",
+   "value": "rgba(255, 255, 255, 0.25)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--window-bg",
+   "value": "#323232",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--grouped-bg",
+   "value": "#1e1e1e",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--control-bg",
+   "value": "#3a3a3c",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--text-bg",
+   "value": "#1e1e1e",
+   "kind": "font",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--bar-bg",
+   "value": "rgba(46, 46, 46, 0.84)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--selection",
+   "value": "#0a84ff",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--fill-subtle",
+   "value": "rgba(255, 255, 255, 0.05)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--fill",
+   "value": "rgba(255, 255, 255, 0.08)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--fill-strong",
+   "value": "rgba(255, 255, 255, 0.12)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--separator",
+   "value": "rgba(255, 255, 255, 0.15)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--border-control",
+   "value": "rgba(255, 255, 255, 0.2)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--banner-error-bg",
+   "value": "rgba(255, 69, 58, 0.16)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--banner-warning-bg",
+   "value": "rgba(255, 159, 10, 0.16)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--banner-error-strip-bg",
+   "value": "rgba(255, 69, 58, 0.12)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--tile-fill",
+   "value": "rgba(10, 132, 255, 0.28)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--tile-stroke",
+   "value": "rgba(10, 132, 255, 0.7)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--recorder-armed-fill",
+   "value": "rgba(10, 132, 255, 0.16)",
+   "kind": "color",
+   "definedIn": "tokens/colors.css",
+   "scope": "[data-appearance=\"dark\"]"
+  },
+  {
+   "name": "--font-system",
+   "value": "-apple-system, BlinkMacSystemFont, system-ui, \"Helvetica Neue\", sans-serif",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--font-mono",
+   "value": "ui-monospace, \"SF Mono\", SFMono-Regular, Menlo, Monaco, monospace",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--font-rounded",
+   "value": "ui-rounded, -apple-system, system-ui, sans-serif",
+   "kind": "radius",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--text-large-title",
+   "value": "26px",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--text-title1",
+   "value": "22px",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--text-title2",
+   "value": "17px",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--text-title3",
+   "value": "15px",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--text-headline",
+   "value": "13px",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--text-default",
+   "value": "13px",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--text-callout",
+   "value": "12px",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--text-subheadline",
+   "value": "11px",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--text-footnote",
+   "value": "10px",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--text-caption",
+   "value": "10px",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--text-caption2",
+   "value": "10px",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--weight-regular",
+   "value": "400",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--weight-medium",
+   "value": "500",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--weight-semibold",
+   "value": "600",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--weight-light",
+   "value": "300",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--leading-tight",
+   "value": "1.2",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--leading-body",
+   "value": "1.35",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--leading-prose",
+   "value": "1.45",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--font-code",
+   "value": "var(--font-mono)",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--font-ui",
+   "value": "var(--font-system)",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--font-chip",
+   "value": "var(--font-rounded)",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--text-hint",
+   "value": "var(--text-callout)",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--text-label",
+   "value": "var(--text-default)",
+   "kind": "font",
+   "definedIn": "tokens/typography.css"
+  },
+  {
+   "name": "--space-1",
+   "value": "1px",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--space-2",
+   "value": "2px",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--space-4",
+   "value": "4px",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--space-5",
+   "value": "5px",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--space-6",
+   "value": "6px",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--space-7",
+   "value": "7px",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--space-8",
+   "value": "8px",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--space-9",
+   "value": "9px",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--space-10",
+   "value": "10px",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--space-11",
+   "value": "11px",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--space-12",
+   "value": "12px",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--space-14",
+   "value": "14px",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--space-16",
+   "value": "16px",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--space-24",
+   "value": "24px",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--gap-row",
+   "value": "var(--space-8)",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--gap-tight",
+   "value": "var(--space-5)",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--pad-bar-x",
+   "value": "var(--space-14)",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--pad-bar-y",
+   "value": "var(--space-9)",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--pad-section-x",
+   "value": "var(--space-16)",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--pad-card-x",
+   "value": "var(--space-12)",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--pad-card-y",
+   "value": "var(--space-9)",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--pad-empty-state",
+   "value": "var(--space-24)",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--w-number-field",
+   "value": "58px",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--w-recorder",
+   "value": "170px",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--w-filter-field",
+   "value": "150px",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--w-env-name",
+   "value": "150px",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--h-control",
+   "value": "22px",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--w-settings-min",
+   "value": "780px",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--w-settings-ideal",
+   "value": "880px",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--h-settings-min",
+   "value": "520px",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--h-settings-ideal",
+   "value": "620px",
+   "kind": "spacing",
+   "definedIn": "tokens/spacing.css"
+  },
+  {
+   "name": "--radius-tile",
+   "value": "4px",
+   "kind": "radius",
+   "definedIn": "tokens/radius.css"
+  },
+  {
+   "name": "--radius-recorder",
+   "value": "5px",
+   "kind": "radius",
+   "definedIn": "tokens/radius.css"
+  },
+  {
+   "name": "--radius-field",
+   "value": "6px",
+   "kind": "radius",
+   "definedIn": "tokens/radius.css"
+  },
+  {
+   "name": "--radius-card",
+   "value": "8px",
+   "kind": "radius",
+   "definedIn": "tokens/radius.css"
+  },
+  {
+   "name": "--radius-window",
+   "value": "10px",
+   "kind": "radius",
+   "definedIn": "tokens/radius.css"
+  },
+  {
+   "name": "--radius-pill",
+   "value": "999px",
+   "kind": "radius",
+   "definedIn": "tokens/radius.css"
+  },
+  {
+   "name": "--icon-corner-ratio",
+   "value": "0.225",
+   "kind": "radius",
+   "definedIn": "tokens/radius.css"
+  },
+  {
+   "name": "--icon-inset-ratio",
+   "value": "0.055",
+   "kind": "spacing",
+   "definedIn": "tokens/radius.css"
+  },
+  {
+   "name": "--border-hairline",
+   "value": "1px",
+   "kind": "spacing",
+   "definedIn": "tokens/radius.css"
+  },
+  {
+   "name": "--border-recorder-armed",
+   "value": "2px",
+   "kind": "spacing",
+   "definedIn": "tokens/radius.css"
+  },
+  {
+   "name": "--border-chip",
+   "value": "3px",
+   "kind": "spacing",
+   "definedIn": "tokens/radius.css"
+  },
+  {
+   "name": "--divider",
+   "value": "var(--border-hairline) solid var(--separator)",
+   "kind": "color",
+   "definedIn": "tokens/elevation.css"
+  },
+  {
+   "name": "--field-border",
+   "value": "var(--border-hairline) solid var(--border-control)",
+   "kind": "color",
+   "definedIn": "tokens/elevation.css"
+  },
+  {
+   "name": "--shadow-none",
+   "value": "none",
+   "kind": "shadow",
+   "definedIn": "tokens/elevation.css"
+  },
+  {
+   "name": "--shadow-popover",
+   "value": "0 10px 30px rgba(0, 0, 0, 0.22), 0 0 0 0.5px rgba(0, 0, 0, 0.14)",
+   "kind": "shadow",
+   "definedIn": "tokens/elevation.css"
+  },
+  {
+   "name": "--shadow-menu",
+   "value": "0 12px 34px rgba(0, 0, 0, 0.28), 0 0 0 0.5px rgba(0, 0, 0, 0.16)",
+   "kind": "shadow",
+   "definedIn": "tokens/elevation.css"
+  },
+  {
+   "name": "--shadow-window",
+   "value": "0 24px 70px rgba(0, 0, 0, 0.34), 0 0 0 0.5px rgba(0, 0, 0, 0.2)",
+   "kind": "shadow",
+   "definedIn": "tokens/elevation.css"
+  },
+  {
+   "name": "--shadow-focus-ring",
+   "value": "0 0 0 3.5px rgba(0, 122, 255, 0.35)",
+   "kind": "shadow",
+   "definedIn": "tokens/elevation.css"
+  },
+  {
+   "name": "--icon-shadow",
+   "value": "0 40px 80px rgba(0, 0, 0, 0.45)",
+   "kind": "shadow",
+   "definedIn": "tokens/elevation.css"
+  },
+  {
+   "name": "--icon-specular",
+   "value": "linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 42%)",
+   "kind": "other",
+   "definedIn": "tokens/elevation.css",
+   "annotation": "other"
+  },
+  {
+   "name": "--icon-bevel",
+   "value": "inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(0, 0, 0, 0.35)",
+   "kind": "shadow",
+   "definedIn": "tokens/elevation.css",
+   "annotation": "shadow"
+  },
+  {
+   "name": "--glass-blur",
+   "value": "24px",
+   "kind": "spacing",
+   "definedIn": "tokens/elevation.css"
+  },
+  {
+   "name": "--bar-blur",
+   "value": "20px",
+   "kind": "spacing",
+   "definedIn": "tokens/elevation.css"
+  },
+  {
+   "name": "--ease-standard",
+   "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+   "kind": "other",
+   "definedIn": "tokens/motion.css",
+   "annotation": "other"
+  },
+  {
+   "name": "--dur-instant",
+   "value": "0ms",
+   "kind": "other",
+   "definedIn": "tokens/motion.css",
+   "annotation": "other"
+  },
+  {
+   "name": "--dur-control",
+   "value": "120ms",
+   "kind": "other",
+   "definedIn": "tokens/motion.css",
+   "annotation": "other"
+  },
+  {
+   "name": "--dur-appear",
+   "value": "180ms",
+   "kind": "other",
+   "definedIn": "tokens/motion.css",
+   "annotation": "other"
+  },
+  {
+   "name": "--timing-refresh-debounce",
+   "value": "50ms",
+   "kind": "other",
+   "definedIn": "tokens/motion.css",
+   "annotation": "other"
+  },
+  {
+   "name": "--timing-autosave-debounce",
+   "value": "600ms",
+   "kind": "other",
+   "definedIn": "tokens/motion.css",
+   "annotation": "other"
+  },
+  {
+   "name": "--timing-copied-flash",
+   "value": "1400ms",
+   "kind": "other",
+   "definedIn": "tokens/motion.css",
+   "annotation": "other"
+  }
+ ],
+ "themes": [
+  {
+   "selector": "[data-appearance=\"dark\"]",
+   "label": "Appearance Dark"
+  }
+ ],
+ "fonts": [],
+ "brandFonts": [],
+ "source": "spa"
+}

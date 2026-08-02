@@ -12,7 +12,7 @@
 <script src="../../_ds_bundle.js"></script>
 </head><body><div id="root"></div>
 <script type="text/babel">
-const { Button, Toggle, TextField, NumberField, SegmentedPicker, Select, CopyButton, KeyRecorderField, Icon } = window.AeroSporkDesignSystem_078bd7;
+const { Button, Toggle, TextField, NumberField, SegmentedPicker, Select, CopyButton, KeyRecorderField, KeyCaps, Icon } = window.AeroSporkDesignSystem_078bd7;
 function Card() {
   const [on, setOn] = React.useState(true);
   const [layout, setLayout] = React.useState('Tiles');
@@ -40,6 +40,10 @@ function Card() {
       <div className="col"><span className="lbl">Key recorder</span>
         <KeyRecorderField notation="alt-shift-h" showsClear={false} />
         <KeyRecorderField notation={rec ? '' : 'cmd-alt-4'} recording={rec} onArm={setRec} width={170} />
+      </div>
+      <div className="col"><span className="lbl">Key caps</span>
+        <KeyCaps notation="alt-shift-h" />
+        <KeyCaps notation="cmd-alt-4" size={11} bordered={false} />
       </div>
       <div className="col"><span className="lbl">Copy</span>
         <div className="row" style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-caption)', color: 'var(--label-tertiary)' }}>AAAAAAAA…<CopyButton value="AAAAAAAA-0000-4000-8000-000000000001" /></div>

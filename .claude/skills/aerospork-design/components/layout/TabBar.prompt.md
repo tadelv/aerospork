@@ -1,4 +1,4 @@
-Use for the top-level navigation of a settings window. Tab titles are one word where possible (General, Gaps, Keys, Monitors, Events); AeroSpork's only two-word tab is "Window Rules".
+Use for the top-level native pane toolbar of an application Settings window. Pane labels are one word where possible (General, Gaps, Keys, Monitors, Events); AeroSpork's only two-word label is "Window Rules".
 
 ~~~jsx
 <TabBar value={tab} onChange={setTab} tabs={[
@@ -7,4 +7,4 @@ Use for the top-level navigation of a settings window. Tab titles are one word w
 ]} />
 ~~~
 
-Tab switching is instant — never animate it.
+Pane switching is instant — never animate it.

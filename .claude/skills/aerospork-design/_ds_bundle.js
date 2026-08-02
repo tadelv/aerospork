@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":4,"namespace":"AeroSporkDesignSystem_078bd7","components":[{"name":"CodeEditor","sourcePath":"components/brand/CodeEditor.jsx"},{"name":"GapsPreview","sourcePath":"components/brand/GapsPreview.jsx"},{"name":"WindowChrome","sourcePath":"components/brand/WindowChrome.jsx"},{"name":"WorkspaceChips","sourcePath":"components/brand/WorkspaceChips.jsx"},{"name":"Button","sourcePath":"components/controls/Button.jsx"},{"name":"CopyButton","sourcePath":"components/controls/CopyButton.jsx"},{"name":"PrettyKey","sourcePath":"components/controls/KeyRecorderField.jsx"},{"name":"KeyRecorderField","sourcePath":"components/controls/KeyRecorderField.jsx"},{"name":"NumberField","sourcePath":"components/controls/NumberField.jsx"},{"name":"SegmentedPicker","sourcePath":"components/controls/SegmentedPicker.jsx"},{"name":"Select","sourcePath":"components/controls/Select.jsx"},{"name":"TextField","sourcePath":"components/controls/TextField.jsx"},{"name":"Toggle","sourcePath":"components/controls/Toggle.jsx"},{"name":"Badge","sourcePath":"components/feedback/Badge.jsx"},{"name":"Banner","sourcePath":"components/feedback/Banner.jsx"},{"name":"ContentUnavailable","sourcePath":"components/feedback/ContentUnavailable.jsx"},{"name":"StatusLabel","sourcePath":"components/feedback/StatusLabel.jsx"},{"name":"SF_TO_LUCIDE","sourcePath":"components/icons/Icon.jsx"},{"name":"ICON_SHAPES","sourcePath":"components/icons/Icon.jsx"},{"name":"Icon","sourcePath":"components/icons/Icon.jsx"},{"name":"BarStrip","sourcePath":"components/layout/BarStrip.jsx"},{"name":"DataTable","sourcePath":"components/layout/DataTable.jsx"},{"name":"FormSection","sourcePath":"components/layout/FormSection.jsx"},{"name":"LabeledContent","sourcePath":"components/layout/LabeledContent.jsx"},{"name":"ListActionBar","sourcePath":"components/layout/ListActionBar.jsx"},{"name":"MenuPanel","sourcePath":"components/layout/MenuPanel.jsx"},{"name":"SectionLabel","sourcePath":"components/layout/SectionLabel.jsx"},{"name":"SettingsFooter","sourcePath":"components/layout/SettingsFooter.jsx"},{"name":"SettingsHint","sourcePath":"components/layout/SettingsHint.jsx"},{"name":"TabBar","sourcePath":"components/layout/TabBar.jsx"}],"sourceHashes":{"components/brand/CodeEditor.jsx":"533a49e91a92","components/brand/GapsPreview.jsx":"87cb37bc5537","components/brand/WindowChrome.jsx":"6dc335057e30","components/brand/WorkspaceChips.jsx":"4173765b5cfe","components/controls/Button.jsx":"24bc808b095e","components/controls/CopyButton.jsx":"648e4540aa27","components/controls/KeyRecorderField.jsx":"483a48c09cf4","components/controls/NumberField.jsx":"6e7b6e8407c9","components/controls/SegmentedPicker.jsx":"2fd45ae04e9f","components/controls/Select.jsx":"b02f6be972aa","components/controls/TextField.jsx":"1cee11e0b9b5","components/controls/Toggle.jsx":"45c2f697e827","components/feedback/Badge.jsx":"ae58a538773b","components/feedback/Banner.jsx":"ba979ef15e20","components/feedback/ContentUnavailable.jsx":"5904028fa356","components/feedback/StatusLabel.jsx":"a2fd1e208954","components/icons/Icon.jsx":"72743b35e185","components/layout/BarStrip.jsx":"c1424c6a9bb1","components/layout/DataTable.jsx":"30a32a636c0e","components/layout/FormSection.jsx":"2bbd30f8edc1","components/layout/LabeledContent.jsx":"a90dccb39353","components/layout/ListActionBar.jsx":"183839398b6d","components/layout/MenuPanel.jsx":"7643a26656de","components/layout/SectionLabel.jsx":"727a9bb3439b","components/layout/SettingsFooter.jsx":"db6e590eb557","components/layout/SettingsHint.jsx":"f3c7437163dd","components/layout/TabBar.jsx":"829940627b04","ui_kits/cli/CliKit.jsx":"31f63b3ab2bc","ui_kits/menu_bar/MenuBarKit.jsx":"e3be52c77c48","ui_kits/settings_app/App.jsx":"f91f02c9693c","ui_kits/settings_app/EventsTab.jsx":"a89c0c784f08","ui_kits/settings_app/GapsTab.jsx":"85919fed77c6","ui_kits/settings_app/GeneralTab.jsx":"1aa5cd4428c4","ui_kits/settings_app/KeysTab.jsx":"8bb618cd4465","ui_kits/settings_app/MonitorsTab.jsx":"4f18e4603d2f","ui_kits/settings_app/RawTomlTab.jsx":"343d00456002","ui_kits/settings_app/RulesTab.jsx":"0de2a95b49e0","ui_kits/settings_app/data.js":"ca3ad4c2d4b1"},"inlinedExternals":[],"unexposedExports":[]} */
+/* @ds-bundle: {"format":4,"namespace":"AeroSporkDesignSystem_078bd7","components":[{"name":"SAMPLE_APPS","sourcePath":"components/brand/AppIcon.jsx"},{"name":"appDisplayName","sourcePath":"components/brand/AppIcon.jsx"},{"name":"AppIcon","sourcePath":"components/brand/AppIcon.jsx"},{"name":"CodeEditor","sourcePath":"components/brand/CodeEditor.jsx"},{"name":"GapsPreview","sourcePath":"components/brand/GapsPreview.jsx"},{"name":"MonitorArrangement","sourcePath":"components/brand/MonitorArrangement.jsx"},{"name":"WindowChrome","sourcePath":"components/brand/WindowChrome.jsx"},{"name":"WorkspaceChips","sourcePath":"components/brand/WorkspaceChips.jsx"},{"name":"Button","sourcePath":"components/controls/Button.jsx"},{"name":"CopyButton","sourcePath":"components/controls/CopyButton.jsx"},{"name":"IconButton","sourcePath":"components/controls/IconButton.jsx"},{"name":"KeyCaps","sourcePath":"components/controls/KeyCaps.jsx"},{"name":"PrettyKey","sourcePath":"components/controls/KeyRecorderField.jsx"},{"name":"KeyRecorderField","sourcePath":"components/controls/KeyRecorderField.jsx"},{"name":"NumberField","sourcePath":"components/controls/NumberField.jsx"},{"name":"SegmentedPicker","sourcePath":"components/controls/SegmentedPicker.jsx"},{"name":"Select","sourcePath":"components/controls/Select.jsx"},{"name":"TextField","sourcePath":"components/controls/TextField.jsx"},{"name":"Toggle","sourcePath":"components/controls/Toggle.jsx"},{"name":"Badge","sourcePath":"components/feedback/Badge.jsx"},{"name":"Banner","sourcePath":"components/feedback/Banner.jsx"},{"name":"ContentUnavailable","sourcePath":"components/feedback/ContentUnavailable.jsx"},{"name":"StatusLabel","sourcePath":"components/feedback/StatusLabel.jsx"},{"name":"SF_TO_LUCIDE","sourcePath":"components/icons/Icon.jsx"},{"name":"ICON_SHAPES","sourcePath":"components/icons/Icon.jsx"},{"name":"Icon","sourcePath":"components/icons/Icon.jsx"},{"name":"BarStrip","sourcePath":"components/layout/BarStrip.jsx"},{"name":"DataTable","sourcePath":"components/layout/DataTable.jsx"},{"name":"FormSection","sourcePath":"components/layout/FormSection.jsx"},{"name":"LabeledContent","sourcePath":"components/layout/LabeledContent.jsx"},{"name":"ListActionBar","sourcePath":"components/layout/ListActionBar.jsx"},{"name":"PanelHeader","sourcePath":"components/layout/PanelHeader.jsx"},{"name":"MenuPanel","sourcePath":"components/layout/MenuPanel.jsx"},{"name":"SectionLabel","sourcePath":"components/layout/SectionLabel.jsx"},{"name":"SettingsFooter","sourcePath":"components/layout/SettingsFooter.jsx"},{"name":"SettingsHint","sourcePath":"components/layout/SettingsHint.jsx"},{"name":"TabBar","sourcePath":"components/layout/TabBar.jsx"}],"sourceHashes":{"components/brand/AppIcon.jsx":"3f8a33f929bd","components/brand/CodeEditor.jsx":"533a49e91a92","components/brand/GapsPreview.jsx":"87cb37bc5537","components/brand/MonitorArrangement.jsx":"b56a8267991e","components/brand/WindowChrome.jsx":"6dc335057e30","components/brand/WorkspaceChips.jsx":"4173765b5cfe","components/controls/Button.jsx":"24bc808b095e","components/controls/CopyButton.jsx":"648e4540aa27","components/controls/KeyRecorderField.jsx":"a54067d8c308","components/controls/NumberField.jsx":"6e7b6e8407c9","components/controls/SegmentedPicker.jsx":"2fd45ae04e9f","components/controls/Select.jsx":"b02f6be972aa","components/controls/TextField.jsx":"1cee11e0b9b5","components/controls/Toggle.jsx":"45c2f697e827","components/feedback/Badge.jsx":"ae58a538773b","components/feedback/Banner.jsx":"ba979ef15e20","components/feedback/ContentUnavailable.jsx":"5904028fa356","components/feedback/StatusLabel.jsx":"a2fd1e208954","components/icons/Icon.jsx":"99ca5796d91f","components/layout/BarStrip.jsx":"c1424c6a9bb1","components/layout/DataTable.jsx":"30a32a636c0e","components/layout/FormSection.jsx":"2bbd30f8edc1","components/layout/LabeledContent.jsx":"a90dccb39353","components/layout/ListActionBar.jsx":"183839398b6d","components/layout/MenuPanel.jsx":"7643a26656de","components/layout/SectionLabel.jsx":"727a9bb3439b","components/layout/SettingsFooter.jsx":"db6e590eb557","components/layout/SettingsHint.jsx":"f3c7437163dd","components/layout/TabBar.jsx":"829940627b04","ui_kits/cli/CliKit.jsx":"31f63b3ab2bc","ui_kits/menu_bar/MenuBarKit.jsx":"e3be52c77c48","ui_kits/settings_app/App.jsx":"8158b1634b89","ui_kits/settings_app/EventsTab.jsx":"a89c0c784f08","ui_kits/settings_app/GapsTab.jsx":"85919fed77c6","ui_kits/settings_app/GeneralTab.jsx":"1aa5cd4428c4","ui_kits/settings_app/KeysTab.jsx":"cc663ef6ac53","ui_kits/settings_app/MonitorsTab.jsx":"4f18e4603d2f","ui_kits/settings_app/RawTomlTab.jsx":"343d00456002","ui_kits/settings_app/RulesTab.jsx":"5dd2d748bc6a","ui_kits/settings_app/data.js":"5f28deb3995f","components/controls/KeyCaps.jsx":"7c451ee37892"},"inlinedExternals":[],"unexposedExports":[]} */
 
 (() => {
 
@@ -8,41 +8,391 @@ const __ds_scope = {};
 
 (__ds_ns.__errors = __ds_ns.__errors || []);
 
+// components/brand/AppIcon.jsx
+try { (() => {
+// Icon.jsx's block runs later in this file, so referencing it eagerly (`const { Icon } =
+// __ds_scope` at module-eval time) would capture `undefined` — __ds_scope.Icon has to be looked
+// up lazily, inside the function body, at actual render time instead.
+
+/* Placeholder app-icon tile: a glyph on a rounded-square plate, in the same squircle convention
+   as the product's own icon (tokens/radius.css --icon-corner-ratio). Stands in for a real macOS
+   app icon in this mock ONLY — every glyph below is a generic pictogram (an envelope, a compass,
+   a folder…), not traced from any real app's actual icon art. Bundling real app icons in a public
+   design-system repo is both a trademark problem and pointless duplication of art nobody here owns.
+
+   DO NOT carry this component's *approach* into the real Swift app. The shipping Settings window
+   should bundle no icon assets at all — it should resolve each app's REAL, currently-installed
+   icon at runtime:
+     let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: appId)
+     let icon = url.map { NSWorkspace.shared.icon(forFile: $0.path) }
+   That is not a legal workaround, it is also simply correct: it shows the user's own icon (right
+   theme, right version), works for any app ID including ones nobody thought to hardcode, and it
+   stays right if an app's icon ever changes. SAMPLE_APPS below exists only so this mock has
+   *something* recognizable to render; it is deliberately small and must not grow into a "real app
+   icon library" — that instinct is exactly the thing NSWorkspace makes unnecessary. */
+const SAMPLE_APPS = [{
+  id: 'com.apple.mail',
+  name: 'Mail',
+  glyph: 'envelope',
+  tint: ['#67b6ff', '#0a6cf0']
+}, {
+  id: 'com.apple.Safari',
+  name: 'Safari',
+  glyph: 'safari',
+  tint: ['#6fe0ff', '#0077c2']
+}, {
+  id: 'com.mitchellh.ghostty',
+  name: 'Ghostty',
+  glyph: 'terminal',
+  tint: ['#5a5a60', '#232326']
+}, {
+  id: 'com.spotify.client',
+  name: 'Spotify',
+  glyph: 'music.note',
+  tint: ['#6bef95', '#159c46']
+}, {
+  id: 'com.tinyspeck.slackmacgap',
+  name: 'Slack',
+  glyph: 'message',
+  tint: ['#d3aeff', '#7c3aed']
+}, {
+  id: 'com.apple.finder',
+  name: 'Finder',
+  glyph: 'folder',
+  tint: ['#8fd9ff', '#1f6fe0']
+}, {
+  id: 'com.apple.systempreferences',
+  name: 'System Settings',
+  glyph: 'gearshape',
+  tint: ['#b8b8bd', '#6e6e73']
+}];
+const BY_ID = Object.fromEntries(SAMPLE_APPS.map(a => [a.id, a]));
+
+/** Best-effort display name for a bundle ID: SAMPLE_APPS, else its last path component,
+    title-cased — the same fallback a hand-typed app ID needs everywhere this shows a name. */
+function appDisplayName(appId) {
+  if (!appId) return 'Any app';
+  const known = BY_ID[appId];
+  if (known) return known.name;
+  const last = appId.split('.').filter(Boolean).pop() || appId;
+  return last.charAt(0).toUpperCase() + last.slice(1);
+}
+
+// ponytail: five hand-picked tints, chosen by a stable hash of the app ID so an unrecognized app
+// keeps the same color across renders instead of reshuffling — not a real color-quantization
+// algorithm, which would be pointless for a fallback nobody is meant to stare at.
+const FALLBACK_TINTS = [['#ffc06b', '#e0821e'], ['#9fd6ff', '#3f7fd4'], ['#ddb8ff', '#8b5cf6'], ['#ffb0c2', '#e0446a'], ['#c3f0a4', '#3fa34d']];
+function hashTint(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = h * 31 + s.charCodeAt(i) >>> 0;
+  return FALLBACK_TINTS[h % FALLBACK_TINTS.length];
+}
+
+/** A rounded-square glyph tile standing in for a real app icon.
+    - Known sample app (SAMPLE_APPS): its glyph, on its tint.
+    - Unknown but non-empty appId (hand-typed, not in the sample set): a monogram of its
+      resolved name, on a tint hashed from the id — stable, not random, across re-renders.
+    - No appId at all ('' / null / undefined — the "any app" matcher): a neutral plate with a
+      generic window glyph, never a monogram, so it can't be mistaken for a specific unknown app. */
+function AppIcon({
+  appId,
+  size = 32,
+  style
+}) {
+  const known = appId ? BY_ID[appId] : null;
+  const customTyped = !!appId && !known;
+  const [from, to] = known ? known.tint : customTyped ? hashTint(appId) : ['#c7c7cc', '#98989d'];
+  const radius = Math.round(size * 0.225); // tokens/radius.css --icon-corner-ratio
+  return /*#__PURE__*/React.createElement("div", {
+    "aria-hidden": "true",
+    style: {
+      width: size,
+      height: size,
+      flex: '0 0 auto',
+      borderRadius: radius,
+      position: 'relative',
+      background: `linear-gradient(180deg, ${from}, ${to})`,
+      overflow: 'hidden',
+      display: 'grid',
+      placeItems: 'center',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,.32), inset 0 -1px 1px rgba(0,0,0,.22), 0 0.5px 1.5px rgba(0,0,0,.22)',
+      ...style
+    }
+  }, known ? /*#__PURE__*/React.createElement(__ds_scope.Icon, {
+    sf: known.glyph,
+    size: Math.round(size * 0.56),
+    style: {
+      color: 'rgba(255,255,255,.95)'
+    }
+  }) : customTyped ? /*#__PURE__*/React.createElement("span", {
+    style: {
+      font: `var(--weight-semibold) ${Math.round(size * 0.46)}px/1 var(--font-rounded)`,
+      color: 'rgba(255,255,255,.95)'
+    }
+  }, appDisplayName(appId).charAt(0).toUpperCase()) : /*#__PURE__*/React.createElement(__ds_scope.Icon, {
+    sf: "macwindow",
+    size: Math.round(size * 0.5),
+    style: {
+      color: 'rgba(255,255,255,.85)'
+    }
+  }));
+}
+Object.assign(__ds_scope, { SAMPLE_APPS, appDisplayName, AppIcon });
+})(); } catch (e) { __ds_ns.__errors.push({ path: "components/brand/AppIcon.jsx", error: String((e && e.message) || e) }); }
+
 // components/brand/CodeEditor.jsx
 try { (() => {
-/* Editable text that is code, not prose: 12px monospaced, 10/12px container inset, on
+// Row height in px for the gutter/pre/textarea to share. --text-default is 13px and the editor's
+// own line-height is the unitless multiplier 1.45 (both from tokens/typography.css); this is a
+// literal rather than a getComputedStyle read so gutter rows line up without a measuring effect.
+// ponytail: bump this if --text-default or the 1.45 line-height ever change.
+const LINE_HEIGHT = 1.45;
+const FONT_PX = 13;
+const ROW_PX = FONT_PX * LINE_HEIGHT;
+
+// Tightened vs. the proposal's own sketch (`^\s*[\[\[]?[^\[\]=]+[\]\]]?\s*$`, proposal-rawtoml.md
+// §2.2), which — read literally — also matches plain non-bracket lines since the brackets are each
+// optional. Requiring the brackets is what "is this a header line" actually means.
+const HEADER_RE = /^\[{1,2}[^\[\]=]+\]{1,2}$/;
+const KEY_RE = /^(\s*)([A-Za-z0-9_.\-"]+)(\s*=)/;
+function isHeaderLine(code) {
+  return HEADER_RE.test(code.trim());
+}
+
+// ponytail: naive — doesn't skip a `#` inside a quoted string (`key = "a # not a comment"`).
+// Called out as an acknowledged mockup simplification in proposal-rawtoml.md §2.2; the real
+// tokenizer needs to walk string spans before looking for `#`.
+function splitComment(line) {
+  const i = line.indexOf('#');
+  return i === -1 ? [line, ''] : [line.slice(0, i), line.slice(i)];
+}
+
+// Three tiers, not four — structure (headers), the thing you'd search for (keys), and comments get
+// a span; everything else (strings/numbers/booleans/dates/punctuation/the `=` itself) inherits the
+// <pre>'s own secondary-opacity color. Deliberately not a per-value-type rainbow scheme — see
+// proposal-rawtoml.md §1/§2.2 for why.
+const TOKEN_STYLE = {
+  header: {
+    color: 'var(--accent)',
+    fontWeight: 'var(--weight-medium)'
+  },
+  comment: {
+    color: 'var(--label-tertiary)',
+    fontWeight: 'var(--weight-regular)'
+  },
+  key: {
+    color: 'var(--label)',
+    fontWeight: 'var(--weight-medium)'
+  }
+};
+function renderLine(line, headerLineSet, lineNum) {
+  const [code, comment] = splitComment(line);
+  const nodes = [];
+  if (headerLineSet.has(lineNum)) {
+    nodes.push(/*#__PURE__*/React.createElement("span", {
+      key: "h",
+      style: TOKEN_STYLE.header
+    }, code));
+  } else {
+    const m = code.match(KEY_RE);
+    if (m) {
+      nodes.push(m[1]);
+      nodes.push(/*#__PURE__*/React.createElement("span", {
+        key: "k",
+        style: TOKEN_STYLE.key
+      }, m[2]));
+      nodes.push(code.slice(m[1].length + m[2].length));
+    } else if (code) {
+      nodes.push(code);
+    }
+  }
+  if (comment) nodes.push(/*#__PURE__*/React.createElement("span", {
+    key: "c",
+    style: TOKEN_STYLE.comment
+  }, comment));
+  return nodes;
+}
+
+/* Editable text that is code, not prose: 13px monospaced (matches every other monospaced element
+   in the window — key/command rows, the version string), 10/12px container inset, on
    textBackgroundColor. In the app this is an NSTextView with every macOS text substitution
-   turned off — smart quotes would turn a valid TOML string into an invalid one. */
-function CodeEditor({
+   turned off — smart quotes would turn a valid TOML string into an invalid one.
+
+   Also owns (proposal-rawtoml.md §2.1-§2.3): a line-number gutter, restrained 3-tier TOML
+   highlighting, and inline error/warning gutter markers. Built via the highlighted-<pre>-under-a-
+   transparent-<textarea> overlay technique — the textarea stays the single source of truth for
+   editing/selection/caret; the <pre> underneath only paints. The outer element auto-grows to its
+   content and owns vertical scroll (no nested scrollbars), which is also what keeps the gutter in
+   lockstep with the text for free. Search-in-editor (⌘F) is not part of this component — see the
+   comment in RawTomlTab.jsx.
+
+   `ref` exposes one imperative method, `scrollToLine(line)`, for callers that need to jump the
+   caret to a known line (a picked "Sections…" entry, a clicked error) — the React equivalent of
+   the real NSTextView's `scrollRangeToVisible`/`setSelectedRange`, which only the view that owns
+   the text storage can drive. */
+const CodeEditor = React.forwardRef(function CodeEditor({
   value = '',
   onChange,
   readOnly = false,
+  errorLine = null,
+  warningLines = [],
+  onCursorMove,
+  sectionHeaders,
   style
-}) {
-  return /*#__PURE__*/React.createElement("textarea", {
+}, ref) {
+  const taRef = React.useRef(null);
+  const scrollRef = React.useRef(null);
+  const [height, setHeight] = React.useState(120);
+  const lines = React.useMemo(() => value.split('\n'), [value]);
+
+  // Section headers are derived by the tab from the same buffer (so the Sections… menu and this
+  // highlighting can't disagree) and passed down; fall back to our own scan so the component still
+  // works standalone.
+  const headerLineSet = React.useMemo(() => {
+    if (sectionHeaders) return new Set(sectionHeaders.map(h => h.line));
+    const set = new Set();
+    lines.forEach((line, i) => {
+      if (isHeaderLine(splitComment(line)[0])) set.add(i + 1);
+    });
+    return set;
+  }, [sectionHeaders, lines]);
+  React.useLayoutEffect(() => {
+    const ta = taRef.current;
+    if (!ta) return;
+    ta.style.height = 'auto'; // release the explicit height so scrollHeight reflects real content
+    setHeight(Math.max(120, ta.scrollHeight));
+  }, [value]);
+  React.useImperativeHandle(ref, () => ({
+    scrollToLine(line) {
+      const ta = taRef.current;
+      if (!ta) return;
+      const clamped = Math.max(1, Math.min(line, lines.length));
+      const pos = lines.slice(0, clamped - 1).reduce((n, l) => n + l.length + 1, 0);
+      ta.focus();
+      ta.setSelectionRange(pos, pos);
+      if (onCursorMove) onCursorMove(clamped, 1);
+      const rowTop = (clamped - 1) * ROW_PX;
+      if (scrollRef.current) scrollRef.current.scrollTo({
+        top: Math.max(0, rowTop - ROW_PX * 3),
+        behavior: 'smooth'
+      });
+    }
+  }), [lines, onCursorMove]);
+  const reportCursor = e => {
+    if (!onCursorMove) return;
+    const before = value.slice(0, e.target.selectionStart).split('\n');
+    onCursorMove(before.length, before[before.length - 1].length + 1);
+  };
+  const digits = Math.max(3, String(lines.length).length);
+  // Shared so the <pre> and <textarea> glyphs land exactly on top of one another.
+  const fontStack = {
+    fontFamily: 'var(--font-mono)',
+    fontSize: 'var(--text-default)',
+    lineHeight: LINE_HEIGHT,
+    tabSize: 4,
+    padding: '12px 10px',
+    boxSizing: 'border-box',
+    // ponytail: wrapping stays on (unchanged from the plain-textarea original), so the gutter is a
+    // naive one-row-per-source-line numbering rather than wrap-fragment-aware — a long wrapped
+    // line's continuation rows won't get their own gutter row. Real fix is an NSRulerView driven by
+    // NSLayoutManager's line fragments (see proposal-rawtoml.md §4); not worth it for a mockup of
+    // config files that are typically short `key = value` lines.
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-word',
+    overflowWrap: 'break-word'
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    ref: scrollRef,
+    style: {
+      flex: 1,
+      minHeight: 0,
+      display: 'flex',
+      overflowY: 'auto',
+      background: 'var(--text-bg)',
+      ...style
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: '0 0 auto',
+      width: `calc(${digits}ch + 22px)`,
+      background: 'var(--fill-subtle)',
+      borderRight: '1px solid var(--separator)',
+      paddingTop: 12,
+      paddingBottom: 12,
+      boxSizing: 'border-box'
+    }
+  }, lines.map((_, i) => {
+    const n = i + 1;
+    const kind = n === errorLine ? 'error' : warningLines.includes(n) ? 'warning' : null;
+    const color = kind === 'error' ? 'var(--status-error)' : kind === 'warning' ? 'var(--status-warning)' : 'var(--label-tertiary)';
+    return /*#__PURE__*/React.createElement("div", {
+      key: n,
+      style: {
+        position: 'relative',
+        lineHeight: ROW_PX + 'px',
+        fontSize: 'var(--text-subheadline)',
+        fontFamily: 'var(--font-system)',
+        color,
+        textAlign: 'right',
+        paddingRight: 8,
+        paddingLeft: 6
+      }
+    }, kind && /*#__PURE__*/React.createElement("span", {
+      style: {
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        bottom: 0,
+        width: 3,
+        background: color
+      }
+    }), n);
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      minWidth: 0,
+      position: 'relative',
+      height
+    }
+  }, /*#__PURE__*/React.createElement("pre", {
+    style: {
+      margin: 0,
+      position: 'absolute',
+      inset: 0,
+      pointerEvents: 'none',
+      color: 'var(--label-secondary)',
+      ...fontStack
+    }
+  }, lines.map((line, i) => /*#__PURE__*/React.createElement(React.Fragment, {
+    key: i
+  }, i > 0 && '\n', renderLine(line, headerLineSet, i + 1)))), /*#__PURE__*/React.createElement("textarea", {
+    ref: taRef,
     value: value,
     readOnly: readOnly,
     spellCheck: false,
-    onChange: e => onChange && onChange(e.target.value),
+    onChange: e => {
+      onChange && onChange(e.target.value);
+      reportCursor(e);
+    },
+    onSelect: reportCursor,
+    onClick: reportCursor,
+    onKeyUp: reportCursor,
     style: {
-      flex: 1,
+      position: 'absolute',
+      top: 0,
+      left: 0,
       width: '100%',
-      minHeight: 120,
-      boxSizing: 'border-box',
+      height,
       resize: 'none',
       border: 'none',
       outline: 'none',
-      background: 'var(--text-bg)',
-      color: 'var(--label)',
-      padding: '12px 10px',
-      fontFamily: 'var(--font-mono)',
-      fontSize: 'var(--text-callout)',
-      lineHeight: 1.45,
-      tabSize: 4,
-      ...style
+      background: 'transparent',
+      color: 'transparent',
+      caretColor: 'var(--label)',
+      ...fontStack
     }
-  });
-}
+  })));
+});
 Object.assign(__ds_scope, { CodeEditor });
 })(); } catch (e) { __ds_ns.__errors.push({ path: "components/brand/CodeEditor.jsx", error: String((e && e.message) || e) }); }
 
@@ -76,7 +426,7 @@ function GapsPreview({
       boxSizing: 'border-box',
       borderRadius: 'var(--radius-card)',
       background: 'var(--fill-subtle)',
-      boxShadow: 'inset 0 0 0 1px rgba(0,0,0,.14)',
+      boxShadow: 'inset 0 0 0 1px var(--border-control)',
       padding: outerTop * s + 'px ' + outerRight * s + 'px ' + outerBottom * s + 'px ' + outerLeft * s + 'px',
       display: 'flex',
       gap: innerHorizontal * s
@@ -99,10 +449,110 @@ function GapsPreview({
 Object.assign(__ds_scope, { GapsPreview });
 })(); } catch (e) { __ds_ns.__errors.push({ path: "components/brand/GapsPreview.jsx", error: String((e && e.message) || e) }); }
 
+// components/brand/MonitorArrangement.jsx
+try { (() => {
+/* A schematic "Displays preference pane" diagram: one rectangle per connected monitor, scaled
+   and positioned from its real `rect` (topLeftX/Y, width, height — points, top-left origin, the
+   same numbers `aerospork list-monitors --format '%{monitor-fingerprint}'` prints). This is the
+   thing a table of "Position 2" numbers can't give you: where a monitor actually sits relative
+   to the others. Every rectangle is a real <button>, not a decorative shape, so selecting one
+   works the same by click or by Tab + Enter/Space. The main monitor gets a thin accent bar along
+   its top edge — the same "this is where the menu bar lives" cue macOS's own Displays pane uses,
+   which is also the most direct answer to "why is this one called main". */
+function MonitorArrangement({ monitors = [], selected, onSelect, width = 560, height = 130 }) {
+  if (!monitors.length) return null;
+  const pad = 14;
+  const minX = Math.min(...monitors.map((m) => m.rect.x));
+  const minY = Math.min(...monitors.map((m) => m.rect.y));
+  const maxX = Math.max(...monitors.map((m) => m.rect.x + m.rect.width));
+  const maxY = Math.max(...monitors.map((m) => m.rect.y + m.rect.height));
+  const scale = Math.min((width - pad * 2) / (maxX - minX), (height - pad * 2) / (maxY - minY));
+  const offX = (width - (maxX - minX) * scale) / 2;
+  const offY = (height - (maxY - minY) * scale) / 2;
+  return /*#__PURE__*/React.createElement("div", { style: {
+    position: "relative",
+    width,
+    height,
+    flex: "0 0 auto",
+    boxSizing: "border-box",
+    borderRadius: "var(--radius-card)",
+    background: "var(--fill-subtle)",
+    boxShadow: "inset 0 0 0 1px var(--border-control)"
+  } }, monitors.map((m, i) => {
+    const on = m.id === selected;
+    const w = m.rect.width * scale;
+    const h = m.rect.height * scale;
+    const showName = w >= 56;
+    const showRes = w >= 96 && h >= 46;
+    return /*#__PURE__*/React.createElement(
+      "button",
+      {
+        key: m.id,
+        type: "button",
+        "aria-pressed": on,
+        "aria-label": m.name + ", position " + (i + 1) + (m.isMain ? ", main display" : "") + ", " + m.resolution,
+        title: m.name + " — " + m.resolution,
+        onClick: () => onSelect && onSelect(m.id),
+        style: {
+          position: "absolute",
+          left: offX + (m.rect.x - minX) * scale,
+          top: offY + (m.rect.y - minY) * scale,
+          width: w,
+          height: h,
+          boxSizing: "border-box",
+          padding: 0,
+          margin: 0,
+          cursor: "pointer",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 2,
+          background: on ? "var(--accent-selection-fill)" : "var(--control-bg)",
+          border: on ? "1.5px solid var(--accent)" : "1px solid var(--border-control)",
+          borderRadius: "var(--radius-field)",
+          boxShadow: on ? "0 2px 8px rgba(0,0,0,.14)" : "0 0.5px 1.5px rgba(0,0,0,.1)",
+          transition: "background var(--dur-control) var(--ease-standard), box-shadow var(--dur-control) var(--ease-standard)"
+        }
+      },
+      m.isMain && /*#__PURE__*/React.createElement("span", { "aria-hidden": "true", style: {
+        position: "absolute",
+        top: 0,
+        left: "18%",
+        right: "18%",
+        height: 3,
+        borderRadius: "0 0 2px 2px",
+        background: "var(--accent)"
+      } }),
+      /*#__PURE__*/React.createElement("span", { "aria-hidden": "true", style: {
+        position: "absolute",
+        top: 3,
+        left: 4,
+        font: "var(--weight-medium) var(--text-caption2)/1 var(--font-mono)",
+        color: "var(--label-tertiary)"
+      } }, i + 1),
+      showName && /*#__PURE__*/React.createElement("span", { style: {
+        font: "var(--weight-medium) var(--text-caption)/1.2 var(--font-system)",
+        color: "var(--label)",
+        maxWidth: "90%",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+        textAlign: "center"
+      } }, m.name),
+      showRes && /*#__PURE__*/React.createElement("span", { style: {
+        font: "var(--weight-regular) var(--text-caption2)/1 var(--font-mono)",
+        color: "var(--label-tertiary)"
+      } }, m.resolution)
+    );
+  }));
+}
+Object.assign(__ds_scope, { MonitorArrangement });
+})(); } catch (e) { __ds_ns.__errors.push({ path: "components/brand/MonitorArrangement.jsx", error: String((e && e.message) || e) }); }
+
 // components/brand/WindowChrome.jsx
 try { (() => {
-/* A macOS window shell: 10px continuous corners, a translucent title bar with traffic lights,
-   and the standard window shadow. Use to frame a screen for docs, README or App Store shots. */
+/* Neutral screenshot approximation of a native macOS window. */
 function WindowChrome({
   title,
   width = 880,
@@ -134,7 +584,7 @@ function WindowChrome({
       display: 'flex',
       alignItems: 'center',
       gap: 'var(--space-8)',
-      height: 28,
+      height: 32,
       padding: '0 var(--space-12)',
       flex: '0 0 auto',
       background: 'var(--bar-bg)',
@@ -292,6 +742,52 @@ function Button({
 }
 Object.assign(__ds_scope, { Button });
 })(); } catch (e) { __ds_ns.__errors.push({ path: "components/controls/Button.jsx", error: String((e && e.message) || e) }); }
+
+// components/controls/IconButton.jsx
+try { (() => {
+/* Icon-only .buttonStyle(.borderless) button. `label` is mandatory: it doubles as the tooltip
+   and the accessible name, recreating SwiftUI's .help() + .accessibilityLabel() pair, so it is
+   written as a name ("Remove “alt-h”"), not an instruction. `role="destructive"` tints the icon
+   red only on hover/press — it stays label-secondary at rest, matching AppKit's own
+   borderless-destructive button rather than flagging the row as already wrong. */
+function IconButton({
+  systemImage,
+  label,
+  size = 14,
+  role,
+  onClick,
+  style
+}) {
+  const [hover, setHover] = React.useState(false);
+  const destructive = role === 'destructive';
+  return /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    title: label,
+    "aria-label": label,
+    onClick: onClick,
+    onMouseEnter: () => setHover(true),
+    onMouseLeave: () => setHover(false),
+    style: {
+      height: 22,
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '0 var(--space-5)',
+      background: 'transparent',
+      border: '1px solid transparent',
+      borderRadius: 'var(--radius-field)',
+      cursor: 'pointer',
+      boxSizing: 'border-box',
+      color: destructive && hover ? 'var(--sys-red)' : 'var(--label-secondary)',
+      ...style
+    }
+  }, /*#__PURE__*/React.createElement(__ds_scope.Icon, {
+    sf: systemImage,
+    size: size
+  }));
+}
+Object.assign(__ds_scope, { IconButton });
+})(); } catch (e) { __ds_ns.__errors.push({ path: "components/controls/IconButton.jsx", error: String((e && e.message) || e) }); }
 
 // components/controls/SegmentedPicker.jsx
 try { (() => {
@@ -510,7 +1006,7 @@ function Badge({
       padding: '2px var(--space-6)',
       borderRadius: 'var(--radius-pill)',
       background: tone === 'muted' ? 'rgba(142,142,147,.2)' : 'var(--fill-strong)',
-      color: 'var(--label-secondary)',
+      color: 'color-mix(in srgb, var(--label) 72%, transparent)',
       fontFamily: 'var(--font-system)',
       fontSize: 'var(--text-caption2)',
       lineHeight: 1.3,
@@ -573,7 +1069,14 @@ const SF_TO_LUCIDE = {
   'pause.circle.fill': 'circle-pause',
   'chevron.down': 'chevron-down',
   'chevron.right': 'chevron-right',
-  'trash': 'trash-2'
+  'trash': 'trash-2',
+  'line.3.horizontal': 'menu',
+  'eye': 'eye',
+  'envelope': 'mail',
+  'safari': 'compass',
+  'music.note': 'music',
+  'message': 'message-circle',
+  'folder': 'folder'
 };
 
 /** Glyph geometry, keyed by Lucide name. Stroke is currentColor, so tint by setting `color`. */
@@ -618,7 +1121,14 @@ const ICON_SHAPES = {
   "chevron-right": "<path d=\"m9 18 6-6-6-6\" />",
   "circle-pause": "<circle cx=\"12\" cy=\"12\" r=\"10\" /><line x1=\"10\" x2=\"10\" y1=\"15\" y2=\"9\" /><line x1=\"14\" x2=\"14\" y1=\"15\" y2=\"9\" />",
   "grid-2x2": "<path d=\"M12 3v18\" /><path d=\"M3 12h18\" /><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" />",
-  "panel-left": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" /><path d=\"M9 3v18\" />"
+  "panel-left": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" /><path d=\"M9 3v18\" />",
+  "menu": "<path d=\"M4 12h16\" /><path d=\"M4 18h16\" /><path d=\"M4 6h16\" />",
+  "eye": "<path d=\"M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0\" /><circle cx=\"12\" cy=\"12\" r=\"3\" />",
+  "mail": "<rect width=\"20\" height=\"16\" x=\"2\" y=\"4\" rx=\"2\" /><path d=\"m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7\" />",
+  "compass": "<path d=\"m16.24 7.76-1.804 5.411a2 2 0 0 1-1.264 1.264L7.76 16.24l1.804-5.411a2 2 0 0 1 1.264-1.264z\" /><circle cx=\"12\" cy=\"12\" r=\"10\" />",
+  "music": "<path d=\"M9 18V5l12-2v13\" /><circle cx=\"6\" cy=\"18\" r=\"3\" /><circle cx=\"18\" cy=\"16\" r=\"3\" />",
+  "message-circle": "<path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\" />",
+  "folder": "<path d=\"M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z\" />"
 };
 function Icon({
   sf,
@@ -689,7 +1199,7 @@ function CopyButton({
 Object.assign(__ds_scope, { CopyButton });
 })(); } catch (e) { __ds_ns.__errors.push({ path: "components/controls/CopyButton.jsx", error: String((e && e.message) || e) }); }
 
-// components/controls/KeyRecorderField.jsx
+// components/controls/KeyCaps.jsx
 try { (() => {
 const GLYPHS = {
   ctrl: '⌃',
@@ -698,26 +1208,74 @@ const GLYPHS = {
   cmd: '⌘'
 };
 
+/* One keyboard key = one keycap chip: a real-key metaphor for a binding's key notation, read
+   verbatim off the keyboard rather than parsed out of a packed mono string like "⌥⇧h". Modifiers
+   render as glyphs, exactly like PrettyKey; the difference is one bordered cap per token instead
+   of one run-on span, which is both more scannable in a list and more literally "what you'd
+   press". Read-only: the editable equivalent is KeyRecorderField, which renders its filled state
+   with this same component (bordered=false, so it doesn't nest a box inside its own box). */
+function KeyCaps({
+  notation = '',
+  size = 12,
+  bordered = true
+}) {
+  if (!notation) return null;
+  const parts = notation.split('-');
+  const key = parts.pop();
+  const caps = [...parts.map(p => GLYPHS[p] || p), key.length === 1 ? key.toUpperCase() : key];
+  return /*#__PURE__*/React.createElement("span", {
+    style: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 3
+    }
+  }, caps.map((c, i) => /*#__PURE__*/React.createElement("kbd", {
+    key: i,
+    style: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minWidth: size + 10,
+      height: size + 10,
+      padding: '0 5px',
+      boxSizing: 'border-box',
+      borderRadius: 4,
+      border: 'none',
+      fontStyle: 'normal',
+      background: bordered ? 'var(--control-bg)' : 'var(--fill)',
+      boxShadow: bordered ? '0 0.5px 1.5px rgba(0,0,0,.14), inset 0 0 0 var(--border-hairline) var(--border-control)' : 'none',
+      font: `var(--weight-medium) ${size}px/1 var(--font-mono)`,
+      color: 'var(--label)'
+    }
+  }, c)));
+}
+Object.assign(__ds_scope, { GLYPHS, KeyCaps });
+})(); } catch (e) { __ds_ns.__errors.push({ path: "components/controls/KeyCaps.jsx", error: String((e && e.message) || e) }); }
+
+// components/controls/KeyRecorderField.jsx
+try { (() => {
 /** aerospork notation ("alt-shift-h") rendered with real modifier glyphs ("⌥⇧h").
     Capitalized because only capitalized exports reach the design-system namespace. */
 function PrettyKey(notation = '') {
   const parts = notation.split('-');
   if (parts.length < 2) return notation;
   const key = parts.pop();
-  return parts.map(p => GLYPHS[p] || p + '-').join('') + key;
+  return parts.map(p => __ds_scope.GLYPHS[p] || p + '-').join('') + key;
 }
 
 /* Click, then press a shortcut. Armed state is accent-tinted with a 2px accent border —
-   the same treatment the hand-drawn NSView uses. */
+   the same treatment the hand-drawn NSView uses. A filled, un-armed value renders as keycap
+   chips (bordered=false, since the field itself already draws the border) rather than one run-on
+   PrettyKey string — the same "one key, one cap" treatment as a read-only KeyCaps row. */
 function KeyRecorderField({
   notation = '',
   recording = false,
   onArm,
   onClear,
   showsClear = true,
-  width = 150
+  width = 170
 }) {
-  const label = notation ? PrettyKey(notation) : recording ? 'Press a shortcut…' : 'Click to record';
+  const placeholder = recording ? 'Press a shortcut…' : 'Click to record';
   return /*#__PURE__*/React.createElement("div", {
     onClick: () => onArm && onArm(!recording),
     style: {
@@ -740,7 +1298,11 @@ function KeyRecorderField({
       overflow: 'hidden',
       whiteSpace: 'nowrap'
     }
-  }, label), showsClear && notation && /*#__PURE__*/React.createElement("button", {
+  }, notation ? /*#__PURE__*/React.createElement(__ds_scope.KeyCaps, {
+    notation: notation,
+    size: 11,
+    bordered: false
+  }) : placeholder), showsClear && notation && /*#__PURE__*/React.createElement("button", {
     type: "button",
     title: "Clear",
     onClick: e => {
@@ -959,60 +1521,52 @@ Object.assign(__ds_scope, { BarStrip });
 // components/layout/DataTable.jsx
 try { (() => {
 /* Table(...).tableStyle(.inset): a header row of 11px secondary titles, hairline row
-   separators, and a full-width accent selection. */
-function DataTable({
-  columns = [],
-  rows = [],
-  selected,
-  onSelect,
-  emptyState
-}) {
+   separators, and a full-width accent selection. A row is also a keyboard stop — Tab to it,
+   Enter or Space selects it, the same handler a click uses. */
+function DataTable({ columns = [], rows = [], selected, onSelect, emptyState }) {
   if (!rows.length && emptyState) return emptyState;
-  const grid = columns.map(c => c.width || '1fr').join(' ');
-  return /*#__PURE__*/React.createElement("div", {
+  const grid = columns.map((c) => c.width || "1fr").join(" ");
+  return /*#__PURE__*/React.createElement("div", { style: { flex: 1, minHeight: 0, overflow: "auto", background: "var(--control-bg)" } }, /*#__PURE__*/React.createElement("div", {
     style: {
-      flex: 1,
-      minHeight: 0,
-      overflow: 'auto',
-      background: 'var(--control-bg)'
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'grid',
+      display: "grid",
       gridTemplateColumns: grid,
-      gap: 'var(--space-8)',
-      padding: '4px var(--space-12)',
-      borderBottom: 'var(--divider)',
-      font: 'var(--weight-regular) var(--text-subheadline)/1.2 var(--font-system)',
-      color: 'var(--label-secondary)',
-      position: 'sticky',
+      gap: "var(--space-8)",
+      padding: "4px var(--space-12)",
+      borderBottom: "var(--divider)",
+      font: "var(--weight-regular) var(--text-subheadline)/1.2 var(--font-system)",
+      color: "var(--label-secondary)",
+      position: "sticky",
       top: 0,
-      background: 'var(--control-bg)'
+      background: "var(--control-bg)"
     }
-  }, columns.map(c => /*#__PURE__*/React.createElement("span", {
-    key: c.key
-  }, c.title))), rows.map(r => {
+  }, columns.map((c) => /*#__PURE__*/React.createElement("span", { key: c.key }, c.title))), rows.map((r) => {
     const on = selected === r.id;
-    return /*#__PURE__*/React.createElement("div", {
-      key: r.id,
-      onClick: () => onSelect && onSelect(r.id),
-      style: {
-        display: 'grid',
-        gridTemplateColumns: grid,
-        gap: 'var(--space-8)',
-        alignItems: 'center',
-        padding: '3px var(--space-12)',
-        borderBottom: 'var(--divider)',
-        cursor: 'default',
-        background: on ? 'var(--selection)' : 'transparent',
-        color: on ? 'var(--selection-fg)' : 'var(--label)'
-      }
-    }, columns.map(c => /*#__PURE__*/React.createElement("div", {
-      key: c.key,
-      style: {
-        minWidth: 0
-      }
-    }, c.render ? c.render(r, on) : r[c.key])));
+    return /*#__PURE__*/React.createElement(
+      "div",
+      {
+        key: r.id,
+        tabIndex: 0,
+        onClick: () => onSelect && onSelect(r.id),
+        onKeyDown: (e) => {
+          if ((e.key === "Enter" || e.key === " ") && onSelect) {
+            e.preventDefault();
+            onSelect(r.id);
+          }
+        },
+        style: {
+          display: "grid",
+          gridTemplateColumns: grid,
+          gap: "var(--space-8)",
+          alignItems: "center",
+          padding: "3px var(--space-12)",
+          borderBottom: "var(--divider)",
+          cursor: "default",
+          background: on ? "var(--selection)" : "transparent",
+          color: on ? "var(--selection-fg)" : "var(--label)"
+        }
+      },
+      columns.map((c) => /*#__PURE__*/React.createElement("div", { key: c.key, style: { minWidth: 0 } }, c.render ? c.render(r, on) : r[c.key]))
+    );
   }));
 }
 Object.assign(__ds_scope, { DataTable });
@@ -1234,6 +1788,28 @@ function SectionLabel({
 Object.assign(__ds_scope, { SectionLabel });
 })(); } catch (e) { __ds_ns.__errors.push({ path: "components/layout/SectionLabel.jsx", error: String((e && e.message) || e) }); }
 
+// components/layout/PanelHeader.jsx
+try { (() => {
+/* SectionLabel pre-wrapped with the padding a Form section header gets for free from
+   .formStyle(.grouped) — for a tab whose layout isn't a Form (a list pane, a split-view list),
+   so its header still lines up with a Form tab's header. Fixed: horizontal 16 / top 14 / bottom 8. */
+function PanelHeader({
+  title,
+  sf,
+  style
+}) {
+  return /*#__PURE__*/React.createElement(__ds_scope.SectionLabel, {
+    title: title,
+    sf: sf,
+    style: {
+      padding: 'var(--space-14) var(--space-16) var(--space-8)',
+      ...style
+    }
+  });
+}
+Object.assign(__ds_scope, { PanelHeader });
+})(); } catch (e) { __ds_ns.__errors.push({ path: "components/layout/PanelHeader.jsx", error: String((e && e.message) || e) }); }
+
 // components/layout/SettingsHint.jsx
 try { (() => {
 const TICK = String.fromCharCode(96);
@@ -1347,7 +1923,7 @@ function ListActionBar({
       display: 'flex',
       alignItems: 'center',
       gap: 'var(--space-10)',
-      padding: '7px 12px ' + (hint ? '3px' : '7px')
+      padding: '7px 14px ' + (hint ? '3px' : '7px')
     }
   }, btn('plus', addHelp, onAdd), btn('minus', removeHelp, onRemove)), hint && /*#__PURE__*/React.createElement(__ds_scope.SettingsHint, {
     style: {
@@ -1377,7 +1953,7 @@ Object.assign(__ds_scope, { SettingsFooter });
 
 // components/layout/TabBar.jsx
 try { (() => {
-/* The toolbar-style TabView of a macOS settings window: icon over title, selected tab filled. */
+/* Stable, non-customizable pane toolbar used by a macOS app Settings window. */
 function TabBar({
   tabs = [],
   value,
@@ -1388,11 +1964,13 @@ function TabBar({
       display: 'flex',
       gap: 'var(--space-2)',
       justifyContent: 'center',
-      padding: '10px var(--space-12)',
+      flex: '0 0 auto',
+      padding: '8px var(--space-12) 9px',
       background: 'var(--bar-bg)',
       backdropFilter: 'blur(var(--bar-blur))',
       WebkitBackdropFilter: 'blur(var(--bar-blur))',
-      borderBottom: 'var(--divider)'
+      borderBottom: 'var(--divider)',
+      overflowX: 'auto'
     }
   }, tabs.map(t => {
     const on = t.id === value;
@@ -1410,7 +1988,7 @@ function TabBar({
         border: 'none',
         cursor: 'pointer',
         borderRadius: 'var(--radius-field)',
-        background: on ? 'var(--label-quaternary)' : 'transparent',
+        background: on ? 'var(--fill)' : 'transparent',
         color: on ? 'var(--label)' : 'var(--label-secondary)',
         fontFamily: 'var(--font-system)',
         fontSize: 'var(--text-subheadline)',
@@ -1549,7 +2127,7 @@ const WORKSPACES = {
   }],
   '2': [{
     title: 'Notes',
-    lines: ['Fork notes', '— monitor identity by UUID', '— settings GUI, seven tabs']
+    lines: ['Fork notes', '— monitor identity by UUID', '— settings GUI, seven panes']
   }, {
     title: 'Mail',
     lines: ['Inbox (3)']
@@ -1769,59 +2347,33 @@ Object.assign(window, {
 
 // ui_kits/settings_app/App.jsx
 try { (() => {
-const {
-  WindowChrome,
-  TabBar,
-  Banner
-} = window.AeroSporkDesignSystem_078bd7;
-const TABS = [{
-  id: 'general',
-  label: 'General',
-  sf: 'gearshape'
-}, {
-  id: 'gaps',
-  label: 'Gaps',
-  sf: 'rectangle.split.3x3'
-}, {
-  id: 'keys',
-  label: 'Keys',
-  sf: 'keyboard'
-}, {
-  id: 'monitors',
-  label: 'Monitors',
-  sf: 'display.2'
-}, {
-  id: 'events',
-  label: 'Events',
-  sf: 'bolt'
-}, {
-  id: 'rules',
-  label: 'Window Rules',
-  sf: 'macwindow.badge.plus'
-}, {
-  id: 'raw',
-  label: 'Raw TOML',
-  sf: 'doc.plaintext'
-}];
-function SettingsApp({
-  framed = true,
-  initialTab = 'general',
-  banner = null
-}) {
+const { WindowChrome, TabBar, Banner } = window.AeroSporkDesignSystem_078bd7;
+const TABS = [
+  { id: "general", label: "General", sf: "gearshape" },
+  { id: "gaps", label: "Gaps", sf: "rectangle.split.3x3" },
+  { id: "keys", label: "Keys", sf: "keyboard" },
+  { id: "monitors", label: "Monitors", sf: "display.2" },
+  { id: "events", label: "Events", sf: "bolt" },
+  { id: "rules", label: "Window Rules", sf: "macwindow.badge.plus" },
+  { id: "raw", label: "Raw TOML", sf: "doc.plaintext" }
+];
+
+function SettingsApp({ framed = true, initialTab = "general", banner = null, width = 880, height = 620 }) {
   const D = window.AS_DATA;
   const [tab, setTab] = React.useState(initialTab);
+  const currentTab = TABS.find((t) => t.id === tab) || TABS[0];
   const [settings, setSettings] = React.useState({
     startAtLogin: true,
     unhide: true,
     autoMove: true,
     menuBarIcon: true,
     dockIcon: false,
-    layout: 'tiles',
-    orientation: 'auto',
+    layout: "tiles",
+    orientation: "auto",
     accordionPadding: 30,
     flatten: true,
     alternate: true,
-    keyMapping: 'qwerty',
+    keyMapping: "qwerty",
     innerH: 8,
     innerV: 8,
     outerTop: 32,
@@ -1829,10 +2381,7 @@ function SettingsApp({
     outerLeft: 8,
     outerRight: 8
   });
-  const set = (k, v) => setSettings(s => ({
-    ...s,
-    [k]: v
-  }));
+  const set = (k, v) => setSettings((s) => ({ ...s, [k]: v }));
   const [bindings, setBindings] = React.useState(D.bindings);
   const [assignments, setAssignments] = React.useState(D.assignments);
   const [rules, setRules] = React.useState(D.rules);
@@ -1840,54 +2389,12 @@ function SettingsApp({
   const [env, setEnv] = React.useState(D.env);
   const [inherit, setInherit] = React.useState(true);
   const [toml, setToml] = React.useState(D.toml);
-  const body = /*#__PURE__*/React.createElement(React.Fragment, null, banner === 'error' && /*#__PURE__*/React.createElement(Banner, {
-    kind: "error"
-  }, 'Your config was not loaded — AeroSpork is running built-in defaults. Fix the errors below and save; the config reloads by itself.\nline 12: unknown key ‘mods’'), /*#__PURE__*/React.createElement(TabBar, {
-    tabs: TABS,
-    value: tab,
-    onChange: setTab
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "tab-body"
-  }, tab === 'general' && /*#__PURE__*/React.createElement(GeneralTab, {
-    s: settings,
-    set: set
-  }), tab === 'gaps' && /*#__PURE__*/React.createElement(GapsTab, {
-    s: settings,
-    set: set
-  }), tab === 'keys' && /*#__PURE__*/React.createElement(KeysTab, {
-    bindings: bindings,
-    setBindings: setBindings
-  }), tab === 'monitors' && /*#__PURE__*/React.createElement(MonitorsTab, {
-    monitors: D.monitors,
-    assignments: assignments,
-    setAssignments: setAssignments
-  }), tab === 'events' && /*#__PURE__*/React.createElement(EventsTab, {
-    events: events,
-    setEvents: setEvents,
-    env: env,
-    setEnv: setEnv,
-    inherit: inherit,
-    setInherit: setInherit
-  }), tab === 'rules' && /*#__PURE__*/React.createElement(RulesTab, {
-    rules: rules,
-    setRules: setRules
-  }), tab === 'raw' && /*#__PURE__*/React.createElement(RawTomlTab, {
-    toml: toml,
-    setToml: setToml,
-    original: D.toml
-  })));
-  if (!framed) return /*#__PURE__*/React.createElement("div", {
-    className: "settings-plain"
-  }, body);
-  return /*#__PURE__*/React.createElement(WindowChrome, {
-    width: 880,
-    height: 620
-  }, body);
+
+  const body = /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(TabBar, { tabs: TABS, value: tab, onChange: setTab }), /*#__PURE__*/React.createElement("div", { className: "tab-body" }, banner === "error" && /*#__PURE__*/React.createElement(Banner, { kind: "error" }, "Your config was not loaded — AeroSpork is running built-in defaults. Fix the errors below and save; the config reloads by itself.\nline 12: unknown key ‘mods’"), tab === "general" && /*#__PURE__*/React.createElement(GeneralTab, { s: settings, set }), tab === "gaps" && /*#__PURE__*/React.createElement(GapsTab, { s: settings, set }), tab === "keys" && /*#__PURE__*/React.createElement(KeysTab, { bindings, setBindings }), tab === "monitors" && /*#__PURE__*/React.createElement(MonitorsTab, { monitors: D.monitors, assignments, setAssignments }), tab === "events" && /*#__PURE__*/React.createElement(EventsTab, { events, setEvents, env, setEnv, inherit, setInherit }), tab === "rules" && /*#__PURE__*/React.createElement(RulesTab, { rules, setRules }), tab === "raw" && /*#__PURE__*/React.createElement(RawTomlTab, { toml, setToml, original: D.toml })));
+  if (!framed) return /*#__PURE__*/React.createElement("div", { className: "settings-plain" }, body);
+  return /*#__PURE__*/React.createElement(WindowChrome, { title: currentTab.label, width, height }, body);
 }
-Object.assign(window, {
-  SettingsApp,
-  SETTINGS_TABS: TABS
-});
+Object.assign(window, { SettingsApp, SETTINGS_TABS: TABS });
 })(); } catch (e) { __ds_ns.__errors.push({ path: "ui_kits/settings_app/App.jsx", error: String((e && e.message) || e) }); }
 
 // ui_kits/settings_app/EventsTab.jsx
@@ -1897,14 +2404,18 @@ const {
   SectionLabel,
   TextField,
   Button,
-  Icon
+  Icon,
+  IconButton,
+  Toggle,
+  SettingsHint
 } = window.AeroSporkDesignSystem_078bd7;
 function CommandRows({
   title,
   sf,
   footer,
   list,
-  onChange
+  onChange,
+  placeholder
 }) {
   const set = (i, v) => onChange(list.map((c, j) => j === i ? v : c));
   const rows = list.length ? list : [null];
@@ -1920,7 +2431,7 @@ function CommandRows({
       fontSize: 'var(--text-callout)',
       color: 'var(--label-tertiary)'
     }
-  }, "Nothing here yet. Anything you add runs every time this event fires — exec-and-forget for a shell command, or an aerospork command directly.") : /*#__PURE__*/React.createElement("div", {
+  }, "Nothing here yet. Anything you add runs every time this event fires \u2014 exec-and-forget for a shell command, or an aerospork command directly.") : /*#__PURE__*/React.createElement("div", {
     key: i,
     style: {
       display: 'flex',
@@ -1930,24 +2441,21 @@ function CommandRows({
   }, /*#__PURE__*/React.createElement(TextField, {
     mono: true,
     value: c,
-    placeholder: "command",
+    placeholder: placeholder,
     onChange: v => set(i, v),
     style: {
       flex: 1
     }
-  }), /*#__PURE__*/React.createElement(Button, {
-    variant: "borderless",
-    iconOnly: true,
-    title: "Remove",
+  }), /*#__PURE__*/React.createElement(IconButton, {
+    systemImage: "minus.circle",
+    role: "destructive",
+    label: c.trim() ? 'Remove “' + c + '”' : 'Remove command',
     onClick: () => onChange(list.filter((_, j) => j !== i))
-  }, /*#__PURE__*/React.createElement(Icon, {
-    sf: "minus.circle",
-    size: 14,
-    style: {
-      color: 'var(--label-secondary)'
-    }
-  })))), /*#__PURE__*/React.createElement(Button, {
+  }))), /*#__PURE__*/React.createElement(Button, {
     variant: "borderless",
+    style: {
+      color: 'var(--label)'
+    },
     onClick: () => onChange([...list, ''])
   }, /*#__PURE__*/React.createElement(Icon, {
     sf: "plus.circle",
@@ -1973,43 +2481,40 @@ function EventsTab({
     sf: "play.circle",
     list: events.afterStartup,
     onChange: set('afterStartup'),
-    footer: "Runs once, after AeroSpork finishes launching."
+    placeholder: "exec-and-forget open -a Terminal",
+    footer: "Runs once, after AeroSpork finishes launching. Multiple commands run in order, top to bottom."
   }), /*#__PURE__*/React.createElement(CommandRows, {
     title: "Focused workspace changed",
     sf: "rectangle.on.rectangle",
     list: events.workspaceChanged,
     onChange: set('workspaceChanged'),
+    placeholder: "exec-and-forget open -a Terminal",
     footer: "Every workspace switch, including switches within one monitor. `move-mouse window-lazy-center` here is what makes the pointer follow you."
   }), /*#__PURE__*/React.createElement(CommandRows, {
     title: "Focused monitor changed",
     sf: "display.2",
     list: events.monitorChanged,
     onChange: set('monitorChanged'),
+    placeholder: "move-mouse monitor-lazy-center",
     footer: "Only when focus moves to a different monitor."
   }), /*#__PURE__*/React.createElement(CommandRows, {
     title: "Focus changed",
     sf: "scope",
     list: events.focusChanged,
     onChange: set('focusChanged'),
+    placeholder: "move-mouse window-lazy-center",
     footer: "Any focus change at all: window, workspace or monitor. Fires the most often \u2014 keep it cheap."
   }), /*#__PURE__*/React.createElement(FormSection, {
     header: /*#__PURE__*/React.createElement(SectionLabel, {
       title: "Environment for exec commands",
       sf: "terminal"
     }),
-    footer: "`exec-and-forget` and every command above run with this environment. `PATH` is the one people usually need."
-  }, /*#__PURE__*/React.createElement("label", {
-    style: {
-      display: 'flex',
-      gap: 8,
-      alignItems: 'center',
-      fontSize: 'var(--text-default)'
-    }
-  }, /*#__PURE__*/React.createElement("input", {
-    type: "checkbox",
+    footer: "`exec-and-forget` and every command above run with this environment. `PATH` is the one people usually need. Commands with a window or workspace target also get `AEROSPORK_WINDOW_ID` or `AEROSPORK_WORKSPACE`: check the exact values with `aerospork list-exec-env-vars`."
+  }, /*#__PURE__*/React.createElement(Toggle, {
+    label: "Inherit AeroSpork's environment",
     checked: inherit,
-    onChange: e => setInherit(e.target.checked)
-  }), "Inherit this app's environment"), env.map(v => /*#__PURE__*/React.createElement("div", {
+    onChange: setInherit
+  }), inherit && /*#__PURE__*/React.createElement(SettingsHint, null, "Every command on this page runs with AeroSpork's full environment, including anything sensitive in it. Turn this off and list only what you need below."), env.map(v => /*#__PURE__*/React.createElement("div", {
     key: v.id,
     style: {
       display: 'flex',
@@ -2028,7 +2533,7 @@ function EventsTab({
   }), /*#__PURE__*/React.createElement(TextField, {
     mono: true,
     value: v.value,
-    placeholder: "value",
+    placeholder: "/opt/homebrew/bin:/opt/homebrew/sbin:${PATH}",
     style: {
       flex: 1
     },
@@ -2036,19 +2541,16 @@ function EventsTab({
       ...e,
       value: nv
     } : e))
-  }), /*#__PURE__*/React.createElement(Button, {
-    variant: "borderless",
-    iconOnly: true,
-    title: "Remove",
+  }), /*#__PURE__*/React.createElement(IconButton, {
+    systemImage: "minus.circle",
+    role: "destructive",
+    label: v.name.trim() ? 'Remove “' + v.name + '”' : 'Remove variable',
     onClick: () => setEnv(env.filter(e => e.id !== v.id))
-  }, /*#__PURE__*/React.createElement(Icon, {
-    sf: "minus.circle",
-    size: 14,
-    style: {
-      color: 'var(--label-secondary)'
-    }
-  })))), /*#__PURE__*/React.createElement(Button, {
+  }))), /*#__PURE__*/React.createElement(Button, {
     variant: "borderless",
+    style: {
+      color: 'var(--label)'
+    },
     onClick: () => setEnv([...env, {
       id: 'v' + Date.now(),
       name: '',
@@ -2071,17 +2573,32 @@ const {
   SectionLabel,
   NumberField,
   SettingsFooter,
-  GapsPreview
+  GapsPreview,
+  Toggle,
+  StatusLabel
 } = window.AeroSporkDesignSystem_078bd7;
 function GapsTab({
   s,
   set
 }) {
+  const D = window.AS_DATA;
+  // Seeded once from the loaded values, not recomputed on every render — otherwise typing a
+  // field toward a matching value would make its row disappear mid-edit.
+  const [innerLinked, setInnerLinked] = React.useState(() => s.innerH === s.innerV);
+  const [outerLinked, setOuterLinked] = React.useState(() => s.outerTop === s.outerBottom && s.outerBottom === s.outerLeft && s.outerLeft === s.outerRight);
   return /*#__PURE__*/React.createElement("div", {
     className: "tab-column"
   }, /*#__PURE__*/React.createElement("div", {
     className: "form-page"
-  }, /*#__PURE__*/React.createElement(FormSection, null, /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement(FormSection, {
+    header: /*#__PURE__*/React.createElement(SectionLabel, {
+      title: "Preview",
+      sf: "eye"
+    }),
+    footer: D.gapsHavePerMonitorOverrides ? /*#__PURE__*/React.createElement(StatusLabel, {
+      kind: "neutral"
+    }, "Some of these gaps have per-monitor rules set in Raw TOML \u2014 editing any value below replaces the whole section with flat numbers.") : null
+  }, /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       justifyContent: 'center',
@@ -2101,11 +2618,25 @@ function GapsTab({
       title: "Between windows",
       sf: "rectangle.split.2x1"
     })
-  }, /*#__PURE__*/React.createElement(NumberField, {
+  }, /*#__PURE__*/React.createElement(Toggle, {
+    label: "Same value for both",
+    checked: innerLinked,
+    onChange: v => {
+      setInnerLinked(v);
+      if (v) set('innerV', s.innerH);
+    }
+  }), innerLinked && /*#__PURE__*/React.createElement(NumberField, {
+    title: "Horizontal & vertical",
+    value: s.innerH,
+    onChange: v => {
+      set('innerH', v);
+      set('innerV', v);
+    }
+  }), !innerLinked && /*#__PURE__*/React.createElement(NumberField, {
     title: "Horizontal",
     value: s.innerH,
     onChange: v => set('innerH', v)
-  }), /*#__PURE__*/React.createElement(NumberField, {
+  }), !innerLinked && /*#__PURE__*/React.createElement(NumberField, {
     title: "Vertical",
     value: s.innerV,
     onChange: v => set('innerV', v)
@@ -2115,23 +2646,43 @@ function GapsTab({
       sf: "rectangle.inset.filled"
     }),
     footer: "The top gap is measured below the menu bar, so 0 is flush with the usable area."
-  }, /*#__PURE__*/React.createElement(NumberField, {
+  }, /*#__PURE__*/React.createElement(Toggle, {
+    label: "Same on all sides",
+    checked: outerLinked,
+    onChange: v => {
+      setOuterLinked(v);
+      if (v) {
+        set('outerBottom', s.outerTop);
+        set('outerLeft', s.outerTop);
+        set('outerRight', s.outerTop);
+      }
+    }
+  }), outerLinked && /*#__PURE__*/React.createElement(NumberField, {
+    title: "All sides",
+    value: s.outerTop,
+    onChange: v => {
+      set('outerTop', v);
+      set('outerBottom', v);
+      set('outerLeft', v);
+      set('outerRight', v);
+    }
+  }), !outerLinked && /*#__PURE__*/React.createElement(NumberField, {
     title: "Top",
     value: s.outerTop,
     onChange: v => set('outerTop', v)
-  }), /*#__PURE__*/React.createElement(NumberField, {
+  }), !outerLinked && /*#__PURE__*/React.createElement(NumberField, {
     title: "Bottom",
     value: s.outerBottom,
     onChange: v => set('outerBottom', v)
-  }), /*#__PURE__*/React.createElement(NumberField, {
+  }), !outerLinked && /*#__PURE__*/React.createElement(NumberField, {
     title: "Left",
     value: s.outerLeft,
     onChange: v => set('outerLeft', v)
-  }), /*#__PURE__*/React.createElement(NumberField, {
+  }), !outerLinked && /*#__PURE__*/React.createElement(NumberField, {
     title: "Right",
     value: s.outerRight,
     onChange: v => set('outerRight', v)
-  }))), /*#__PURE__*/React.createElement(SettingsFooter, null, "Per-monitor gaps, such as a list of values under outer.top, = [", '{', " monitor.main = 16 ", '}', ", 8] survive untouched until you change one of these \u2014 editing any gap rewrites the whole gaps section. Use Raw TOML for per-monitor rules."));
+  }))), /*#__PURE__*/React.createElement(SettingsFooter, null, "Raw TOML can set a different value per monitor for any of these six gaps. Editing a gap here always writes one flat number for every monitor. Use Raw TOML for per-monitor rules."));
 }
 Object.assign(window, {
   GapsTab
@@ -2154,13 +2705,26 @@ function GeneralTab({
   s,
   set
 }) {
+  // v3: the page header (icon + "General") now lives once in App.jsx, shared by every tab, so
+  // this file starts straight into content. The six sections are unchanged in count, order and
+  // copy — the only new thing is a two-column card grid instead of one long column, which the
+  // extra width the sidebar redesign keeps available (see tokens/spacing.css) makes room for.
+  // Pairs read top to bottom, left column then right: startup+menu bar, layout+normalization,
+  // keyboard+about — related, similarly short sections next to each other.
   return /*#__PURE__*/React.createElement("div", {
-    className: "form-page"
+    className: "form-page",
+    style: {
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr',
+      gap: 'var(--space-16)',
+      alignItems: 'start'
+    }
   }, /*#__PURE__*/React.createElement(FormSection, {
     header: /*#__PURE__*/React.createElement(SectionLabel, {
       title: "Startup & behaviour",
       sf: "power"
-    })
+    }),
+    footer: "Automatically unhiding macOS hidden apps undoes \u2318H so a hidden window keeps tiling. Moving workspaces on monitor connect puts each one back on the monitor you pinned it to; off, a workspace stays wherever it landed when that monitor disappeared."
   }, /*#__PURE__*/React.createElement(Toggle, {
     label: "Start AeroSpork at login",
     checked: s.startAtLogin,
@@ -2177,7 +2741,7 @@ function GeneralTab({
     help: "Re-applies workspace-to-monitor assignments when the monitor set changes"
   })), /*#__PURE__*/React.createElement(FormSection, {
     header: /*#__PURE__*/React.createElement(SectionLabel, {
-      title: "Appearance",
+      title: "Menu bar & Dock",
       sf: "menubar.rectangle"
     }),
     footer: "AeroSpork has no window of its own, so these two icons are the only ways back into Settings without the command line. `aerospork open-settings` opens this window from anywhere."
@@ -2195,7 +2759,7 @@ function GeneralTab({
       title: "Layout",
       sf: "rectangle.split.3x1"
     }),
-    footer: "Auto gives wide monitors a horizontal split and tall monitors a vertical one. The accordion peek is how much of the window behind stays visible; 0 stacks them exactly."
+    footer: "Auto gives wide monitors a horizontal split and tall monitors a vertical one. The accordion peek is how much of the window behind stays visible; 0 stacks them exactly. It applies to any accordion container, not just new workspaces."
   }, /*#__PURE__*/React.createElement(LabeledContent, {
     label: "New workspaces use"
   }, /*#__PURE__*/React.createElement(SegmentedPicker, {
@@ -2293,17 +2857,291 @@ Object.assign(window, {
 try { (() => {
 const {
   BarStrip,
-  SegmentedPicker,
   TextField,
   Button,
   Icon,
   KeyRecorderField,
   PrettyKey,
+  KeyCaps,
+  FormSection,
+  SectionLabel,
   Badge,
   ContentUnavailable,
   SettingsHint,
-  StatusLabel
+  StatusLabel,
+  IconButton,
+  MenuPanel
 } = window.AeroSporkDesignSystem_078bd7;
+
+// Categories, derived from the command's leading verb (before the first ';'). Verified against
+// Sources/AppBundle/command/cmdManifest.swift's CmdArgs.Kind switch: every case there maps to one
+// of these four buckets or falls through to Other (list-*, move-mouse, debug-windows).
+const CATEGORY_VERBS = {
+  'Focus': ['focus', 'focus-monitor', 'focus-back-and-forth'],
+  'Move & workspace': ['move', 'move-node-to-workspace', 'move-node-to-monitor', 'move-workspace-to-monitor', 'workspace', 'workspace-back-and-forth', 'summon-workspace'],
+  'Layout & resize': ['layout', 'split', 'join-with', 'fullscreen', 'resize', 'balance-sizes', 'flatten-workspace-tree', 'macos-native-fullscreen', 'macos-native-minimize'],
+  'Mode & system': ['mode', 'reload-config', 'enable', 'close', 'close-all-windows-but-current', 'volume', 'exec-and-forget', 'trigger-binding', 'config', 'open-settings']
+};
+const CATEGORY_ORDER = ['Focus', 'Move & workspace', 'Layout & resize', 'Mode & system', 'Other'];
+// One glyph per category card header — crosshair for aim, a workspace grid, the 3-pane split
+// General's own Layout section uses, a terminal for the exec/system bucket.
+const CATEGORY_ICONS = {
+  'Focus': 'scope',
+  'Move & workspace': 'square.grid.2x2',
+  'Layout & resize': 'rectangle.split.3x1',
+  'Mode & system': 'terminal',
+  'Other': 'ellipsis.circle'
+};
+function categoryFor(command) {
+  const verb = command.split(';')[0].trim().split(/\s+/)[0] || '';
+  for (const cat of CATEGORY_ORDER) {
+    if ((CATEGORY_VERBS[cat] || []).includes(verb)) return cat;
+  }
+  return 'Other';
+}
+
+// A starting point for the command field's autocomplete, grounded in the real command set
+// (cmdManifest.swift) — not a constraint. Selecting one fills the field; the user can still type
+// or append anything, chained commands included. `quick` marks the six shown before any typing,
+// one per category so the empty-state list isn't just every focus-* variant.
+const COMMAND_SUGGESTIONS = [{
+  cmd: 'focus left',
+  cat: 'Focus',
+  quick: true
+}, {
+  cmd: 'focus down',
+  cat: 'Focus'
+}, {
+  cmd: 'focus up',
+  cat: 'Focus'
+}, {
+  cmd: 'focus right',
+  cat: 'Focus'
+}, {
+  cmd: 'focus-monitor next',
+  cat: 'Focus'
+}, {
+  cmd: 'focus-back-and-forth',
+  cat: 'Focus'
+}, {
+  cmd: 'move left',
+  cat: 'Move & workspace'
+}, {
+  cmd: 'move-node-to-workspace 3',
+  cat: 'Move & workspace',
+  quick: true
+}, {
+  cmd: 'move-node-to-monitor next',
+  cat: 'Move & workspace'
+}, {
+  cmd: 'workspace 1',
+  cat: 'Move & workspace'
+}, {
+  cmd: 'workspace-back-and-forth',
+  cat: 'Move & workspace'
+}, {
+  cmd: 'layout floating tiling',
+  cat: 'Layout & resize',
+  quick: true
+}, {
+  cmd: 'layout accordion',
+  cat: 'Layout & resize'
+}, {
+  cmd: 'split horizontal',
+  cat: 'Layout & resize'
+}, {
+  cmd: 'resize smart -50',
+  cat: 'Layout & resize'
+}, {
+  cmd: 'fullscreen',
+  cat: 'Layout & resize'
+}, {
+  cmd: 'mode service',
+  cat: 'Mode & system',
+  quick: true
+}, {
+  cmd: 'reload-config',
+  cat: 'Mode & system',
+  quick: true
+}, {
+  cmd: 'close-all-windows-but-current',
+  cat: 'Mode & system'
+}, {
+  cmd: 'volume up',
+  cat: 'Mode & system'
+}, {
+  cmd: 'exec-and-forget open -na Ghostty',
+  cat: 'Mode & system',
+  quick: true
+}];
+function commandSuggestions(query) {
+  const q = query.trim().toLowerCase();
+  const pool = q ? COMMAND_SUGGESTIONS.filter(s => s.cmd.toLowerCase().includes(q)) : COMMAND_SUGGESTIONS.filter(s => s.quick);
+  return pool.slice(0, 6);
+}
+
+// Wraps the first hit of `needle` in a light accent mark — used in the search-primary flat list,
+// never in the browse-by-category cards (there is no needle there to highlight).
+function highlightMatch(text, needle) {
+  if (!needle) return text;
+  const i = text.toLowerCase().indexOf(needle);
+  if (i === -1) return text;
+  return /*#__PURE__*/React.createElement(React.Fragment, null, text.slice(0, i), /*#__PURE__*/React.createElement("mark", {
+    style: {
+      background: 'var(--accent-selection-fill)',
+      color: 'inherit',
+      borderRadius: 2
+    }
+  }, text.slice(i, i + needle.length)), text.slice(i + needle.length));
+}
+
+// Modes are i3-style: a named set of bindings that is either always active ("main") or entered
+// and left by a binding elsewhere. Most users have never met the concept, so instead of just a
+// switcher, name the entry and exit keys for the mode actually on screen — read out of the real
+// bindings, not asserted in prose that can drift from them.
+function describeMode(name, bindings) {
+  if (name === 'main') return 'Always active — every other mode is entered from here and returns to it.';
+  const entry = Object.entries(bindings).flatMap(([m, rows]) => m === name ? [] : rows.map(row => ({
+    mode: m,
+    row
+  }))).find(({
+    row
+  }) => row.command.split(';')[0].trim() === 'mode ' + name);
+  const exits = (bindings[name] || []).filter(row => row.command.split(';').some(c => c.trim() === 'mode main'));
+  let s = entry ? 'Entered with ' + PrettyKey(entry.row.key) + ' from “' + entry.mode + '”.' : 'Entered by a “mode ' + name + '” command elsewhere.';
+  if (exits.length === 1) s += ' ' + PrettyKey(exits[0].key) + ' returns to “main”.';else if (exits.length > 1) s += ' ' + PrettyKey(exits[0].key) + ' and ' + (exits.length - 1) + ' more return to “main”.';
+  return s;
+}
+const stepLabelStyle = {
+  font: 'var(--weight-medium) var(--text-subheadline)/1 var(--font-system)',
+  color: 'var(--label-tertiary)'
+};
+const cardShellStyle = {
+  background: 'var(--control-bg)',
+  borderRadius: 'var(--radius-card)',
+  boxShadow: '0 0 0 0.5px var(--separator)',
+  overflow: 'hidden'
+};
+
+// One binding in the *active* mode: editable if it has a line to edit, read-only chips otherwise.
+// Used both inside a category card (no outer padding — FormSection supplies it) and in the
+// search-primary flat list (`dense`: the tighter `.binding-row` padding, so many matches still
+// fit at a glance). `needle` only ever arrives non-empty in the dense/search case, to ring the key
+// chips when the match was in the key rather than the command.
+function BindingRow({
+  b,
+  needle,
+  dense,
+  onUpdate,
+  onRemove,
+  onOverride,
+  onDuplicate
+}) {
+  const keyHit = needle && b.key.toLowerCase().includes(needle);
+  return /*#__PURE__*/React.createElement("div", {
+    className: dense ? 'binding-row' : undefined,
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      width: 'var(--w-recorder)',
+      flex: '0 0 auto',
+      display: 'flex',
+      borderRadius: 6,
+      boxShadow: keyHit ? 'inset 0 0 0 1.5px var(--accent)' : 'none',
+      padding: keyHit ? 2 : 0
+    }
+  }, b.origin === 'explicit' ? /*#__PURE__*/React.createElement(KeyRecorderField, {
+    notation: b.key,
+    showsClear: false
+  }) : /*#__PURE__*/React.createElement(KeyCaps, {
+    notation: b.key
+  })), /*#__PURE__*/React.createElement("span", {
+    style: {
+      flex: 1,
+      minWidth: 0
+    }
+  }, b.origin === 'explicit' ? /*#__PURE__*/React.createElement(TextField, {
+    mono: true,
+    value: b.command,
+    onChange: v => onUpdate(b.id, {
+      command: v
+    }),
+    style: {
+      width: '100%'
+    }
+  }) : /*#__PURE__*/React.createElement("span", {
+    className: "mono cmdcell"
+  }, highlightMatch(b.command, needle))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 6,
+      flex: '0 0 auto'
+    }
+  }, b.origin === 'generated' && /*#__PURE__*/React.createElement(Badge, {
+    help: "Generated from mod and workspaces. It is not written in your config file."
+  }, "generated"), /*#__PURE__*/React.createElement(IconButton, {
+    systemImage: "doc.on.doc",
+    label: 'Duplicate “' + b.command + '”',
+    onClick: () => onDuplicate(b)
+  }), b.origin === 'explicit' ? /*#__PURE__*/React.createElement(IconButton, {
+    systemImage: "minus.circle",
+    role: "destructive",
+    label: 'Remove “' + b.key + '”',
+    onClick: () => onRemove(b.id)
+  }) : /*#__PURE__*/React.createElement(Button, {
+    variant: "borderless",
+    onClick: () => onOverride(b)
+  }, "Override")));
+}
+
+// A match from a mode other than the active one: read-only regardless of origin (editing a
+// binding you can't see the rest of is how you end up with two conflicting keys), tagged with its
+// mode, and offering only "Go" — the same restriction the previous round enforced, just restyled.
+function CrossModeRow({
+  mode,
+  row,
+  needle,
+  onGo
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "binding-row",
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      width: 54,
+      flex: '0 0 auto',
+      color: 'var(--label-secondary)',
+      fontSize: 'var(--text-callout)'
+    }
+  }, "\u201C", mode, "\u201D"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      width: 'var(--w-recorder)',
+      flex: '0 0 auto'
+    }
+  }, /*#__PURE__*/React.createElement(KeyCaps, {
+    notation: row.key
+  })), /*#__PURE__*/React.createElement("span", {
+    className: "mono cmdcell",
+    style: {
+      flex: 1,
+      minWidth: 0
+    }
+  }, highlightMatch(row.command, needle)), row.origin === 'generated' && /*#__PURE__*/React.createElement(Badge, {
+    help: "Generated from mod and workspaces. It is not written in your config file."
+  }, "generated"), /*#__PURE__*/React.createElement(Button, {
+    variant: "borderless",
+    onClick: onGo
+  }, "Go"));
+}
 function KeysTab({
   bindings,
   setBindings
@@ -2313,12 +3151,52 @@ function KeysTab({
   const [newKey, setNewKey] = React.useState('');
   const [newCommand, setNewCommand] = React.useState('');
   const [recording, setRecording] = React.useState(false);
+  const [modeMenuOpen, setModeMenuOpen] = React.useState(false);
+  const [suggestOpen, setSuggestOpen] = React.useState(false);
   const all = bindings[mode] || [];
   const needle = query.trim().toLowerCase();
-  const rows = needle ? all.filter(b => b.key.toLowerCase().includes(needle) || b.command.toLowerCase().includes(needle)) : all;
+  const rowMatches = b => b.key.toLowerCase().includes(needle) || b.command.toLowerCase().includes(needle);
+  const rows = needle ? all.filter(rowMatches) : all;
   const generated = all.filter(b => b.origin === 'generated').length;
   const explicit = all.length - generated;
   const conflict = newKey ? all.find(b => b.key === newKey) : null;
+  const deleteModeLabel = 'Delete “' + mode + '”' + (explicit > 0 ? ' — ' + explicit + (explicit === 1 ? ' binding' : ' bindings') : '');
+
+  // Real mode list (main first, then alphabetical) — the pills below used to be a SegmentedPicker
+  // hardcoded to ['main', 'service'], which meant a config with a third mode (this mock's "apps")
+  // had no way to reach it from the GUI at all. Deriving it from the data fixes that, and scrolls
+  // rather than overflows if someone has many modes, instead of relying on a fixed width fitting.
+  const modeNames = ['main', ...Object.keys(bindings).filter(m => m !== 'main').sort()];
+  const otherModeNames = modeNames.filter(m => m !== mode);
+  const crossModeRowMatches = needle ? otherModeNames.flatMap(m => (bindings[m] || []).filter(rowMatches).map(row => ({
+    mode: m,
+    row
+  }))) : [];
+  const otherModesWithMatches = needle ? otherModeNames.filter(m => (bindings[m] || []).some(rowMatches)) : [];
+  const isSearching = !!needle;
+  let emptyTitle, emptyMessage, emptyActionTitle, emptyAction;
+  if (isSearching) {
+    emptyTitle = 'No matches';
+    emptyMessage = 'Nothing in “' + mode + '” matches “' + query + '”.' + (otherModesWithMatches.length === 1 ? ' It’s bound in “' + otherModesWithMatches[0] + '” instead.' : otherModesWithMatches.length >= 2 ? ' It’s bound in other modes.' : '');
+    emptyActionTitle = otherModesWithMatches.length === 1 ? 'Go to “' + otherModesWithMatches[0] + '”' : 'Clear filter';
+    emptyAction = otherModesWithMatches.length === 1 ? () => setMode(otherModesWithMatches[0]) : () => setQuery('');
+  } else {
+    // Empty states teach the feature rather than announce emptiness — point straight at the
+    // composer that fixes it, the way Window Rules' empty state points at "Add".
+    emptyTitle = 'No bindings yet';
+    emptyMessage = '“' + mode + '” mode has no bindings. Record a shortcut below and describe what it does to add the first one.';
+    emptyActionTitle = undefined;
+    emptyAction = undefined;
+  }
+  const crossModeKeyMatches = newKey ? otherModeNames.filter(m => (bindings[m] || []).some(b => b.key === newKey)) : [];
+  const crossModeKeyMessage = (() => {
+    const count = crossModeKeyMatches.length;
+    if (count === 0) return '';
+    if (count === 1) return 'Also bound in “' + crossModeKeyMatches[0] + '” mode.';
+    const named = crossModeKeyMatches.slice(0, 2).map(m => '“' + m + '”').join(', ');
+    const extra = count > 2 ? ', and ' + (count - 2) + ' more' : '';
+    return 'Also bound in ' + named + extra + ' mode' + (count > 1 ? 's' : '') + '.';
+  })();
   const update = (id, patch) => setBindings({
     ...bindings,
     [mode]: all.map(b => b.id === id ? {
@@ -2354,6 +3232,13 @@ function KeysTab({
     setNewKey('');
     setNewCommand('');
   };
+  // Duplicate to a second key: seed the command, leave the key recorder empty to record.
+  const duplicate = b => {
+    setNewCommand(b.command);
+    setNewKey('');
+  };
+  const suggestions = commandSuggestions(newCommand);
+  const categoriesPresent = CATEGORY_ORDER.filter(cat => all.some(b => categoryFor(b.command) === cat));
   return /*#__PURE__*/React.createElement("div", {
     className: "tab-column"
   }, /*#__PURE__*/React.createElement(BarStrip, {
@@ -2366,23 +3251,52 @@ function KeysTab({
       gap: 10,
       padding: '9px 14px'
     }
-  }, /*#__PURE__*/React.createElement(SegmentedPicker, {
-    options: ['main', 'service'],
-    value: mode,
-    onChange: setMode
-  }), /*#__PURE__*/React.createElement(Button, {
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "mode-pills"
+  }, modeNames.map(m => /*#__PURE__*/React.createElement("button", {
+    key: m,
+    type: "button",
+    className: 'mode-pill' + (m === mode ? ' on' : ''),
+    onClick: () => setMode(m)
+  }, m)), /*#__PURE__*/React.createElement(IconButton, {
+    systemImage: "plus.circle",
+    label: "New mode\u2026",
+    onClick: () => {}
+  })), mode !== 'main' && /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'relative',
+      flex: '0 0 auto'
+    }
+  }, /*#__PURE__*/React.createElement(Button, {
     variant: "borderless",
     iconOnly: true,
-    title: "Mode actions"
+    title: "Mode actions",
+    onClick: () => setModeMenuOpen(v => !v)
   }, /*#__PURE__*/React.createElement(Icon, {
     sf: "ellipsis.circle",
     size: 15
-  })), /*#__PURE__*/React.createElement("span", {
+  })), modeMenuOpen && /*#__PURE__*/React.createElement("div", {
     style: {
-      flex: 1
+      position: 'absolute',
+      top: '100%',
+      left: 0,
+      marginTop: 4,
+      zIndex: 10
     }
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "filter"
+  }, /*#__PURE__*/React.createElement(MenuPanel, {
+    width: 220,
+    items: [{
+      label: deleteModeLabel,
+      onClick: () => setModeMenuOpen(false)
+    }]
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "filter",
+    style: {
+      flex: '0 1 300px',
+      minWidth: 160,
+      padding: '5px 10px',
+      gap: 8
+    }
   }, /*#__PURE__*/React.createElement(Icon, {
     sf: "magnifyingglass",
     size: 12,
@@ -2391,10 +3305,13 @@ function KeysTab({
     }
   }), /*#__PURE__*/React.createElement(TextField, {
     variant: "plain",
-    placeholder: "Filter",
+    placeholder: "key or command, e.g. focus left",
     value: query,
     onChange: setQuery,
-    width: 150
+    style: {
+      flex: 1,
+      width: 'auto'
+    }
   }), query && /*#__PURE__*/React.createElement("button", {
     className: "clear",
     onClick: () => setQuery('')
@@ -2402,79 +3319,182 @@ function KeysTab({
     sf: "xmark.circle.fill",
     size: 12
   }))))), /*#__PURE__*/React.createElement("div", {
-    className: "list"
-  }, rows.length === 0 ? /*#__PURE__*/React.createElement(ContentUnavailable, {
-    sf: "magnifyingglass",
-    title: "No matches",
-    message: 'Nothing in “' + mode + '” matches “' + query + '”.'
-  }) : rows.map(b => /*#__PURE__*/React.createElement("div", {
-    key: b.id,
-    className: "binding-row"
-  }, b.origin === 'explicit' ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(KeyRecorderField, {
-    notation: b.key,
-    showsClear: false
-  }), /*#__PURE__*/React.createElement(TextField, {
-    mono: true,
-    value: b.command,
-    onChange: v => update(b.id, {
-      command: v
-    }),
     style: {
-      flex: 1
+      display: 'flex',
+      alignItems: 'flex-start',
+      gap: 6,
+      padding: '7px 14px',
+      borderBottom: 'var(--divider)'
     }
-  }), /*#__PURE__*/React.createElement(Button, {
-    variant: "borderless",
-    iconOnly: true,
-    title: "Remove this binding",
-    onClick: () => remove(b.id)
   }, /*#__PURE__*/React.createElement(Icon, {
-    sf: "minus.circle",
-    size: 14,
+    sf: "info.circle",
+    size: 12,
     style: {
-      color: 'var(--label-secondary)'
+      color: 'var(--label-tertiary)',
+      marginTop: 1,
+      flex: '0 0 auto'
     }
-  }))) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
-    className: "mono keycell"
-  }, PrettyKey(b.key)), /*#__PURE__*/React.createElement("span", {
-    className: "mono cmdcell"
-  }, b.command), /*#__PURE__*/React.createElement("span", {
+  }), /*#__PURE__*/React.createElement(SettingsHint, null, describeMode(mode, bindings))), /*#__PURE__*/React.createElement("div", {
+    className: "form-page",
     style: {
-      flex: 1
+      gap: 'var(--space-16)'
     }
-  }), /*#__PURE__*/React.createElement(Badge, {
-    help: "Generated from mod and workspaces. It is not written in your config file."
-  }, "generated"), /*#__PURE__*/React.createElement(Button, {
-    variant: "borderless",
-    onClick: () => override(b)
-  }, "Override"))))), /*#__PURE__*/React.createElement(BarStrip, {
+  }, rows.length === 0 ? /*#__PURE__*/React.createElement(ContentUnavailable, {
+    sf: isSearching ? 'magnifyingglass' : 'keyboard',
+    title: emptyTitle,
+    message: emptyMessage,
+    actionTitle: emptyActionTitle,
+    onAction: emptyAction
+  }) : isSearching ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: cardShellStyle
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: '8px 14px 4px'
+    }
+  }, /*#__PURE__*/React.createElement(SectionLabel, {
+    title: 'Matches — ' + rows.length,
+    sf: "magnifyingglass"
+  })), rows.map(b => /*#__PURE__*/React.createElement(BindingRow, {
+    key: b.id,
+    b: b,
+    needle: needle,
+    dense: true,
+    onUpdate: update,
+    onRemove: remove,
+    onOverride: override,
+    onDuplicate: duplicate
+  }))), crossModeRowMatches.length > 0 && /*#__PURE__*/React.createElement("div", {
+    style: cardShellStyle
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: '8px 14px 4px'
+    }
+  }, /*#__PURE__*/React.createElement(SectionLabel, {
+    title: 'In other modes — ' + crossModeRowMatches.length,
+    sf: "arrow.triangle.branch"
+  })), crossModeRowMatches.map(({
+    mode: m,
+    row
+  }) => /*#__PURE__*/React.createElement(CrossModeRow, {
+    key: m + ':' + row.id,
+    mode: m,
+    row: row,
+    needle: needle,
+    onGo: () => setMode(m)
+  })))) :
+  // Browse-by-category, the default (empty-query) state now that search is primary. One
+  // full-width card per category rather than a two-column grid: the 170px recorder width
+  // is a fixed control width this design system copies verbatim (see readme.md), and two
+  // columns at the 960px floor leave a card only ~360px wide — the recorder alone would
+  // eat half of it. Stacked full-width cards keep every row as roomy as the old flat list.
+  categoriesPresent.map(cat => {
+    const catRows = all.filter(b => categoryFor(b.command) === cat);
+    return /*#__PURE__*/React.createElement(FormSection, {
+      key: cat,
+      header: /*#__PURE__*/React.createElement("div", {
+        style: {
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }
+      }, /*#__PURE__*/React.createElement(SectionLabel, {
+        title: cat,
+        sf: CATEGORY_ICONS[cat]
+      }), /*#__PURE__*/React.createElement(Badge, {
+        tone: "muted"
+      }, catRows.length))
+    }, catRows.map(b => /*#__PURE__*/React.createElement(BindingRow, {
+      key: b.id,
+      b: b,
+      needle: "",
+      onUpdate: update,
+      onRemove: remove,
+      onOverride: override,
+      onDuplicate: duplicate
+    })));
+  })), /*#__PURE__*/React.createElement(BarStrip, {
     padded: false
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
-      gap: 8,
-      padding: '10px 14px 0'
+      alignItems: 'flex-end',
+      gap: 10,
+      padding: '12px 14px 0'
     }
-  }, /*#__PURE__*/React.createElement(KeyRecorderField, {
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 4
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: stepLabelStyle
+  }, "1 \xB7 Shortcut"), /*#__PURE__*/React.createElement(KeyRecorderField, {
     notation: newKey,
     width: 170,
     recording: recording,
     onArm: v => {
       setRecording(v);
       if (v) setTimeout(() => {
-        setNewKey('alt-shift-d');
+        setNewKey('esc');
         setRecording(false);
       }, 700);
     },
     onClear: () => setNewKey('')
-  }), /*#__PURE__*/React.createElement(TextField, {
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      height: 22,
+      display: 'flex',
+      alignItems: 'center',
+      flex: '0 0 auto'
+    }
+  }, /*#__PURE__*/React.createElement(Icon, {
+    sf: "chevron.right",
+    size: 11,
+    style: {
+      color: 'var(--label-tertiary)'
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 4,
+      flex: 1,
+      minWidth: 0,
+      position: 'relative'
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: stepLabelStyle
+  }, "2 \xB7 Command"), /*#__PURE__*/React.createElement(TextField, {
     mono: true,
     placeholder: "command, e.g. focus left",
     value: newCommand,
     onChange: setNewCommand,
+    onFocus: () => setSuggestOpen(true),
+    onBlur: () => setTimeout(() => setSuggestOpen(false), 120),
     style: {
-      flex: 1
+      width: '100%'
     }
-  }), /*#__PURE__*/React.createElement(Button, {
+  }), suggestOpen && suggestions.length > 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'absolute',
+      bottom: 'calc(100% + 4px)',
+      left: 0,
+      right: 0,
+      zIndex: 10
+    }
+  }, /*#__PURE__*/React.createElement(MenuPanel, {
+    width: "100%",
+    items: suggestions.map(s => ({
+      label: s.cmd,
+      suffix: s.cat,
+      mono: true,
+      onClick: () => {
+        setNewCommand(s.cmd);
+        setSuggestOpen(false);
+      }
+    }))
+  }))), /*#__PURE__*/React.createElement(Button, {
     onClick: add,
     disabled: !newKey || !newCommand.trim()
   }, conflict ? 'Replace' : 'Add')), conflict && /*#__PURE__*/React.createElement("div", {
@@ -2488,15 +3508,21 @@ function KeysTab({
     kind: "warning"
   }, PrettyKey(conflict.key) + ' is already bound to ', /*#__PURE__*/React.createElement("span", {
     className: "mono"
-  }, conflict.command)), conflict.origin === 'generated' && /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontSize: 'var(--text-callout)',
-      color: 'var(--label-secondary)'
-    }
-  }, "(generated)"), /*#__PURE__*/React.createElement(Button, {
+  }, conflict.command)), conflict.origin === 'generated' && /*#__PURE__*/React.createElement(Badge, {
+    help: "Generated from mod and workspaces. It is not written in your config file."
+  }, "generated"), /*#__PURE__*/React.createElement(Button, {
     variant: "borderless",
     onClick: () => setQuery(conflict.key)
-  }, "Show")), /*#__PURE__*/React.createElement(SettingsHint, {
+  }, "Show")), newKey && crossModeKeyMatches.length > 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 6,
+      padding: '7px 14px 0'
+    }
+  }, /*#__PURE__*/React.createElement(StatusLabel, {
+    kind: "neutral"
+  }, crossModeKeyMessage)), /*#__PURE__*/React.createElement(SettingsHint, {
     style: {
       padding: '7px 14px 10px'
     }
@@ -2509,164 +3535,100 @@ Object.assign(window, {
 
 // ui_kits/settings_app/MonitorsTab.jsx
 try { (() => {
-const {
-  SectionLabel,
-  SettingsHint,
-  CopyButton,
-  Icon,
-  DataTable,
-  ListActionBar,
-  TextField,
-  Select,
-  ContentUnavailable
-} = window.AeroSporkDesignSystem_078bd7;
-function MonitorsTab({
-  monitors,
-  assignments,
-  setAssignments
-}) {
+const { SectionLabel, CopyButton, Icon, DataTable, ListActionBar, TextField, Select, ContentUnavailable, Badge, Button, MonitorArrangement } = window.AeroSporkDesignSystem_078bd7;
+function MonitorsTab({ monitors, assignments, setAssignments }) {
   const [selected, setSelected] = React.useState(null);
-  const monitorOptions = [{
-    value: 'main',
-    label: 'Main'
-  }, {
-    value: 'secondary',
-    label: 'Non-main'
-  }, {
-    separator: true
-  }, ...monitors.flatMap(m => [{
-    value: m.name,
-    label: m.name
-  }, {
-    value: m.uuid,
-    label: m.name + ' — exact display'
-  }])];
-  const update = (id, patch) => setAssignments(assignments.map(a => a.id === id ? {
-    ...a,
-    ...patch
-  } : a));
-  const add = () => setAssignments([...assignments, {
-    id: 'a' + Date.now(),
-    workspace: '',
-    monitor: 'main'
-  }]);
+  const [selectedMonitor, setSelectedMonitor] = React.useState(null);
+  const monitorOptions = [
+    { value: "main", label: "Main" },
+    { value: "secondary", label: "Non-main" },
+    { separator: true },
+    ...monitors.map((m, i) => ({ value: String(i + 1), label: `Position ${i + 1} \u2014 left to right` })),
+    { separator: true },
+    ...monitors.flatMap((m) => [
+      // The plain name only needs disambiguating when a UUID sibling is offered right below it.
+      { value: m.name, label: m.uuid ? m.name + " \u2014 matches by name" : m.name },
+      ...m.uuid ? [{ value: m.uuid, label: m.name + " \u2014 exact display" }] : []
+    ])
+  ];
+  const resolveMonitorId = (token) => {
+    if (!token) return null;
+    if (token === "main") return monitors.find((m) => m.isMain)?.id ?? null;
+    if (token === "secondary") return monitors.length === 2 ? monitors.find((m) => !m.isMain)?.id ?? null : null;
+    const seq = Number(token);
+    if (Number.isInteger(seq) && String(seq) === token && seq >= 1) return monitors[seq - 1]?.id ?? null;
+    const hit = monitors.find((m) => m.uuid === token || m.name === token);
+    return hit ? hit.id : null;
+  };
+  const update = (id, patch) => setAssignments(assignments.map((a) => a.id === id ? { ...a, ...patch } : a));
+  const add = (monitor = "main") => {
+    const id = "a" + Date.now();
+    setAssignments([...assignments, { id, workspace: "", monitor }]);
+    setSelected(id);
+  };
   const remove = () => {
-    setAssignments(assignments.filter(a => a.id !== selected));
+    setAssignments(assignments.filter((a) => a.id !== selected));
     setSelected(null);
   };
-  return /*#__PURE__*/React.createElement("div", {
-    className: "tab-column"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "monitors"
-  }, /*#__PURE__*/React.createElement(SectionLabel, {
-    title: "Connected monitors",
-    sf: "display.2",
-    style: {
-      padding: '14px 16px 8px'
+  const toggleMonitor = (id) => setSelectedMonitor((cur) => cur === id ? null : id);
+  const activeMonitor = monitors.find((m) => m.id === selectedMonitor) || null;
+  const pinnedHere = activeMonitor ? assignments.filter((a) => resolveMonitorId(a.monitor) === activeMonitor.id) : [];
+  return /* @__PURE__ */ React.createElement("div", { className: "tab-column" }, /* @__PURE__ */ React.createElement("div", { className: "form-page" }, /* @__PURE__ */ React.createElement("section", { className: "monitors-section" }, /* @__PURE__ */ React.createElement(SectionLabel, { title: "Connected monitors", sf: "display.2", style: { padding: "0 var(--space-2)" } }), /* @__PURE__ */ React.createElement("div", { className: "card-surface monitors-surface" }, monitors.length === 0 ? /* @__PURE__ */ React.createElement(
+    ContentUnavailable,
+    {
+      sf: "display",
+      title: "No monitors detected",
+      message: "Monitors appear here as soon as macOS reports one \u2014 their UUIDs are what pins a workspace to a physical panel."
     }
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "monitor-list"
-  }, monitors.map(m => /*#__PURE__*/React.createElement("div", {
-    key: m.id,
-    className: "monitor-row"
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      color: 'var(--label-secondary)',
-      width: 26,
-      display: 'grid',
-      placeItems: 'center'
-    }
-  }, /*#__PURE__*/React.createElement(Icon, {
-    sf: "display",
-    size: 17
-  })), /*#__PURE__*/React.createElement("span", {
-    style: {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 1,
-      minWidth: 0
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontWeight: 'var(--weight-medium)'
-    }
-  }, m.name), /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontSize: 'var(--text-callout)',
-      color: 'var(--label-secondary)'
-    }
-  }, m.resolution)), /*#__PURE__*/React.createElement("span", {
-    style: {
-      flex: 1
-    }
-  }), /*#__PURE__*/React.createElement("span", {
-    className: "mono",
-    style: {
-      fontSize: 'var(--text-caption)',
-      color: 'var(--label-tertiary)'
-    }
-  }, m.uuid.slice(0, 8), "\u2026"), /*#__PURE__*/React.createElement(CopyButton, {
-    value: m.uuid,
-    help: 'Copy display UUID\n' + m.uuid
-  }))))), /*#__PURE__*/React.createElement("div", {
-    className: "hairline"
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "assignments"
-  }, /*#__PURE__*/React.createElement(SectionLabel, {
-    title: "Workspace assignments",
-    sf: "arrow.triangle.branch",
-    style: {
-      padding: '12px 16px 8px'
-    }
-  }), /*#__PURE__*/React.createElement(DataTable, {
-    selected: selected,
-    onSelect: setSelected,
-    columns: [{
-      key: 'workspace',
-      title: 'Workspace',
-      width: '140px',
-      render: r => /*#__PURE__*/React.createElement(TextField, {
-        mono: true,
-        value: r.workspace,
-        placeholder: "name",
-        onChange: v => update(r.id, {
-          workspace: v
-        }),
-        style: {
-          width: '100%'
+  ) : /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "monitor-diagram-wrap" }, /* @__PURE__ */ React.createElement(MonitorArrangement, { monitors, selected: selectedMonitor, onSelect: toggleMonitor })), /* @__PURE__ */ React.createElement("div", { className: "monitor-detail" }, activeMonitor ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(Icon, { sf: "display", size: 13, style: { color: "var(--label-tertiary)", flex: "0 0 auto" } }), /* @__PURE__ */ React.createElement("span", null, /* @__PURE__ */ React.createElement("strong", { style: { color: "var(--label)", fontWeight: "var(--weight-medium)" } }, activeMonitor.name), pinnedHere.length === 0 ? " \u2014 no workspaces pinned here yet." : " \u2014 pinned:"), pinnedHere.map((a) => /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      key: a.id,
+      type: "button",
+      className: "workspace-chip",
+      onClick: () => setSelected(a.id),
+      title: "Edit " + (a.workspace ? "\u201C" + a.workspace + "\u201D" : "this assignment")
+    },
+    a.workspace ? "\u201C" + a.workspace + "\u201D" : "(unnamed)"
+  )), /* @__PURE__ */ React.createElement("span", { style: { flex: 1 } }), /* @__PURE__ */ React.createElement(Button, { onClick: () => add(activeMonitor.uuid || activeMonitor.name) }, "Pin a workspace here")) : /* @__PURE__ */ React.createElement("span", null, "Select a monitor above to see what\u2019s pinned to it, or pin a new workspace to it directly.")), /* @__PURE__ */ React.createElement("div", { className: "monitor-list" }, monitors.map((m, i) => /* @__PURE__ */ React.createElement("div", { key: m.id, className: "monitor-row" + (m.id === selectedMonitor ? " is-selected" : "") }, /* @__PURE__ */ React.createElement("span", { className: "mono", style: { fontSize: "var(--text-caption)", color: "var(--label-tertiary)", width: 14, textAlign: "right" } }, i + 1), /* @__PURE__ */ React.createElement("span", { style: { color: "var(--label-secondary)", width: 26, display: "grid", placeItems: "center" } }, /* @__PURE__ */ React.createElement(Icon, { sf: "display", size: 17 })), /* @__PURE__ */ React.createElement("span", { style: { display: "flex", flexDirection: "column", gap: 1, minWidth: 0 } }, /* @__PURE__ */ React.createElement("span", { style: { display: "flex", alignItems: "center", gap: 6 } }, /* @__PURE__ */ React.createElement("span", { style: { fontWeight: "var(--weight-medium)" } }, m.name), m.isMain && /* @__PURE__ */ React.createElement(Badge, { tone: "muted", help: "AeroSpork's main display \u2014 the monitor the \u201Cmain\u201D pattern matches." }, "main")), /* @__PURE__ */ React.createElement("span", { style: { fontSize: "var(--text-callout)", color: "var(--label-secondary)" } }, m.resolution)), /* @__PURE__ */ React.createElement("span", { style: { flex: 1 } }), /* @__PURE__ */ React.createElement("span", { className: "mono", style: { fontSize: "var(--text-caption)", color: "var(--label-tertiary)" } }, m.uuid.slice(0, 8), "\u2026"), /* @__PURE__ */ React.createElement(CopyButton, { value: m.uuid, help: "Copy display UUID\n" + m.uuid }))))))), /* @__PURE__ */ React.createElement("section", { className: "assignments-section" }, /* @__PURE__ */ React.createElement(SectionLabel, { title: "Workspace assignments", sf: "arrow.triangle.branch", style: { padding: "0 var(--space-2)" } }), /* @__PURE__ */ React.createElement("div", { className: "card-surface assignments-surface" }, /* @__PURE__ */ React.createElement(
+    DataTable,
+    {
+      selected,
+      onSelect: setSelected,
+      columns: [
+        // Inert handle column: mirrors the real Table's leading column, which carries no
+        // control so a click has somewhere to land for row selection. Decorative only.
+        // A plain dot, not a drag handle -- this row can't be reordered, and
+        // `line.3.horizontal` would say otherwise. Matches the real Swift's tiny 6pt
+        // `circle` glyph: a near-invisible marker, not a visible icon.
+        { key: "handle", title: "", width: "20px", render: () => /* @__PURE__ */ React.createElement("span", { style: { display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: "var(--label-tertiary)" } }) },
+        { key: "workspace", title: "Workspace", width: "140px", render: (r) => /* @__PURE__ */ React.createElement(TextField, { mono: true, value: r.workspace, placeholder: "name", onChange: (v) => update(r.id, { workspace: v }), style: { width: "100%" } }) },
+        { key: "monitor", title: "Monitor", render: (r) => /* @__PURE__ */ React.createElement("span", { style: { display: "flex", gap: 6, alignItems: "center" } }, /* @__PURE__ */ React.createElement(Select, { value: r.monitor, options: monitorOptions, onChange: (v) => update(r.id, { monitor: v }), style: { flex: 1 } }), r.complex && /* @__PURE__ */ React.createElement(Badge, { help: "Written with more detail than this editor can show \u2014 a fallback list of monitors, or a fingerprint keyed on more than its UUID. Any structured save in this window is refused until this changes; edit it in Raw TOML." }, "complex")) }
+      ],
+      rows: assignments,
+      emptyState: /* @__PURE__ */ React.createElement(
+        ContentUnavailable,
+        {
+          sf: "arrow.triangle.branch",
+          title: "No assignments",
+          message: "Workspaces land wherever they were last used. Add an assignment to pin one to a specific monitor.",
+          actionTitle: "Add assignment",
+          onAction: () => add()
         }
-      })
-    }, {
-      key: 'monitor',
-      title: 'Monitor',
-      render: r => /*#__PURE__*/React.createElement(Select, {
-        value: r.monitor,
-        options: monitorOptions,
-        onChange: v => update(r.id, {
-          monitor: v
-        }),
-        width: "100%"
-      })
-    }],
-    rows: assignments,
-    emptyState: /*#__PURE__*/React.createElement(ContentUnavailable, {
-      sf: "arrow.triangle.branch",
-      title: "No assignments",
-      message: "Workspaces land wherever they were last used. Add an assignment to pin one to a specific monitor.",
-      actionTitle: "Add assignment",
-      onAction: add
-    })
-  })), /*#__PURE__*/React.createElement(ListActionBar, {
-    addHelp: "Pin a workspace to a monitor",
-    removeHelp: "Remove the selected assignment",
-    onAdd: add,
-    onRemove: selected ? remove : null,
-    hint: "Hardware fingerprints already in your config are preserved \u2014 they just show up here under the monitor's name. A DisplayLink panel reports no vendor or serial, so its UUID is the only thing that pins a workspace to that exact screen."
-  }));
+      )
+    }
+  ), /* @__PURE__ */ React.createElement(
+    ListActionBar,
+    {
+      addHelp: "Pin a workspace to a monitor",
+      removeHelp: "Remove the selected assignment",
+      onAdd: () => add(),
+      onRemove: selected ? remove : null,
+      hint: "Hardware fingerprints already in your config are preserved \u2014 they just show up here under the monitor's name. A DisplayLink monitor reports no vendor or serial, so its UUID is the only thing that pins a workspace to that exact monitor. A workspace name listed here also stays available \u2014 in the menu bar, in app switching \u2014 even with no windows on it; a name bound to a key (Keys tab) does the same."
+    }
+  )))));
 }
-Object.assign(window, {
-  MonitorsTab
-});
+Object.assign(window, { MonitorsTab });
 })(); } catch (e) { __ds_ns.__errors.push({ path: "ui_kits/settings_app/MonitorsTab.jsx", error: String((e && e.message) || e) }); }
 
 // ui_kits/settings_app/RawTomlTab.jsx
@@ -2676,15 +3638,62 @@ const {
   Icon,
   Button,
   CodeEditor,
-  StatusLabel
+  StatusLabel,
+  MenuPanel
 } = window.AeroSporkDesignSystem_078bd7;
+
+// Every `[section]` / `[[array-of-table]]` header line, in document order — feeds both the
+// Sections… menu below and CodeEditor's `sectionHeaders` prop, so the menu and the editor's own
+// header-line highlighting can never disagree about what counts as a header.
+function findSectionHeaders(text) {
+  const headerRe = /^\[{1,2}[^\[\]=]+\]{1,2}$/;
+  return text.split('\n').reduce((acc, line, i) => {
+    const code = line.split('#')[0].trim();
+    if (headerRe.test(code)) acc.push({
+      label: code,
+      line: i + 1
+    });
+    return acc;
+  }, []);
+}
 function RawTomlTab({
   toml,
   setToml,
   original
 }) {
   const edited = toml !== original;
-  const error = /^\s*=/m.test(toml) ? 'line 3: expected a key before ‘=’' : null;
+  const lines = toml.split('\n');
+  const badLine = lines.findIndex(l => /^\s*=/.test(l));
+  const errorLine = badLine === -1 ? null : badLine + 1;
+  const error = errorLine ? `line ${errorLine}: expected a key before ‘=’` : null;
+  const sectionHeaders = React.useMemo(() => findSectionHeaders(toml), [toml]);
+  const [cursor, setCursor] = React.useState({
+    line: 1,
+    col: 1
+  });
+  const [sectionsOpen, setSectionsOpen] = React.useState(false);
+  const [sectionsMenuPos, setSectionsMenuPos] = React.useState(null);
+  const [errorHover, setErrorHover] = React.useState(false);
+  const editorRef = React.useRef(null);
+  const sectionsButtonRef = React.useRef(null);
+  const jumpToLine = line => editorRef.current && editorRef.current.scrollToLine(line);
+
+  // Portaled to document.body, not rendered in place: this bar strip sits directly above
+  // CodeEditor's own scrolling, absolutely-positioned overlay (the highlighted-<pre>-under-a-
+  // transparent-<textarea> trick), which paints its z-index:auto layer ahead of an ordinary
+  // in-place z-indexed popup here regardless of the z-index value -- confirmed empirically
+  // (`elementsFromPoint` put the textarea above a z-index:10/20 popup every time). A portal is
+  // the standard fix for exactly this: it sits in body's own stacking order, so no ancestor's
+  // stacking context can bury it. Position is computed from the button's own rect since a
+  // portaled node can't rely on a `position: relative` ancestor for placement.
+  const openSectionsMenu = () => {
+    const r = sectionsButtonRef.current && sectionsButtonRef.current.getBoundingClientRect();
+    if (r) setSectionsMenuPos({
+      top: r.bottom + 4,
+      right: window.innerWidth - r.right
+    });
+    setSectionsOpen(v => !v);
+  };
   return /*#__PURE__*/React.createElement("div", {
     className: "tab-column"
   }, /*#__PURE__*/React.createElement(BarStrip, {
@@ -2695,7 +3704,7 @@ function RawTomlTab({
       display: 'flex',
       alignItems: 'center',
       gap: 8,
-      padding: '8px 14px'
+      padding: '9px 14px'
     }
   }, /*#__PURE__*/React.createElement("span", {
     style: {
@@ -2714,15 +3723,60 @@ function RawTomlTab({
     style: {
       flex: 1
     }
-  }), /*#__PURE__*/React.createElement(Button, {
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 'var(--text-callout)',
+      color: 'var(--label-secondary)',
+      fontFamily: 'var(--font-system)'
+    }
+  }, "Ln ", cursor.line, ", Col ", cursor.col), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'relative'
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    ref: sectionsButtonRef,
+    style: {
+      display: 'inline-block'
+    }
+  }, /*#__PURE__*/React.createElement(Button, {
+    variant: "borderless",
+    disabled: sectionHeaders.length === 0,
+    title: sectionHeaders.length === 0 ? 'This file has no sections' : 'Jump to a section',
+    onClick: openSectionsMenu
+  }, "Sections\u2026")), sectionsOpen && sectionHeaders.length > 0 && sectionsMenuPos && ReactDOM.createPortal(/*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'fixed',
+      top: sectionsMenuPos.top,
+      right: sectionsMenuPos.right,
+      zIndex: 1000
+    }
+  }, /*#__PURE__*/React.createElement(MenuPanel, {
+    width: 240,
+    items: sectionHeaders.map(h => ({
+      label: h.label,
+      mono: true,
+      onClick: () => {
+        jumpToLine(h.line);
+        setSectionsOpen(false);
+      }
+    }))
+  })), document.body)), /*#__PURE__*/React.createElement(Button, {
     variant: "borderless",
     title: "External edits are picked up automatically \u2014 the config file is watched"
   }, "Open in TextEdit"), /*#__PURE__*/React.createElement(Button, {
     variant: "borderless",
     title: "Re-read the config file. Normally automatic."
   }, "Reload"))), /*#__PURE__*/React.createElement(CodeEditor, {
+    ref: editorRef,
     value: toml,
-    onChange: setToml
+    onChange: setToml,
+    errorLine: errorLine,
+    warningLines: [],
+    sectionHeaders: sectionHeaders,
+    onCursorMove: (line, col) => setCursor({
+      line,
+      col
+    })
   }), /*#__PURE__*/React.createElement(BarStrip, {
     padded: false
   }, /*#__PURE__*/React.createElement("div", {
@@ -2730,11 +3784,20 @@ function RawTomlTab({
       display: 'flex',
       alignItems: 'center',
       gap: 12,
-      padding: '10px 14px'
+      padding: '9px 14px'
     }
-  }, error ? /*#__PURE__*/React.createElement(StatusLabel, {
+  }, error ? /*#__PURE__*/React.createElement("span", {
+    onClick: () => jumpToLine(errorLine),
+    onMouseEnter: () => setErrorHover(true),
+    onMouseLeave: () => setErrorHover(false),
+    title: `Jump to line ${errorLine}`,
+    style: {
+      cursor: 'pointer',
+      textDecoration: errorHover ? 'underline' : 'none'
+    }
+  }, /*#__PURE__*/React.createElement(StatusLabel, {
     kind: "error"
-  }, error) : edited ? /*#__PURE__*/React.createElement(StatusLabel, {
+  }, error)) : edited ? /*#__PURE__*/React.createElement(StatusLabel, {
     kind: "ok"
   }, "Valid \u2014 press Apply (\u2318S) to write it") : /*#__PURE__*/React.createElement(StatusLabel, {
     kind: "neutral"
@@ -2762,124 +3825,397 @@ Object.assign(window, {
 try { (() => {
 const {
   SectionLabel,
-  DataTable,
+  PanelHeader,
   ListActionBar,
   ContentUnavailable,
   FormSection,
   LabeledContent,
   TextField,
   Toggle,
-  Badge
+  Badge,
+  SegmentedPicker,
+  Button,
+  Icon,
+  AppIcon,
+  appDisplayName,
+  SAMPLE_APPS
 } = window.AeroSporkDesignSystem_078bd7;
-function summary(r) {
+
+// `run` is a restricted grammar (parseOnWindowDetected.swift): any number of `layout floating` /
+// `layout tiling`, plus at most one `move-node-to-workspace`, which must come last. That's exactly
+// "make the window float/tile" + "move it somewhere" \u2014 two plain-language controls \u2014 so the common
+// case never needs the raw command field at all. Anything else (leftover) can't be represented by
+// the guided controls, so it flips the section into "custom" mode instead of silently truncating it.
+function parseRun(run) {
+  const parts = (run || '').split(';').map(s => s.trim()).filter(Boolean);
+  let floatAction = 'none';
+  let moveWorkspace = '';
+  const leftover = [];
+  for (const p of parts) {
+    if (p === 'layout floating') floatAction = 'float';else if (p === 'layout tiling') floatAction = 'tile';else if (p.startsWith('move-node-to-workspace ')) moveWorkspace = p.slice('move-node-to-workspace '.length).trim();else leftover.push(p);
+  }
+  return {
+    floatAction,
+    moveWorkspace,
+    custom: leftover.length > 0
+  };
+}
+function composeRun({
+  floatAction,
+  moveWorkspace
+}) {
   const parts = [];
-  if (r.appId) parts.push(r.appId);
-  if (r.appNameRegex) parts.push('name~' + r.appNameRegex);
-  if (r.windowTitleRegex) parts.push('title~' + r.windowTitleRegex);
-  if (r.workspace) parts.push('ws=' + r.workspace);
-  return parts.length ? parts.join(' ') : '(any window)';
+  if (floatAction === 'float') parts.push('layout floating');else if (floatAction === 'tile') parts.push('layout tiling');
+  if (moveWorkspace.trim()) parts.push('move-node-to-workspace ' + moveWorkspace.trim());
+  return parts.join(' ; ');
+}
+// The plain-language line under each app name in the list \u2014 "explain the consequence", not the
+// command syntax.
+function describeAction(rule) {
+  const p = parseRun(rule.run);
+  if (p.custom) return 'Runs a custom command';
+  const bits = [];
+  if (p.floatAction === 'float') bits.push('opens as a floating window');else if (p.floatAction === 'tile') bits.push('is forced to tile');
+  if (p.moveWorkspace) bits.push('moves to workspace \u201c' + p.moveWorkspace + '\u201d');
+  if (!bits.length) return 'Doesn\u2019t do anything yet';
+  const sentence = bits.join(' and ');
+  return sentence.charAt(0).toUpperCase() + sentence.slice(1);
+}
+function advancedMatcherCount(rule) {
+  return [rule.appNameRegex, rule.windowTitleRegex, rule.workspace].filter(Boolean).length + (rule.duringStartup !== undefined ? 1 : 0);
+}
+
+// A Spotlight/Launchpad-style app grid, not a dropdown: search narrows a grid of icon tiles, and
+// typing something not in the sample set always leaves a way to use it verbatim as a custom app
+// ID (`aerospork list-apps` is how a real user would get that ID). Scoped to the split view by
+// `.app-picker-backdrop`'s position:absolute ancestor (`.split`), so the sidebar and page header
+// stay visible, the way a sheet stays attached to one pane rather than covering the whole window.
+function AppPicker({
+  title,
+  query,
+  setQuery,
+  onPick,
+  onClose
+}) {
+  const needle = query.trim().toLowerCase();
+  const matches = needle ? SAMPLE_APPS.filter(a => a.name.toLowerCase().includes(needle) || a.id.toLowerCase().includes(needle)) : SAMPLE_APPS;
+  const exact = SAMPLE_APPS.some(a => a.id.toLowerCase() === needle || a.name.toLowerCase() === needle);
+  return /*#__PURE__*/React.createElement("div", {
+    className: "app-picker-backdrop",
+    onMouseDown: e => {
+      if (e.target === e.currentTarget) onClose();
+    },
+    onKeyDown: e => {
+      if (e.key === 'Escape') onClose();
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "app-picker-panel",
+    onMouseDown: e => e.stopPropagation()
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "app-picker-search"
+  }, /*#__PURE__*/React.createElement(PanelHeader, {
+    title: title,
+    sf: "macwindow.badge.plus",
+    style: {
+      padding: '0 0 8px'
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "filter",
+    style: {
+      width: '100%',
+      boxSizing: 'border-box'
+    }
+  }, /*#__PURE__*/React.createElement(Icon, {
+    sf: "magnifyingglass",
+    size: 12,
+    style: {
+      color: 'var(--label-secondary)'
+    }
+  }), /*#__PURE__*/React.createElement(TextField, {
+    variant: "plain",
+    autoFocus: true,
+    placeholder: "Search apps, or paste a bundle ID",
+    value: query,
+    onChange: setQuery,
+    style: {
+      flex: 1
+    }
+  }), query && /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "clear",
+    onClick: () => setQuery('')
+  }, /*#__PURE__*/React.createElement(Icon, {
+    sf: "xmark.circle.fill",
+    size: 12
+  })))), /*#__PURE__*/React.createElement("div", {
+    className: "app-picker-grid"
+  }, !needle && /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "app-picker-tile",
+    onClick: () => onPick('')
+  }, /*#__PURE__*/React.createElement(AppIcon, {
+    appId: "",
+    size: 40
+  }), /*#__PURE__*/React.createElement("span", null, "Any app")), matches.map(a => /*#__PURE__*/React.createElement("button", {
+    key: a.id,
+    type: "button",
+    className: "app-picker-tile",
+    onClick: () => onPick(a.id)
+  }, /*#__PURE__*/React.createElement(AppIcon, {
+    appId: a.id,
+    size: 40
+  }), /*#__PURE__*/React.createElement("span", null, a.name))), needle && matches.length === 0 && /*#__PURE__*/React.createElement("div", {
+    className: "app-picker-empty"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    sf: "magnifyingglass",
+    size: 22,
+    weight: "light"
+  }), /*#__PURE__*/React.createElement("span", null, "No sample app matches \u201c", query.trim(), "\u201d."))), needle && !exact && /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "app-picker-custom",
+    onClick: () => onPick(query.trim())
+  }, /*#__PURE__*/React.createElement(AppIcon, {
+    appId: query.trim(),
+    size: 26
+  }), "Use \u201c", query.trim(), "\u201d as a custom app ID"), /*#__PURE__*/React.createElement("div", {
+    className: "app-picker-footer"
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      font: 'var(--weight-regular) var(--text-callout)/1.35 var(--font-system)',
+      color: 'var(--label-secondary)'
+    }
+  }, /*#__PURE__*/React.createElement("code", {
+    style: {
+      font: 'var(--text-callout)/1 var(--font-mono)'
+    }
+  }, "aerospork list-apps"), " prints the exact ID for anything running."))));
 }
 function RulesTab({
   rules,
   setRules
 }) {
-  const [selected, setSelected] = React.useState('r1');
-  const rule = rules.find(r => r.id === selected);
+  const [selected, setSelected] = React.useState(rules[0] ? rules[0].id : null);
+  const [pickerMode, setPickerMode] = React.useState(null); // null | 'new' | 'change'
+  const [pickerQuery, setPickerQuery] = React.useState('');
+  const [advancedOpen, setAdvancedOpen] = React.useState(false);
+  const rule = rules.find(r => r.id === selected) || null;
+
+  // Re-derived only when the *selected rule* changes, not on every keystroke \u2014 so a rule that
+  // already narrows itself with a regex or a startup filter starts open, but expanding it to type
+  // in one more matcher doesn't fight the user by trying to snap back closed mid-edit.
+  React.useEffect(() => {
+    setAdvancedOpen(rule ? advancedMatcherCount(rule) > 0 : false);
+  }, [selected]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const update = patch => setRules(rules.map(r => r.id === selected ? {
     ...r,
     ...patch
   } : r));
-  const add = () => {
-    const id = 'r' + Date.now();
-    setRules([...rules, {
-      id,
-      appId: '',
-      appNameRegex: '',
-      windowTitleRegex: '',
-      workspace: '',
-      run: '',
-      checkFurther: false
-    }]);
-    setSelected(id);
-  };
   const remove = () => {
     setRules(rules.filter(r => r.id !== selected));
     setSelected(null);
   };
+  const openPicker = mode => {
+    setPickerQuery('');
+    setPickerMode(mode);
+  };
+  const pickApp = appId => {
+    if (pickerMode === 'new') {
+      const id = 'r' + Date.now();
+      setRules([...rules, {
+        id,
+        appId,
+        appNameRegex: '',
+        windowTitleRegex: '',
+        workspace: '',
+        run: '',
+        checkFurther: false,
+        duringStartup: undefined
+      }]);
+      setSelected(id);
+    } else if (pickerMode === 'change') {
+      update({
+        appId
+      });
+    }
+    setPickerMode(null);
+  };
+  const parsed = rule ? parseRun(rule.run) : null;
+  const advancedCount = rule ? advancedMatcherCount(rule) : 0;
   return /*#__PURE__*/React.createElement("div", {
     className: "split"
   }, /*#__PURE__*/React.createElement("div", {
     className: "split-list"
-  }, /*#__PURE__*/React.createElement(SectionLabel, {
-    title: "Rules",
-    sf: "list.bullet",
-    style: {
-      padding: '10px 14px'
-    }
+  }, /*#__PURE__*/React.createElement(PanelHeader, {
+    title: "All rules",
+    sf: "list.bullet"
   }), /*#__PURE__*/React.createElement("div", {
     className: "hairline"
-  }), /*#__PURE__*/React.createElement(DataTable, {
-    selected: selected,
-    onSelect: setSelected,
-    rows: rules,
-    columns: [{
-      key: 'match',
-      title: 'Matches',
-      width: '1fr',
-      render: r => /*#__PURE__*/React.createElement("span", {
-        style: {
-          display: 'flex',
-          gap: 5,
-          alignItems: 'center',
-          minWidth: 0
-        }
-      }, /*#__PURE__*/React.createElement("span", {
-        className: "mono ellipsis"
-      }, summary(r)), r.duringStartup && /*#__PURE__*/React.createElement(Badge, {
-        tone: "muted",
-        help: "Only applies while AeroSpork is starting up"
-      }, "startup"))
-    }, {
-      key: 'run',
-      title: 'Run',
-      width: '150px',
-      render: r => /*#__PURE__*/React.createElement("span", {
-        className: "mono ellipsis"
-      }, r.run)
-    }],
-    emptyState: /*#__PURE__*/React.createElement(ContentUnavailable, {
-      sf: "macwindow",
-      title: "No window rules",
-      message: "Rules run once, when a window first appears \u2014 the usual use is sending an app straight to its workspace.",
-      actionTitle: "Add rule",
-      onAction: add
-    })
-  }), /*#__PURE__*/React.createElement(ListActionBar, {
+  }), rules.length === 0 ? /*#__PURE__*/React.createElement(ContentUnavailable, {
+    sf: "macwindow",
+    title: "No window rules",
+    message: "Rules run once, when a window first appears \u2014 pick an app and AeroSpork remembers what to do with it every time.",
+    actionTitle: "Add rule",
+    onAction: () => openPicker('new')
+  }) : /*#__PURE__*/React.createElement("div", {
+    className: "rule-list"
+  }, rules.map(r => {
+    const on = r.id === selected;
+    const count = advancedMatcherCount(r);
+    return /*#__PURE__*/React.createElement("button", {
+      key: r.id,
+      type: "button",
+      className: 'rule-row' + (on ? ' is-selected' : ''),
+      onClick: () => setSelected(r.id)
+    }, /*#__PURE__*/React.createElement(AppIcon, {
+      appId: r.appId,
+      size: 30
+    }), /*#__PURE__*/React.createElement("span", {
+      className: "rule-row-text"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "rule-row-name"
+    }, appDisplayName(r.appId)), /*#__PURE__*/React.createElement("span", {
+      className: "rule-row-summary"
+    }, describeAction(r))), /*#__PURE__*/React.createElement("span", {
+      className: "rule-row-badges"
+    }, r.duringStartup === true && /*#__PURE__*/React.createElement(Badge, {
+      tone: "muted",
+      help: "Only applies while AeroSpork is starting up"
+    }, "startup"), r.duringStartup === false && /*#__PURE__*/React.createElement(Badge, {
+      tone: "muted",
+      help: "Only applies after AeroSpork has finished starting up"
+    }, "runtime"), count > 0 && /*#__PURE__*/React.createElement(Badge, {
+      tone: "muted",
+      help: count + ' more thing' + (count > 1 ? 's' : '') + ' this rule checks, beyond the app \u2014 see Advanced matching.'
+    }, "+", count)));
+  })), /*#__PURE__*/React.createElement(ListActionBar, {
     addHelp: "Add a window rule",
     removeHelp: "Remove the selected rule",
-    onAdd: add,
+    onAdd: () => openPicker('new'),
     onRemove: selected ? remove : null
   })), /*#__PURE__*/React.createElement("div", {
     className: "split-detail"
   }, rule ? /*#__PURE__*/React.createElement("div", {
     className: "form-page"
-  }, /*#__PURE__*/React.createElement(FormSection, {
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "rule-detail-header"
+  }, /*#__PURE__*/React.createElement(AppIcon, {
+    appId: rule.appId,
+    size: 44
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      flexDirection: 'column',
+      minWidth: 0
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "name ellipsis"
+  }, appDisplayName(rule.appId)), rule.appId && /*#__PURE__*/React.createElement("span", {
+    className: "bundle-id mono ellipsis"
+  }, rule.appId)), /*#__PURE__*/React.createElement("span", {
+    style: {
+      flex: 1
+    }
+  }), /*#__PURE__*/React.createElement(Button, {
+    variant: "bordered",
+    onClick: () => openPicker('change')
+  }, "Change app\u2026")), /*#__PURE__*/React.createElement(FormSection, {
     header: /*#__PURE__*/React.createElement(SectionLabel, {
-      title: "Match when\u2026",
-      sf: "line.3.horizontal.decrease.circle"
+      title: "What happens",
+      sf: "bolt"
     }),
-    footer: "Empty matchers are left out. A rule with no matchers at all applies to every window. `aerospork list-apps` prints app IDs."
-  }, /*#__PURE__*/React.createElement(LabeledContent, {
-    label: "App ID"
+    footer: parsed.custom ? 'This does more than the guided controls below can compose \u2014 only `layout floating`, `layout tiling`, and one final `move-node-to-workspace`, are supported. Edit the exact text, or start over.' : 'Applied once, the moment the window appears. Leaving the workspace blank does not move the window.'
+  }, parsed.custom && /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 'var(--space-8)'
+    }
+  }, /*#__PURE__*/React.createElement(Badge, {
+    tone: "muted",
+    help: "Written with more detail than the guided controls below can show."
+  }, "custom"), /*#__PURE__*/React.createElement(Button, {
+    variant: "borderless",
+    onClick: () => update({
+      run: ''
+    })
+  }, "Start over with guided controls")), !parsed.custom && /*#__PURE__*/React.createElement(LabeledContent, {
+    label: "Make the window"
+  }, /*#__PURE__*/React.createElement(SegmentedPicker, {
+    options: [{
+      value: 'none',
+      label: 'Leave as is'
+    }, {
+      value: 'float',
+      label: 'Float'
+    }, {
+      value: 'tile',
+      label: 'Tile'
+    }],
+    value: parsed.floatAction,
+    onChange: v => update({
+      run: composeRun({
+        floatAction: v,
+        moveWorkspace: parsed.moveWorkspace
+      })
+    })
+  })), !parsed.custom && /*#__PURE__*/React.createElement(LabeledContent, {
+    label: "Move it to workspace"
   }, /*#__PURE__*/React.createElement(TextField, {
     mono: true,
-    placeholder: "com.apple.finder",
-    value: rule.appId,
+    placeholder: "don\u2019t move it",
+    value: parsed.moveWorkspace,
+    width: 160,
     onChange: v => update({
-      appId: v
+      run: composeRun({
+        floatAction: parsed.floatAction,
+        moveWorkspace: v
+      })
+    })
+  })), /*#__PURE__*/React.createElement(TextField, {
+    mono: true,
+    placeholder: "e.g. move-node-to-workspace 3",
+    value: rule.run,
+    onChange: v => update({
+      run: v
     }),
-    width: 200
-  })), /*#__PURE__*/React.createElement(LabeledContent, {
+    style: {
+      width: '100%'
+    }
+  }), /*#__PURE__*/React.createElement(Toggle, {
+    label: "Keep checking later rules",
+    checked: rule.checkFurther,
+    onChange: v => update({
+      checkFurther: v
+    }),
+    help: "Off (default): the first matching rule wins. On: AeroSpork keeps evaluating rules after this one, so a later rule can add to what this one already did."
+  })), /*#__PURE__*/React.createElement("section", {
+    style: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 'var(--space-6)'
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "disclosure-header",
+    onClick: () => setAdvancedOpen(v => !v),
+    "aria-expanded": advancedOpen
+  }, /*#__PURE__*/React.createElement(Icon, {
+    sf: "chevron.right",
+    size: 10,
+    style: {
+      color: 'var(--label-secondary)',
+      transform: advancedOpen ? 'rotate(90deg)' : 'none',
+      transition: 'transform var(--dur-control) var(--ease-standard)'
+    }
+  }), /*#__PURE__*/React.createElement(SectionLabel, {
+    title: "Advanced matching",
+    sf: "line.3.horizontal.decrease.circle"
+  }), !advancedOpen && advancedCount > 0 && /*#__PURE__*/React.createElement(Badge, {
+    tone: "muted"
+  }, advancedCount, " set")), advancedOpen && /*#__PURE__*/React.createElement(FormSection, {
+    footer: "Empty fields are left out of the match \u2014 a rule with only an app picked applies to every window from that app. `aerospork list-apps` prints app IDs."
+  }, /*#__PURE__*/React.createElement(LabeledContent, {
     label: "App name"
   }, /*#__PURE__*/React.createElement(TextField, {
     mono: true,
@@ -2900,7 +4236,7 @@ function RulesTab({
     }),
     width: 200
   })), /*#__PURE__*/React.createElement(LabeledContent, {
-    label: "Workspace"
+    label: "Only on workspace"
   }, /*#__PURE__*/React.createElement(TextField, {
     mono: true,
     placeholder: "optional",
@@ -2909,33 +4245,34 @@ function RulesTab({
       workspace: v
     }),
     width: 200
-  }))), /*#__PURE__*/React.createElement(FormSection, {
-    header: /*#__PURE__*/React.createElement(SectionLabel, {
-      title: "Then run",
-      sf: "bolt"
-    }),
-    footer: "Chain commands with ;. By default a matching rule stops the search."
-  }, /*#__PURE__*/React.createElement(TextField, {
-    mono: true,
-    placeholder: "move-node-to-workspace 3",
-    value: rule.run,
+  })), /*#__PURE__*/React.createElement(LabeledContent, {
+    label: "Startup timing"
+  }, /*#__PURE__*/React.createElement(SegmentedPicker, {
+    options: [{
+      value: 'any',
+      label: 'Any'
+    }, {
+      value: 'true',
+      label: 'Startup'
+    }, {
+      value: 'false',
+      label: 'Runtime'
+    }],
+    value: rule.duringStartup === true ? 'true' : rule.duringStartup === false ? 'false' : 'any',
     onChange: v => update({
-      run: v
-    }),
-    style: {
-      width: '100%'
-    }
-  }), /*#__PURE__*/React.createElement(Toggle, {
-    label: "Keep checking later rules",
-    checked: rule.checkFurther,
-    onChange: v => update({
-      checkFurther: v
+      duringStartup: v === 'any' ? undefined : v === 'true'
     })
-  }))) : /*#__PURE__*/React.createElement(ContentUnavailable, {
+  }))))) : /*#__PURE__*/React.createElement(ContentUnavailable, {
     sf: "sidebar.left",
     title: "No rule selected",
-    message: "Pick a rule on the left to edit what it matches and what it does."
-  })));
+    message: "Pick a rule on the left, or add one, to see what it matches and what it does."
+  })), pickerMode && /*#__PURE__*/React.createElement(AppPicker, {
+    title: pickerMode === 'new' ? 'Add a window rule' : 'Change app',
+    query: pickerQuery,
+    setQuery: setPickerQuery,
+    onPick: pickApp,
+    onClose: () => setPickerMode(null)
+  }));
 }
 Object.assign(window, {
   RulesTab
@@ -2946,151 +4283,104 @@ Object.assign(window, {
 try { (() => {
 // Mock state for the AeroSpork Settings recreation. Values match the shipped default config.
 window.AS_DATA = {
-  monitors: [{
-    id: 'm1',
-    name: 'Built-in Retina Display',
-    resolution: '1728 × 1117 pt',
-    uuid: 'BBBBBBBB-0000-4000-8000-000000000002'
-  }, {
-    id: 'm2',
-    name: 'DELL U2720Q',
-    resolution: '2560 × 1440 pt',
-    uuid: 'AAAAAAAA-0000-4000-8000-000000000001'
-  }, {
-    id: 'm3',
-    name: 'DisplayLink Monitor',
-    resolution: '1920 × 1080 pt',
-    uuid: 'CCCCCCCC-0000-4000-8000-000000000003'
-  }],
-  assignments: [{
-    id: 'a1',
-    workspace: '1',
-    monitor: 'main'
-  }, {
-    id: 'a2',
-    workspace: 'web',
-    monitor: 'AAAAAAAA-0000-4000-8000-000000000001'
-  }],
+  // Gaps tab: whether any of the six gaps currently carries a per-monitor rule in Raw TOML.
+  // Off by default so the common (flat-numbers) case shows no extra chrome.
+  gapsHavePerMonitorOverrides: false,
+  // `rect` is topLeftX/topLeftY/width/height in points, same shape and units as
+  // Sources/AppBundle/model/Monitor.swift's `rect` — what MonitorArrangement draws to scale.
+  // This arrangement (bottom-aligned, the laptop propped lower than the two externals) is a
+  // realistic one, not an idealized row of equal-height rectangles, on purpose: it's the case
+  // "Position 2" as a bare number hides and a diagram doesn't.
+  monitors: [
+    { id: 'm1', name: 'Built-in Retina Display', resolution: '1728 × 1117 pt', uuid: 'BBBBBBBB-0000-4000-8000-000000000002', isMain: true, rect: { x: 0, y: 323, width: 1728, height: 1117 } },
+    { id: 'm2', name: 'DELL U2720Q', resolution: '2560 × 1440 pt', uuid: 'AAAAAAAA-0000-4000-8000-000000000001', rect: { x: 1728, y: 0, width: 2560, height: 1440 } },
+    { id: 'm3', name: 'DisplayLink Monitor', resolution: '1920 × 1080 pt', uuid: 'CCCCCCCC-0000-4000-8000-000000000003', rect: { x: 4288, y: 360, width: 1920, height: 1080 } },
+  ],
+  assignments: [
+    { id: 'a1', workspace: '1', monitor: 'main' },
+    { id: 'a2', workspace: 'web', monitor: 'AAAAAAAA-0000-4000-8000-000000000001' },
+    { id: 'a3', workspace: 'media', monitor: 'DELL U2720Q', complex: true },
+  ],
   bindings: {
-    main: [{
-      id: 'g1',
-      key: 'alt-h',
-      command: 'focus left',
-      origin: 'generated'
-    }, {
-      id: 'g2',
-      key: 'alt-j',
-      command: 'focus down',
-      origin: 'generated'
-    }, {
-      id: 'g3',
-      key: 'alt-k',
-      command: 'focus up',
-      origin: 'generated'
-    }, {
-      id: 'g4',
-      key: 'alt-l',
-      command: 'focus right',
-      origin: 'generated'
-    }, {
-      id: 'g5',
-      key: 'alt-shift-h',
-      command: 'move left',
-      origin: 'generated'
-    }, {
-      id: 'g6',
-      key: 'alt-minus',
-      command: 'resize smart -50',
-      origin: 'generated'
-    }, {
-      id: 'g7',
-      key: 'alt-slash',
-      command: 'layout tiles horizontal vertical',
-      origin: 'generated'
-    }, {
-      id: 'g8',
-      key: 'alt-tab',
-      command: 'workspace-back-and-forth',
-      origin: 'generated'
-    }, {
-      id: 'e1',
-      key: 'alt-shift-semicolon',
-      command: 'mode service',
-      origin: 'explicit'
-    }, {
-      id: 'e2',
-      key: 'alt-enter',
-      command: 'exec-and-forget open -na Ghostty',
-      origin: 'explicit'
-    }],
-    service: [{
-      id: 's1',
-      key: 'esc',
-      command: 'reload-config ; mode main',
-      origin: 'explicit'
-    }, {
-      id: 's2',
-      key: 'r',
-      command: 'flatten-workspace-tree ; mode main',
-      origin: 'explicit'
-    }, {
-      id: 's3',
-      key: 'f',
-      command: 'layout floating tiling ; mode main',
-      origin: 'explicit'
-    }, {
-      id: 's4',
-      key: 'backspace',
-      command: 'close-all-windows-but-current ; mode main',
-      origin: 'explicit'
-    }]
+    main: [
+      { id: 'g1', key: 'alt-h', command: 'focus left', origin: 'generated' },
+      { id: 'g2', key: 'alt-j', command: 'focus down', origin: 'generated' },
+      { id: 'g3', key: 'alt-k', command: 'focus up', origin: 'generated' },
+      { id: 'g4', key: 'alt-l', command: 'focus right', origin: 'generated' },
+      { id: 'g5', key: 'alt-shift-h', command: 'move left', origin: 'generated' },
+      { id: 'g6', key: 'alt-minus', command: 'resize smart -50', origin: 'generated' },
+      { id: 'g7', key: 'alt-slash', command: 'layout tiles horizontal vertical', origin: 'generated' },
+      { id: 'g8', key: 'alt-tab', command: 'workspace-back-and-forth', origin: 'generated' },
+      { id: 'e1', key: 'alt-shift-semicolon', command: 'mode service', origin: 'explicit' },
+      { id: 'e2', key: 'alt-enter', command: 'exec-and-forget open -na Ghostty', origin: 'explicit' },
+    ],
+    service: [
+      { id: 's1', key: 'esc', command: 'reload-config ; mode main', origin: 'explicit' },
+      { id: 's2', key: 'r', command: 'flatten-workspace-tree ; mode main', origin: 'explicit' },
+      { id: 's3', key: 'f', command: 'layout floating tiling ; mode main', origin: 'explicit' },
+      { id: 's4', key: 'backspace', command: 'close-all-windows-but-current ; mode main', origin: 'explicit' },
+    ],
+    // A small, single-category mode (all "Mode & system") — demonstrates Change A's flat-list
+    // path, and its 'esc'/Ghostty overlap with main and service demonstrates Change B/C's
+    // multi-mode branches (2+ other modes matching a search or a recorded key).
+    apps: [
+      { id: 'p1', key: 'esc', command: 'mode main', origin: 'explicit' },
+      { id: 'p2', key: 'o', command: 'exec-and-forget open -na Ghostty', origin: 'explicit' },
+      { id: 'p3', key: 's', command: 'exec-and-forget open -na Safari', origin: 'explicit' },
+    ],
   },
-  rules: [{
-    id: 'r1',
-    appId: 'com.apple.mail',
-    appNameRegex: '',
-    windowTitleRegex: '',
-    workspace: '',
-    run: 'move-node-to-workspace 3',
-    checkFurther: false,
-    duringStartup: false
-  }, {
-    id: 'r2',
-    appId: 'com.apple.systempreferences',
-    appNameRegex: '',
-    windowTitleRegex: '',
-    workspace: '',
-    run: 'layout floating',
-    checkFurther: false,
-    duringStartup: false
-  }, {
-    id: 'r3',
-    appId: 'com.spotify.client',
-    appNameRegex: '',
-    windowTitleRegex: '',
-    workspace: '',
-    run: 'move-node-to-workspace media',
-    checkFurther: false,
-    duringStartup: true
-  }],
+  // r1-r3 are known sample apps (AppIcon.jsx's SAMPLE_APPS) so their rows carry a real glyph.
+  // r4 has no app-id matcher at all ("any app") and r5 names an app outside the sample set, so
+  // between them the mock demonstrates every AppIcon fallback: known glyph, generic "any app",
+  // and a monogram for an app nobody hardcoded an icon for.
+  rules: [
+    { id: 'r1', appId: 'com.apple.mail', appNameRegex: '', windowTitleRegex: '', workspace: '', run: 'move-node-to-workspace 3', checkFurther: false, duringStartup: false },
+    { id: 'r2', appId: 'com.apple.systempreferences', appNameRegex: '', windowTitleRegex: '', workspace: '', run: 'layout floating', checkFurther: false, duringStartup: false },
+    { id: 'r3', appId: 'com.spotify.client', appNameRegex: '', windowTitleRegex: '', workspace: '', run: 'move-node-to-workspace media', checkFurther: false, duringStartup: true },
+    { id: 'r4', appId: '', appNameRegex: '', windowTitleRegex: 'Picture[- ]in[- ]Picture', workspace: '', run: 'layout floating', checkFurther: true, duringStartup: undefined },
+    { id: 'r5', appId: 'org.mozilla.firefox', appNameRegex: '', windowTitleRegex: '', workspace: '', run: 'layout floating ; move-node-to-workspace web', checkFurther: false, duringStartup: undefined },
+  ],
   events: {
     afterStartup: ['exec-and-forget sketchybar --reload'],
     workspaceChanged: ['move-mouse window-lazy-center'],
     monitorChanged: [],
-    focusChanged: []
+    focusChanged: [],
   },
-  env: [{
-    id: 'v1',
-    name: 'PATH',
-    value: '/opt/homebrew/bin:/usr/bin:/bin'
-  }],
-  toml: ['# AeroSpork — tiling window manager for macOS', '', 'mod = "alt"', 'workspaces = "1-9"', '', '[gaps]', 'inner = 8', 'outer = { top = 32, bottom = 8, left = 8, right = 8 }', '', '[keys]', 'alt-shift-semicolon = "mode service"', 'alt-enter = "exec-and-forget open -na Ghostty"', '', '[keys.service]', 'esc = ["reload-config", "mode main"]', 'r = ["flatten-workspace-tree", "mode main"]', '', '[monitors]', '1 = "main"', 'web = { uuid = "AAAAAAAA-0000-4000-8000-000000000001" }', '', '[on-window]', '"com.apple.mail" = "move-node-to-workspace 3"'].join('\n')
+  env: [{ id: 'v1', name: 'PATH', value: '/opt/homebrew/bin:/usr/bin:/bin' }],
+  toml: [
+    '# AeroSpork — tiling window manager for macOS',
+    '',
+    'mod = "alt"',
+    'workspaces = "1-9"',
+    '',
+    '[gaps]',
+    'inner = 8',
+    'outer = { top = 32, bottom = 8, left = 8, right = 8 }',
+    '',
+    '[keys]',
+    'alt-shift-semicolon = "mode service"',
+    'alt-enter = "exec-and-forget open -na Ghostty"',
+    '',
+    '[keys.service]',
+    'esc = ["reload-config", "mode main"]',
+    'r = ["flatten-workspace-tree", "mode main"]',
+    '',
+    '[monitors]',
+    '1 = "main"',
+    'web = { uuid = "AAAAAAAA-0000-4000-8000-000000000001" }',
+    '',
+    '[on-window]',
+    '"com.apple.mail" = "move-node-to-workspace 3"',
+  ].join('\n'),
 };
+
 })(); } catch (e) { __ds_ns.__errors.push({ path: "ui_kits/settings_app/data.js", error: String((e && e.message) || e) }); }
 
 __ds_ns.CodeEditor = __ds_scope.CodeEditor;
 
 __ds_ns.GapsPreview = __ds_scope.GapsPreview;
+
+__ds_ns.MonitorArrangement = __ds_scope.MonitorArrangement;
 
 __ds_ns.WindowChrome = __ds_scope.WindowChrome;
 
@@ -3098,7 +4388,11 @@ __ds_ns.WorkspaceChips = __ds_scope.WorkspaceChips;
 
 __ds_ns.Button = __ds_scope.Button;
 
+__ds_ns.IconButton = __ds_scope.IconButton;
+
 __ds_ns.CopyButton = __ds_scope.CopyButton;
+
+__ds_ns.KeyCaps = __ds_scope.KeyCaps;
 
 __ds_ns.PrettyKey = __ds_scope.PrettyKey;
 
@@ -3142,10 +4436,18 @@ __ds_ns.MenuPanel = __ds_scope.MenuPanel;
 
 __ds_ns.SectionLabel = __ds_scope.SectionLabel;
 
+__ds_ns.PanelHeader = __ds_scope.PanelHeader;
+
 __ds_ns.SettingsFooter = __ds_scope.SettingsFooter;
 
 __ds_ns.SettingsHint = __ds_scope.SettingsHint;
 
 __ds_ns.TabBar = __ds_scope.TabBar;
+
+__ds_ns.SAMPLE_APPS = __ds_scope.SAMPLE_APPS;
+
+__ds_ns.appDisplayName = __ds_scope.appDisplayName;
+
+__ds_ns.AppIcon = __ds_scope.AppIcon;
 
 })();

@@ -7,7 +7,7 @@ const WORKSPACES = {
     { title: 'Safari', lines: ['github.com/wbsmolen/aerospork'] },
   ],
   '2': [
-    { title: 'Notes', lines: ['Fork notes', '— monitor identity by UUID', '— settings GUI, seven tabs'] },
+    { title: 'Notes', lines: ['Fork notes', '— monitor identity by UUID', '— settings GUI, seven panes'] },
     { title: 'Mail', lines: ['Inbox (3)'] },
   ],
   'web': [

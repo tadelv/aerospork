@@ -1,12 +1,12 @@
 # UI kit — AeroSpork Settings
 
 A recreation of the app's SwiftUI `Settings` scene (`Sources/AppBundle/ui/` in
-[wbsmolen/aerospork](https://github.com/wbsmolen/aerospork)). Every tab, control and caveat string
+[wbsmolen/aerospork](https://github.com/wbsmolen/aerospork)). Every pane, control and caveat string
 is taken from the Swift source, not from a screenshot.
 
 | File | Source it recreates |
 |---|---|
-| `App.jsx` | `ConfigurationWindow.swift` — banner + `TabView` with the seven tabs |
+| `App.jsx` | `ConfigurationWindow.swift` — banner + native pane-toolbar `TabView` |
 | `GeneralTab.jsx` | `ConfigurationTabs/GeneralSettingsTab.swift` |
 | `GapsTab.jsx` | `ConfigurationTabs/GapsSettingsTab.swift` (incl. `GapsPreview`) |
 | `KeysTab.jsx` | `ConfigurationTabs/KeyBindingsTab.swift` (recorder, origin badge, conflict banner) |
@@ -18,14 +18,18 @@ is taken from the Swift source, not from a screenshot.
 
 ## What is interactive
 
-Tabs switch; toggles, pickers and number fields update live (the real app auto-saves on a 600ms
-debounce — there is no Save button); the Keys tab filters, records a shortcut, shows the
+Toolbar panes switch; toggles, pickers and number fields update live (the real app auto-saves on a
+600ms debounce — there is no Save button); the Keys pane filters, records a shortcut, shows the
 already-bound conflict, and Override copies a generated binding into the writable set; the Monitors
 and Window Rules tables select, add and remove rows; the Raw TOML editor enables Revert/Apply only
 when the text differs from disk.
+
+The entry point accepts `tab`, `appearance`, `width`, `height`, and `banner` query parameters. The
+checked redesign matrix in `dev-docs/redesign-v3/mockups/` renders every pane in light and dark at
+880×620 and 780×520.
 
 ## Deliberately not modelled
 
 Per-monitor gap arrays, monitor fingerprints other than UUID, key-code mapping presets — in the real
 app these round-trip through the config writer but have no control, which is exactly why the Raw TOML
-tab exists. `framed={false}` renders the window content without the macOS chrome.
+pane exists. `framed={false}` renders the window content without the macOS chrome.

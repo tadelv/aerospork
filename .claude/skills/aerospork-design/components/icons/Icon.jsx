@@ -24,6 +24,12 @@ export const SF_TO_LUCIDE = {
   'ellipsis.circle': 'ellipsis', 'line.3.horizontal.decrease.circle': 'filter',
   'square.grid.2x2': 'grid-2x2', 'pause.circle.fill': 'circle-pause',
   'chevron.down': 'chevron-down', 'chevron.right': 'chevron-right', 'trash': 'trash-2',
+  'line.3.horizontal': 'menu', 'eye': 'eye',
+  // Window Rules v3 — generic app-icon glyphs (AppIcon.jsx). Universal pictograms, not traced
+  // from any real app's actual logo: an envelope, not Mail.app's specific stamp art; a compass,
+  // not Safari's specific compass painting; a folder, not Finder's two-tone face.
+  'envelope': 'mail', 'safari': 'compass', 'music.note': 'music', 'message': 'message-circle',
+  'folder': 'folder',
 };
 
 /** Glyph geometry, keyed by Lucide name. Stroke is currentColor, so tint by setting `color`. */
@@ -69,6 +75,13 @@ export const ICON_SHAPES = {
   "circle-pause": "<circle cx=\"12\" cy=\"12\" r=\"10\" /><line x1=\"10\" x2=\"10\" y1=\"15\" y2=\"9\" /><line x1=\"14\" x2=\"14\" y1=\"15\" y2=\"9\" />",
   "grid-2x2": "<path d=\"M12 3v18\" /><path d=\"M3 12h18\" /><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" />",
   "panel-left": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" /><path d=\"M9 3v18\" />",
+  "menu": "<path d=\"M4 12h16\" /><path d=\"M4 18h16\" /><path d=\"M4 6h16\" />",
+  "eye": "<path d=\"M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0\" /><circle cx=\"12\" cy=\"12\" r=\"3\" />",
+  "mail": "<rect width=\"20\" height=\"16\" x=\"2\" y=\"4\" rx=\"2\" /><path d=\"m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7\" />",
+  "compass": "<path d=\"m16.24 7.76-1.804 5.411a2 2 0 0 1-1.264 1.264L7.76 16.24l1.804-5.411a2 2 0 0 1 1.264-1.264z\" /><circle cx=\"12\" cy=\"12\" r=\"10\" />",
+  "music": "<path d=\"M9 18V5l12-2v13\" /><circle cx=\"6\" cy=\"18\" r=\"3\" /><circle cx=\"18\" cy=\"16\" r=\"3\" />",
+  "message-circle": "<path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\" />",
+  "folder": "<path d=\"M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z\" />",
 };
 
 export function Icon({ sf, name, size = 14, weight = 'regular', style }) {

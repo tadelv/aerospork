@@ -1,13 +1,22 @@
 // Mock state for the AeroSpork Settings recreation. Values match the shipped default config.
 window.AS_DATA = {
+  // Gaps pane: whether any of the six gaps currently carries a per-monitor rule in Raw TOML.
+  // Off by default so the common (flat-numbers) case shows no extra chrome.
+  gapsHavePerMonitorOverrides: false,
+  // `rect` is topLeftX/topLeftY/width/height in points, same shape and units as
+  // Sources/AppBundle/model/Monitor.swift's `rect` — what MonitorArrangement draws to scale.
+  // This arrangement (bottom-aligned, the laptop propped lower than the two externals) is a
+  // realistic one, not an idealized row of equal-height rectangles, on purpose: it's the case
+  // "Position 2" as a bare number hides and a diagram doesn't.
   monitors: [
-    { id: 'm1', name: 'Built-in Retina Display', resolution: '1728 × 1117 pt', uuid: 'BBBBBBBB-0000-4000-8000-000000000002' },
-    { id: 'm2', name: 'DELL U2720Q', resolution: '2560 × 1440 pt', uuid: 'AAAAAAAA-0000-4000-8000-000000000001' },
-    { id: 'm3', name: 'DisplayLink Monitor', resolution: '1920 × 1080 pt', uuid: 'CCCCCCCC-0000-4000-8000-000000000003' },
+    { id: 'm1', name: 'Built-in Retina Display', resolution: '1728 × 1117 pt', uuid: 'BBBBBBBB-0000-4000-8000-000000000002', isMain: true, rect: { x: 0, y: 323, width: 1728, height: 1117 } },
+    { id: 'm2', name: 'DELL U2720Q', resolution: '2560 × 1440 pt', uuid: 'AAAAAAAA-0000-4000-8000-000000000001', rect: { x: 1728, y: 0, width: 2560, height: 1440 } },
+    { id: 'm3', name: 'DisplayLink Monitor', resolution: '1920 × 1080 pt', uuid: 'CCCCCCCC-0000-4000-8000-000000000003', rect: { x: 4288, y: 360, width: 1920, height: 1080 } },
   ],
   assignments: [
     { id: 'a1', workspace: '1', monitor: 'main' },
     { id: 'a2', workspace: 'web', monitor: 'AAAAAAAA-0000-4000-8000-000000000001' },
+    { id: 'a3', workspace: 'media', monitor: 'DELL U2720Q', complex: true },
   ],
   bindings: {
     main: [
@@ -28,11 +37,25 @@ window.AS_DATA = {
       { id: 's3', key: 'f', command: 'layout floating tiling ; mode main', origin: 'explicit' },
       { id: 's4', key: 'backspace', command: 'close-all-windows-but-current ; mode main', origin: 'explicit' },
     ],
+    // A small, single-category mode (all "Mode & system") — demonstrates Change A's flat-list
+    // path, and its 'esc'/Ghostty overlap with main and service demonstrates Change B/C's
+    // multi-mode branches (2+ other modes matching a search or a recorded key).
+    apps: [
+      { id: 'p1', key: 'esc', command: 'mode main', origin: 'explicit' },
+      { id: 'p2', key: 'o', command: 'exec-and-forget open -na Ghostty', origin: 'explicit' },
+      { id: 'p3', key: 's', command: 'exec-and-forget open -na Safari', origin: 'explicit' },
+    ],
   },
+  // r1-r3 are known sample apps (AppIcon.jsx's SAMPLE_APPS) so their rows carry a real glyph.
+  // r4 has no app-id matcher at all ("any app") and r5 names an app outside the sample set, so
+  // between them the mock demonstrates every AppIcon fallback: known glyph, generic "any app",
+  // and a monogram for an app nobody hardcoded an icon for.
   rules: [
     { id: 'r1', appId: 'com.apple.mail', appNameRegex: '', windowTitleRegex: '', workspace: '', run: 'move-node-to-workspace 3', checkFurther: false, duringStartup: false },
     { id: 'r2', appId: 'com.apple.systempreferences', appNameRegex: '', windowTitleRegex: '', workspace: '', run: 'layout floating', checkFurther: false, duringStartup: false },
     { id: 'r3', appId: 'com.spotify.client', appNameRegex: '', windowTitleRegex: '', workspace: '', run: 'move-node-to-workspace media', checkFurther: false, duringStartup: true },
+    { id: 'r4', appId: '', appNameRegex: '', windowTitleRegex: 'Picture[- ]in[- ]Picture', workspace: '', run: 'layout floating', checkFurther: true, duringStartup: undefined },
+    { id: 'r5', appId: 'org.mozilla.firefox', appNameRegex: '', windowTitleRegex: '', workspace: '', run: 'layout floating ; move-node-to-workspace web', checkFurther: false, duringStartup: undefined },
   ],
   events: {
     afterStartup: ['exec-and-forget sketchybar --reload'],

@@ -3,12 +3,12 @@
    there is no macOS Spaces animation. So: no transitions on anything structural. What is left
    is standard AppKit control feedback and a few product timings worth encoding.
 
-   --dur-instant   workspace switch, tab switch, layout change
+   --dur-instant   workspace switch, pane switch, layout change
    --dur-control   hover/press on a control
    --dur-appear    popover / menu appearance
    Product timings (quote these in copy, not in CSS animations):
    --timing-refresh-debounce   RefreshDebouncer coalesces accessibility bursts
-   --timing-autosave-debounce  structured settings tabs apply live
+   --timing-autosave-debounce  structured settings panes apply live
    --timing-copied-flash       CopyButton checkmark hold */
 
 :root {

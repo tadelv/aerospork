@@ -7,8 +7,9 @@ date: 2026-07-29T16:42:05Z
 
 ### Updated in this project
 
-- Built the design system from the Swift UI layer: tokens, 27 components, three UI kits.
-- Recreated the seven-tab Settings window from `Sources/AppBundle/ui/` (all tabs, real caveat copy).
+- Built the design system from the Swift UI layer: tokens, 32 components, three UI kits.
+- Recreated the seven-pane native-toolbar Settings window from `Sources/AppBundle/ui/` (all panes,
+  real caveat copy, light/dark and ideal/compact states).
 - Generated a new layered (Icon Composer style) app icon set plus README banner and App Store hero.
 - Imported the shipped app icon and `docs/assets/` product screenshots and monitor diagrams.
 
@@ -27,6 +28,9 @@ system was derived from it. What did not match was fixed in the repo, not here:
   specifies, differing only in tone.
 - `CopyButton` now tints its checkmark green on copy, per `components/controls/CopyButton.jsx`. The
   colour change is the whole confirmation: the product has no toast anywhere.
+- The settings kit and Swift implementation now share the native pane toolbar, monitor-arrangement
+  schematic, guided Rules controls, cross-mode Keys search, and AppKit Raw TOML editor behavior.
+  `dev-docs/redesign-v3/` holds the reviewed matrix and production mapping.
 
 `UIChromeConsistencyTest` pins all of it, including the chip ratio, so the two sides cannot drift
 apart silently.

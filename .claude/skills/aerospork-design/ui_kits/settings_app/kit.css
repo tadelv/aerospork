@@ -14,17 +14,66 @@ body { margin: 0; background: #2b2f3a; display: grid; place-items: center; min-h
 .list { flex: 1; min-height: 0; overflow: auto; background: var(--control-bg); padding: 4px 0; }
 .binding-row { display: flex; align-items: center; gap: 8px; padding: 3px 14px; }
 .binding-row:hover { background: var(--fill-subtle); }
-.keycell { width: 150px; flex: 0 0 auto; font-size: var(--text-default); }
 .cmdcell { color: var(--label-secondary); font-size: var(--text-default); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Mode pills replace the old two-option SegmentedPicker: any number of modes, scrolling rather
+   than overflowing at the 960px floor if there are many. Hover needs a real CSS rule (the
+   selected/label-weight bits stay inline, driven by React state). */
+.mode-pills { display: flex; align-items: center; gap: 6px; overflow-x: auto; flex: 1 1 auto; min-width: 0; }
+.mode-pill { flex: 0 0 auto; height: 20px; padding: 0 10px; border: none; border-radius: var(--radius-pill); background: transparent; color: var(--label-secondary); font: var(--weight-regular) var(--text-default)/1 var(--font-system); cursor: pointer; white-space: nowrap; }
+.mode-pill:hover { background: var(--fill-subtle); }
+.mode-pill.on { background: var(--accent-selection-fill); color: var(--label); font-weight: var(--weight-medium); }
 
-/* Monitors */
-.monitors { flex: 0 0 auto; max-height: 200px; display: flex; flex-direction: column; background: var(--grouped-bg); }
-.monitor-list { overflow-y: auto; overflow-x: hidden; padding: 0 16px 14px; display: flex; flex-direction: column; gap: 8px; }
-.monitor-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--radius-card); background: var(--fill-subtle); font-size: var(--text-default); }
-.assignments { flex: 1; min-height: 0; display: flex; flex-direction: column; background: var(--grouped-bg); }
+/* Monitors — v3 card treatment: two elevated cards (arrangement + list, assignments) in a
+   scrolling .form-page, in place of the old flush grouped-bg panels split by one hairline.
+   `.card-surface` is FormSection's own card recipe (bg/radius/shadow), reused here directly
+   since this pane's content doesn't fit FormSection's per-row layout. */
+.card-surface { background: var(--control-bg); border-radius: var(--radius-card); box-shadow: 0 0 0 0.5px var(--separator); overflow: hidden; }
+.monitors-section { display: flex; flex-direction: column; gap: var(--space-6); flex: 0 0 auto; }
+.monitors-surface { display: flex; flex-direction: column; }
+.monitor-diagram-wrap { padding: var(--space-14) var(--space-16) var(--space-12); display: flex; justify-content: center; }
+.monitor-detail { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); min-height: 18px; padding: 0 var(--space-16) var(--space-12); font: var(--weight-regular) var(--text-callout)/1.4 var(--font-system); color: var(--label-secondary); }
+.monitor-list { border-top: var(--divider); overflow-y: auto; overflow-x: hidden; max-height: 148px; padding: var(--space-10) var(--space-16) var(--space-14); display: flex; flex-direction: column; gap: 8px; }
+.monitor-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--radius-row); background: var(--fill-subtle); font-size: var(--text-default); box-sizing: border-box; }
+.monitor-row.is-selected { background: var(--accent-selection-fill); box-shadow: inset 0 0 0 1px var(--accent); }
+.workspace-chip { font: var(--weight-medium) var(--text-callout)/1 var(--font-mono); color: var(--accent); background: var(--accent-selection-fill); border: none; border-radius: var(--radius-pill); padding: 2px var(--space-6); cursor: pointer; }
+.workspace-chip:hover { filter: brightness(0.95); }
+.assignments-section { display: flex; flex-direction: column; gap: var(--space-6); flex: 1; min-height: 220px; }
+.assignments-surface { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 
 /* Window rules split view */
-.split { flex: 1; min-height: 0; display: flex; }
+.split { flex: 1; min-height: 0; display: flex; position: relative; }
 .split-list { width: 340px; flex: 0 0 auto; display: flex; flex-direction: column; background: var(--control-bg); border-right: 1px solid var(--separator); }
-.split-detail { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--grouped-bg); }
+.split-detail { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--grouped-bg); overflow: auto; }
 .ellipsis { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Window rules — icon-forward row list (v3 revamp) */
+.rule-list { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; gap: 1px; padding: 6px 8px; background: var(--control-bg); }
+.rule-row { display: flex; align-items: center; gap: 10px; width: 100%; padding: 6px 8px; border: none; background: transparent; border-radius: var(--radius-row); box-sizing: border-box; cursor: pointer; text-align: left; color: var(--label); }
+.rule-row:hover:not(.is-selected) { background: var(--fill-subtle); }
+.rule-row.is-selected { background: var(--selection); color: var(--selection-fg); }
+.rule-row-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+.rule-row-name { font: var(--weight-medium) var(--text-default)/1.25 var(--font-system); color: inherit; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rule-row-summary { font-size: var(--text-callout); line-height: 1.3; color: var(--label-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rule-row.is-selected .rule-row-summary { color: rgba(255, 255, 255, 0.82); }
+.rule-row-badges { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex: 0 0 auto; }
+
+/* Window rules — detail pane header (chosen app + change-app affordance) */
+.rule-detail-header { display: flex; align-items: center; gap: 12px; }
+.rule-detail-header .name { display: block; font: var(--weight-semibold) var(--text-title2)/1.2 var(--font-system); color: var(--label); }
+.rule-detail-header .bundle-id { display: block; font-size: var(--text-callout); color: var(--label-secondary); margin-top: 1px; }
+
+/* Window rules — collapsible "Advanced matching" */
+.disclosure-header { display: flex; align-items: center; gap: 6px; padding: 0 var(--space-2); border: none; background: transparent; cursor: pointer; text-align: left; }
+
+/* Window rules — web stand-in for the application-chooser sheet, scoped to the split pane. */
+.app-picker-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.28); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: flex; align-items: flex-start; justify-content: center; padding-top: 56px; z-index: 20; box-sizing: border-box; }
+.app-picker-panel { width: 440px; max-height: 400px; display: flex; flex-direction: column; background: var(--control-bg); border-radius: var(--radius-window); box-shadow: var(--shadow-popover); overflow: hidden; }
+.app-picker-search { padding: 10px 12px; border-bottom: var(--divider); flex: 0 0 auto; }
+.app-picker-grid { flex: 1; min-height: 0; overflow-y: auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; padding: 10px; align-content: start; }
+.app-picker-tile { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 4px; border: none; background: transparent; border-radius: var(--radius-card); cursor: pointer; font: var(--weight-regular) var(--text-callout)/1.25 var(--font-system); color: var(--label); }
+.app-picker-tile span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.app-picker-tile:hover { background: var(--fill-subtle); }
+.app-picker-empty { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 22px 12px; color: var(--label-secondary); font-size: var(--text-callout); text-align: center; }
+.app-picker-custom { display: flex; align-items: center; gap: 8px; margin: 0 10px 10px; padding: 7px 10px; border: var(--field-border); border-radius: var(--radius-field); background: var(--fill-subtle); cursor: pointer; font: var(--weight-regular) var(--text-default)/1.2 var(--font-system); color: var(--label); text-align: left; }
+.app-picker-custom:hover { background: var(--fill); }
+.app-picker-footer { padding: 0 12px 10px; flex: 0 0 auto; }

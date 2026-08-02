@@ -1,9 +1,12 @@
 const { FormSection, SectionLabel, LabeledContent, Toggle, SegmentedPicker, Select, NumberField, CopyButton } = window.AeroSporkDesignSystem_078bd7;
 
 function GeneralTab({ s, set }) {
+  // A single grouped form is the native Mac settings shape. It also keeps reading and keyboard
+  // order identical at the 780pt minimum instead of reflowing a dashboard-style card grid.
   return (
     <div className="form-page">
-      <FormSection header={<SectionLabel title="Startup & behaviour" sf="power" />}>
+      <FormSection header={<SectionLabel title="Startup & behaviour" sf="power" />}
+        footer="Automatically unhiding macOS hidden apps undoes ⌘H so a hidden window keeps tiling. Moving workspaces on monitor connect puts each one back on the monitor you pinned it to; off, a workspace stays wherever it landed when that monitor disappeared.">
         <Toggle label="Start AeroSpork at login" checked={s.startAtLogin} onChange={(v) => set('startAtLogin', v)} />
         <Toggle label="Automatically unhide macOS hidden apps" checked={s.unhide} onChange={(v) => set('unhide', v)}
           help="Undo Command-H automatically, so hidden windows keep tiling" />
@@ -11,7 +14,7 @@ function GeneralTab({ s, set }) {
           help="Re-applies workspace-to-monitor assignments when the monitor set changes" />
       </FormSection>
 
-      <FormSection header={<SectionLabel title="Appearance" sf="menubar.rectangle" />}
+      <FormSection header={<SectionLabel title="Menu bar & Dock" sf="menubar.rectangle" />}
         footer="AeroSpork has no window of its own, so these two icons are the only ways back into Settings without the command line. `aerospork open-settings` opens this window from anywhere.">
         <Toggle label="Show icon in the menu bar" checked={s.menuBarIcon} onChange={(v) => set('menuBarIcon', v)}
           help="The workspace chips, and the menu with workspace switching and Settings in it" />
@@ -19,7 +22,7 @@ function GeneralTab({ s, set }) {
       </FormSection>
 
       <FormSection header={<SectionLabel title="Layout" sf="rectangle.split.3x1" />}
-        footer="Auto gives wide monitors a horizontal split and tall monitors a vertical one. The accordion peek is how much of the window behind stays visible; 0 stacks them exactly.">
+        footer="Auto gives wide monitors a horizontal split and tall monitors a vertical one. The accordion peek is how much of the window behind stays visible; 0 stacks them exactly. It applies to any accordion container, not just new workspaces.">
         <LabeledContent label="New workspaces use">
           <SegmentedPicker options={[{ value: 'tiles', label: 'Tiles' }, { value: 'accordion', label: 'Accordion' }]}
             value={s.layout} onChange={(v) => set('layout', v)} />

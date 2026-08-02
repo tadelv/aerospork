@@ -64,6 +64,8 @@
   --tile-fill: rgba(0, 122, 255, 0.28);
   --tile-stroke: rgba(0, 122, 255, 0.7);
   --recorder-armed-fill: rgba(0, 122, 255, 0.14);
+
+  --accent-selection-fill: rgba(0, 122, 255, 0.12);
 }
 
 /* ---- Dark appearance. Applied with [data-appearance="dark"] or automatically. ---- */
@@ -102,4 +104,6 @@
   --tile-fill: rgba(10, 132, 255, 0.28);
   --tile-stroke: rgba(10, 132, 255, 0.7);
   --recorder-armed-fill: rgba(10, 132, 255, 0.16);
+
+  --accent-selection-fill: rgba(10, 132, 255, 0.16);
 }

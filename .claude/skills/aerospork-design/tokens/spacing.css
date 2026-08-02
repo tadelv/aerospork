@@ -31,11 +31,11 @@
 
   /* Fixed control widths taken from the source */
   --w-number-field: 58px;
-  --w-recorder-row: 150px;
-  --w-recorder-composer: 170px;
+  --w-recorder: 170px; /* every KeyRecorderField -- row and composer are the same width in Swift */
   --w-filter-field: 150px;
   --w-env-name: 150px;
   --h-control: 22px;
+
   --w-settings-min: 780px;
   --w-settings-ideal: 880px;
   --h-settings-min: 520px;

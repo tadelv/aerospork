@@ -9,7 +9,7 @@ product is and how it differs from upstream; this document covers how it looks a
 
 | Source | What was read |
 |---|---|
-| [github.com/wbsmolen/aerospork](https://github.com/wbsmolen/aerospork) (`main`) | `README.md`, `CLAUDE.md`, the whole SwiftUI layer in `Sources/AppBundle/ui/` (settings chrome + all seven tabs, menu bar, menu bar label), `generate-app-icon.py`, `resources/Assets.xcassets/`, `docs/` (config reference, `list-monitors` output formats, `default-config.toml`), `docs/assets/` |
+| [github.com/wbsmolen/aerospork](https://github.com/wbsmolen/aerospork) (`main`) | `README.md`, `CLAUDE.md`, the whole SwiftUI/AppKit layer in `Sources/AppBundle/ui/` (settings chrome + all seven panes, menu bar, menu bar label), `generate-app-icon.py`, `resources/Assets.xcassets/`, `docs/` (config reference, `list-monitors` output formats, `default-config.toml`), `docs/assets/` |
 | [github.com/nikitabobko/AeroSpace](https://github.com/nikitabobko/AeroSpace) | Named as upstream for context only — nothing was copied from it |
 
 No Figma file, no design file, and no written brand guidelines exist for this product. **Everything
@@ -26,8 +26,9 @@ tight tracking (see `thumbnail.html`, `assets/icon/Banner.html`).
 
 ## Products / surfaces
 
-1. **AeroSpork.app — Settings GUI** (`Sources/AppBundle/ui/`, SwiftUI). Seven tabs: General, Gaps,
-   Keys, Monitors, Events, Window Rules, Raw TOML. 880×620 ideal, 780×520 minimum. Structured tabs
+1. **AeroSpork.app — Settings GUI** (`Sources/AppBundle/ui/`, SwiftUI/AppKit). Seven peer panes in a
+   native macOS preferences toolbar: General, Gaps, Keys, Monitors, Events, Window Rules, Raw TOML.
+   880×620 ideal, 780×520 minimum. Structured panes
    apply live on a 600 ms debounce; there is no Save button.
 2. **AeroSpork.app — menu bar extra** (`MenuBar.swift`, `MenuBarLabel.swift`). A monochrome chip per
    visible workspace, and a short menu that is a *remote control*, not a control panel.
@@ -47,8 +48,8 @@ match the pixels.
 never "we". The app never refers to itself in the first person. Feature docs describe what the
 software does, in plain present tense: "Runs once, after AeroSpork finishes launching."
 
-**Casing.** Sentence case everywhere — labels, buttons, section headers, tab titles.
-`Start AeroSpork at login`, not `Start AeroSpork At Login`. Tab titles are one word where possible
+**Casing.** Sentence case everywhere — labels, buttons, section headers, pane labels.
+`Start AeroSpork at login`, not `Start AeroSpork At Login`. Pane labels are one word where possible
 (General, Gaps, Keys, Monitors, Events); the one exception is *Window Rules*. Product name is always
 `AeroSpork`; the binary, the config keys and the CLI are always lowercase `aerospork`.
 
@@ -103,7 +104,7 @@ override it. Colour carries meaning only: red = config not loaded, orange = warn
 Brand palette: plate `#1C202C → #10121A`, focused pane `#5E9EFF`, dimmed pane `#4E566A`.
 
 **Type.** San Francisco through the system font, at the sizes macOS resolves its text styles to:
-13px body, 12px hints/footers, 11px tab titles and table headers, 13px semibold section headers,
+13px body, 12px hints/footers, 11px pane labels and table headers, 13px semibold section headers,
 10px badges. Monospaced (SF Mono) for *anything the user could type into the config file*: commands,
 key notation, app ids, paths, UUIDs, versions, format strings. SF Rounded semibold appears in exactly
 one place: the menu bar workspace chips.
@@ -112,7 +113,7 @@ one place: the menu bar workspace chips.
 bar strip, `7px` above a +/- row, `16px` at a Form's edge. Do not round these to a 4/8 grid; the
 source says 9, so it is 9.
 
-**Corner radii.** 4 tile · 5 recorder · 6 field & button · 8 card/row · 10 window · capsule for
+**Corner radii.** 4 tile · 5 recorder · 8 field & button/row · 10 card · 14 window · capsule for
 badges and the mode chip. Every rounded rect in the app is `style: .continuous` (a squircle); CSS
 `border-radius` is an approximation, so at large sizes (the icon) use the real squircle geometry:
 22.5% corner ratio on artwork inset 5.5% from the canvas.
@@ -134,7 +135,7 @@ menus, and nothing else. Content surfaces are opaque.
 
 **Animation.** Essentially none, on purpose: the product's whole claim is that workspace switching is
 *instant*, because workspaces are emulated rather than handed to macOS Spaces. Never animate a
-workspace switch, a tab change or a layout change. What remains is standard AppKit control feedback
+workspace switch, a pane change or a layout change. What remains is standard AppKit control feedback
 (~120 ms), menu/popover appearance (~180 ms), and one product timing worth knowing: the CopyButton
 checkmark holds for 1.4 s. Layout refreshes are debounced at 50 ms; settings auto-save at 600 ms.
 
@@ -203,7 +204,7 @@ to rebuild the set.
 | `tokens/` | `colors.css`, `typography.css`, `spacing.css`, `radius.css`, `elevation.css`, `motion.css`, `base.css` |
 | `guidelines/` | 18 specimen cards: colors, type, spacing, brand |
 | `components/` | Reusable primitives (below) |
-| `ui_kits/settings_app/` | The seven-tab Settings window, fully click-through |
+| `ui_kits/settings_app/` | The seven-pane native-toolbar Settings window, fully click-through |
 | `ui_kits/menu_bar/` | Menu bar extra over a tiled desktop |
 | `ui_kits/cli/` | Terminal session with the `aerospork` client |
 | `assets/icon/` | New layered app icon (`AppIcon.appiconset/`, 1024 PNGs, banner, App Store hero) |
@@ -220,14 +221,15 @@ Grouped by concern. Every one of these has a counterpart in `Sources/AppBundle/u
 invented to round out a "standard" set.
 
 **`components/controls/`.** `Button`, `Toggle`, `TextField`, `NumberField`, `SegmentedPicker`,
-`Select`, `CopyButton`, `KeyRecorderField`
+`Select`, `CopyButton`, `IconButton`, `KeyRecorderField`, `KeyCaps`
 
 **`components/layout/`.** `FormSection`, `SectionLabel`, `SettingsHint`, `SettingsFooter`,
-`BarStrip`, `ListActionBar`, `TabBar`, `LabeledContent`, `DataTable`, `MenuPanel`
+`BarStrip`, `ListActionBar`, `PanelHeader`, `TabBar`, `LabeledContent`, `DataTable`, `MenuPanel`
 
 **`components/feedback/`.** `Banner`, `StatusLabel`, `ContentUnavailable`, `Badge`
 
-**`components/brand/`.** `WorkspaceChips`, `GapsPreview`, `CodeEditor`, `WindowChrome`
+**`components/brand/`.** `AppIcon`, `WorkspaceChips`, `GapsPreview`, `MonitorArrangement`,
+`CodeEditor`, `WindowChrome`
 
 **`components/icons/`.** `Icon`
 

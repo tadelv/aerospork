@@ -18,7 +18,7 @@ export function ListActionBar({ addHelp = 'Add', removeHelp = 'Remove', onAdd, o
     <BarStrip padded={false}>
       <div style={{
         display: 'flex', alignItems: 'center', gap: 'var(--space-10)',
-        padding: '7px 12px ' + (hint ? '3px' : '7px'),
+        padding: '7px 14px ' + (hint ? '3px' : '7px'),
       }}>{btn('plus', addHelp, onAdd)}{btn('minus', removeHelp, onRemove)}</div>
       {hint && <SettingsHint style={{ padding: '0 var(--space-14) var(--space-9)' }}>{hint}</SettingsHint>}
     </BarStrip>

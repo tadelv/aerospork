@@ -16,6 +16,6 @@ export interface IconProps {
 }
 export function Icon(props: IconProps): React.JSX.Element;
 /** The SF Symbol -> Lucide substitution table this design system ships. */
-export const SF_TO_LUCIDE: Record<string, string>;
+export declare const SF_TO_LUCIDE: Record<string, string>;
 /** Inlined glyph geometry, keyed by Lucide name. Also on disk in assets/icons/. */
-export const ICON_SHAPES: Record<string, string>;
+export declare const ICON_SHAPES: Record<string, string>;

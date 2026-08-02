@@ -15,7 +15,7 @@ export function GapsPreview({
   return (
     <div style={{
       width, height, boxSizing: 'border-box', borderRadius: 'var(--radius-card)',
-      background: 'var(--fill-subtle)', boxShadow: 'inset 0 0 0 1px rgba(0,0,0,.14)',
+      background: 'var(--fill-subtle)', boxShadow: 'inset 0 0 0 1px var(--border-control)',
       padding: (outerTop * s) + 'px ' + (outerRight * s) + 'px ' + (outerBottom * s) + 'px ' + (outerLeft * s) + 'px',
       display: 'flex', gap: innerHorizontal * s,
     }}>

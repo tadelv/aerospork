@@ -5,4 +5,4 @@ Use anywhere a keyboard shortcut is entered — never a plain text field asking 
 <KeyRecorderField notation={newKey} width={170} recording={rec} onArm={setRec} />
 ```
 
-150px wide in a binding row (`showsClear={false}`), 170px in the composer. Use `PrettyKey(notation)` to render a read-only row (a generated binding has no editable key).
+150px wide in a binding row (`showsClear={false}`), 170px in the composer. A filled value renders as `KeyCaps` chips internally — for a fully read-only row (a generated binding has no editable key), use `KeyCaps` directly instead of this field, or `PrettyKey(notation)` for a plain string in prose.

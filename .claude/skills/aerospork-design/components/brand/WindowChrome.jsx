@@ -1,7 +1,8 @@
 import React from 'react';
 
-/* A macOS window shell: 10px continuous corners, a translucent title bar with traffic lights,
-   and the standard window shadow. Use to frame a screen for docs, README or App Store shots. */
+/* A neutral macOS window shell for screenshots. Production delegates all title-bar material,
+   contrast and accessibility behavior to NSWindow; this approximation must not invent a sheen or
+   glass treatment that the app itself never draws. */
 export function WindowChrome({ title, width = 880, height, children, style }) {
   const light = (bg) => ({ width: 12, height: 12, borderRadius: '50%', background: bg, boxShadow: 'inset 0 0 0 0.5px rgba(0,0,0,.12)' });
   return (
@@ -11,7 +12,7 @@ export function WindowChrome({ title, width = 880, height, children, style }) {
       boxShadow: 'var(--shadow-window)', ...style,
     }}>
       <div style={{
-        display: 'flex', alignItems: 'center', gap: 'var(--space-8)', height: 28,
+        display: 'flex', alignItems: 'center', gap: 'var(--space-8)', height: 32,
         padding: '0 var(--space-12)', flex: '0 0 auto',
         background: 'var(--bar-bg)', backdropFilter: 'blur(var(--bar-blur))',
         WebkitBackdropFilter: 'blur(var(--bar-blur))', borderBottom: 'var(--divider)',

@@ -10,9 +10,10 @@ const TABS = [
   { id: 'raw', label: 'Raw TOML', sf: 'doc.plaintext' },
 ];
 
-function SettingsApp({ framed = true, initialTab = 'general', banner = null }) {
+function SettingsApp({ framed = true, initialTab = 'general', banner = null, width = 880, height = 620 }) {
   const D = window.AS_DATA;
   const [tab, setTab] = React.useState(initialTab);
+  const currentTab = TABS.find((t) => t.id === tab) || TABS[0];
   const [settings, setSettings] = React.useState({
     startAtLogin: true, unhide: true, autoMove: true, menuBarIcon: true, dockIcon: false,
     layout: 'tiles', orientation: 'auto', accordionPadding: 30, flatten: true, alternate: true,
@@ -27,11 +28,14 @@ function SettingsApp({ framed = true, initialTab = 'general', banner = null }) {
   const [inherit, setInherit] = React.useState(true);
   const [toml, setToml] = React.useState(D.toml);
 
+  // A Mac app's Settings window uses a stable, non-customizable pane toolbar. The window title
+  // follows the selected pane; the pane itself starts with content rather than repeating the same
+  // icon and title in a web-style page header.
   const body = (
-    <>
-      {banner === 'error' && <Banner kind="error">{'Your config was not loaded — AeroSpork is running built-in defaults. Fix the errors below and save; the config reloads by itself.\nline 12: unknown key ‘mods’'}</Banner>}
+    <React.Fragment>
       <TabBar tabs={TABS} value={tab} onChange={setTab} />
       <div className="tab-body">
+        {banner === 'error' && <Banner kind="error">{'Your config was not loaded — AeroSpork is running built-in defaults. Fix the errors below and save; the config reloads by itself.\nline 12: unknown key ‘mods’'}</Banner>}
         {tab === 'general' && <GeneralTab s={settings} set={set} />}
         {tab === 'gaps' && <GapsTab s={settings} set={set} />}
         {tab === 'keys' && <KeysTab bindings={bindings} setBindings={setBindings} />}
@@ -40,10 +44,10 @@ function SettingsApp({ framed = true, initialTab = 'general', banner = null }) {
         {tab === 'rules' && <RulesTab rules={rules} setRules={setRules} />}
         {tab === 'raw' && <RawTomlTab toml={toml} setToml={setToml} original={D.toml} />}
       </div>
-    </>
+    </React.Fragment>
   );
 
   if (!framed) return <div className="settings-plain">{body}</div>;
-  return <WindowChrome width={880} height={620}>{body}</WindowChrome>;
+  return <WindowChrome title={currentTab.label} width={width} height={height}>{body}</WindowChrome>;
 }
 Object.assign(window, { SettingsApp, SETTINGS_TABS: TABS });

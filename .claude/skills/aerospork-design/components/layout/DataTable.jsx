@@ -1,7 +1,8 @@
 import React from 'react';
 
 /* Table(...).tableStyle(.inset): a header row of 11px secondary titles, hairline row
-   separators, and a full-width accent selection. */
+   separators, and a full-width accent selection. A row is also a keyboard stop — Tab to it,
+   Enter or Space selects it, the same handler a click uses. */
 export function DataTable({ columns = [], rows = [], selected, onSelect, emptyState }) {
   if (!rows.length && emptyState) return emptyState;
   const grid = columns.map((c) => c.width || '1fr').join(' ');
@@ -19,7 +20,10 @@ export function DataTable({ columns = [], rows = [], selected, onSelect, emptySt
       {rows.map((r) => {
         const on = selected === r.id;
         return (
-          <div key={r.id} onClick={() => onSelect && onSelect(r.id)} style={{
+          <div key={r.id} tabIndex={0} onClick={() => onSelect && onSelect(r.id)}
+            onKeyDown={(e) => {
+              if ((e.key === 'Enter' || e.key === ' ') && onSelect) { e.preventDefault(); onSelect(r.id); }
+            }} style={{
             display: 'grid', gridTemplateColumns: grid, gap: 'var(--space-8)',
             alignItems: 'center', padding: '3px var(--space-12)',
             borderBottom: 'var(--divider)', cursor: 'default',
