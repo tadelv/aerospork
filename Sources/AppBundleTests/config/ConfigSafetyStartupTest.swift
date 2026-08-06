@@ -7,56 +7,56 @@ import XCTest
 /// making that honest: the state stays visible, and fixing the file recovers on its own.
 @MainActor
 final class ConfigSafetyStartupTest: XCTestCase {
-    private var savedUrl: URL!
-    private var savedFailure: String?
+  private var savedUrl: URL!
+  private var savedFailure: String?
 
-    override func setUp() async throws {
-        savedUrl = configUrl
-        savedFailure = configLoadFailure
-    }
+  override func setUp() async throws {
+    savedUrl = configUrl
+    savedFailure = configLoadFailure
+  }
 
-    override func tearDown() async throws {
-        configUrl = savedUrl
-        configLoadFailure = savedFailure
-    }
+  override func tearDown() async throws {
+    configUrl = savedUrl
+    configLoadFailure = savedFailure
+  }
 
-    func testFallbackToDefaultsIsVisible() {
-        configLoadFailure = "Failed to parse ~/.aerospork.toml"
-        configUrl = defaultConfigUrl
-        XCTAssertTrue(isRunningFallbackDefaults)
-    }
+  func testFallbackToDefaultsIsVisible() {
+    configLoadFailure = "Failed to parse ~/.aerospork.toml"
+    configUrl = defaultConfigUrl
+    XCTAssertTrue(isRunningFallbackDefaults)
+  }
 
-    /// Recovery needs no separate signal: a successful reload points `configUrl` back at the user's
-    /// file and clears the failure, so the banner and the menu-bar warning go away by themselves.
-    func testFixingTheConfigClearsTheWarning() {
-        configLoadFailure = "Failed to parse ~/.aerospork.toml"
-        configUrl = defaultConfigUrl
-        configLoadFailure = nil
-        configUrl = URL(filePath: "/tmp/aerospork-test.toml")
-        XCTAssertFalse(isRunningFallbackDefaults)
-    }
+  /// Recovery needs no separate signal: a successful reload points `configUrl` back at the user's
+  /// file and clears the failure, so the banner and the menu-bar warning go away by themselves.
+  func testFixingTheConfigClearsTheWarning() {
+    configLoadFailure = "Failed to parse ~/.aerospork.toml"
+    configUrl = defaultConfigUrl
+    configLoadFailure = nil
+    configUrl = URL(filePath: "/tmp/aerospork-test.toml")
+    XCTAssertFalse(isRunningFallbackDefaults)
+  }
 
-    /// A healthy app running the bundled default (no user config exists) is not "in fallback".
-    func testBundledDefaultWithoutAFailureIsNotFallback() {
-        configLoadFailure = nil
-        configUrl = defaultConfigUrl
-        XCTAssertFalse(isRunningFallbackDefaults)
-    }
+  /// A healthy app running the bundled default (no user config exists) is not "in fallback".
+  func testBundledDefaultWithoutAFailureIsNotFallback() {
+    configLoadFailure = nil
+    configUrl = defaultConfigUrl
+    XCTAssertFalse(isRunningFallbackDefaults)
+  }
 
-    /// `initAppBundle` retries with the bundled default the instant the user's config fails, and
-    /// that retry always succeeds. Recording health from it would wipe the failure a millisecond
-    /// after it was recorded, leaving nothing anywhere that says the config did not load.
-    func testForcedDefaultReadDoesNotEraseTheFailure() {
-        configLoadFailure = "Failed to parse ~/.aerospork.toml"
-        _ = readConfig(forceConfigUrl: defaultConfigUrl)
-        assertEquals(configLoadFailure, "Failed to parse ~/.aerospork.toml")
-    }
+  /// `initAppBundle` retries with the bundled default the instant the user's config fails, and
+  /// that retry always succeeds. Recording health from it would wipe the failure a millisecond
+  /// after it was recorded, leaving nothing anywhere that says the config did not load.
+  func testForcedDefaultReadDoesNotEraseTheFailure() {
+    configLoadFailure = "Failed to parse ~/.aerospork.toml"
+    _ = readConfig(forceConfigUrl: defaultConfigUrl)
+    assertEquals(configLoadFailure, "Failed to parse ~/.aerospork.toml")
+  }
 
-    /// The watcher must follow the file the USER edits. Watching `configUrl` meant that after a
-    /// fallback it watched a file inside the app bundle, which can never change — so the fix the
-    /// user was busy typing would not be picked up until the app was restarted.
-    func testWatcherNeverWatchesTheBundledDefault() {
-        configUrl = defaultConfigUrl
-        XCTAssertNotEqual(ConfigFileWatcher.watchedPath, defaultConfigUrl.path)
-    }
+  /// The watcher must follow the file the USER edits. Watching `configUrl` meant that after a
+  /// fallback it watched a file inside the app bundle, which can never change — so the fix the
+  /// user was busy typing would not be picked up until the app was restarted.
+  func testWatcherNeverWatchesTheBundledDefault() {
+    configUrl = defaultConfigUrl
+    XCTAssertNotEqual(ConfigFileWatcher.watchedPath, defaultConfigUrl.path)
+  }
 }

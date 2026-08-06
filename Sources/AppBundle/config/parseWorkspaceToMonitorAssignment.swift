@@ -2,125 +2,125 @@ import Common
 import TOMLKit
 
 func parseWorkspaceToMonitorAssignment(_ raw: TOMLValueConvertible, _ backtrace: TomlBacktrace, _ errors: inout [TomlParseError]) -> [String: [MonitorDescription]] {
-    guard let rawTable = raw.table else {
-        errors += [expectedActualTypeError(expected: .table, actual: raw.type, backtrace)]
-        return [:]
-    }
-    var result: [String: [MonitorDescription]] = [:]
-    for (workspaceName, rawMonitorDescription) in rawTable {
-        result[workspaceName] = parseMonitorDescriptions(rawMonitorDescription, backtrace + .key(workspaceName), &errors)
-    }
-    return result
+  guard let rawTable = raw.table else {
+    errors += [expectedActualTypeError(expected: .table, actual: raw.type, backtrace)]
+    return [:]
+  }
+  var result: [String: [MonitorDescription]] = [:]
+  for (workspaceName, rawMonitorDescription) in rawTable {
+    result[workspaceName] = parseMonitorDescriptions(rawMonitorDescription, backtrace + .key(workspaceName), &errors)
+  }
+  return result
 }
 
 func parseMonitorDescriptions(_ raw: TOMLValueConvertible, _ backtrace: TomlBacktrace, _ errors: inout [TomlParseError]) -> [MonitorDescription] {
-    if let array = raw.array {
-        return array.enumerated()
-            .map { (index, rawDesc) in parseMonitorDescription(rawDesc, backtrace + .index(index)).getOrNil(appendErrorTo: &errors) }
-            .filterNotNil()
-    } else {
-        return parseMonitorDescription(raw, backtrace).getOrNil(appendErrorTo: &errors).asList()
-    }
+  if let array = raw.array {
+    return array.enumerated()
+      .map { (index, rawDesc) in parseMonitorDescription(rawDesc, backtrace + .index(index)).getOrNil(appendErrorTo: &errors) }
+      .filterNotNil()
+  } else {
+    return parseMonitorDescription(raw, backtrace).getOrNil(appendErrorTo: &errors).asList()
+  }
 }
 
 func parseMonitorDescription(_ raw: TOMLValueConvertible, _ backtrace: TomlBacktrace) -> ParsedToml<MonitorDescription> {
-    // Check if it's a table (fingerprint pattern). `{ fingerprint = { … } }` is the v1 spelling;
-    // v2 drops the wrapper, because a table here can only ever have meant a fingerprint.
-    if let table = raw.table {
-        if let fingerprintTable = table["fingerprint"]?.table {
-            return parseFingerprintPattern(fingerprintTable, backtrace + .key("fingerprint"))
-        } else {
-            return parseFingerprintPattern(table, backtrace)
-        }
-    }
-
-    // Otherwise parse as string/int
-    let rawString: String
-    if let string = raw.string {
-        rawString = string
-    } else if let int = raw.int {
-        rawString = String(int)
+  // Check if it's a table (fingerprint pattern). `{ fingerprint = { … } }` is the v1 spelling;
+  // v2 drops the wrapper, because a table here can only ever have meant a fingerprint.
+  if let table = raw.table {
+    if let fingerprintTable = table["fingerprint"]?.table {
+      return parseFingerprintPattern(fingerprintTable, backtrace + .key("fingerprint"))
     } else {
-        return .failure(expectedActualTypeError(expected: [.string, .int, .table], actual: raw.type, backtrace))
+      return parseFingerprintPattern(table, backtrace)
     }
+  }
 
-    return parseMonitorDescription(rawString).toParsedToml(backtrace)
+  // Otherwise parse as string/int
+  let rawString: String
+  if let string = raw.string {
+    rawString = string
+  } else if let int = raw.int {
+    rawString = String(int)
+  } else {
+    return .failure(expectedActualTypeError(expected: [.string, .int, .table], actual: raw.type, backtrace))
+  }
+
+  return parseMonitorDescription(rawString).toParsedToml(backtrace)
 }
 
 private func parseFingerprintPattern(_ table: TOMLTable, _ backtrace: TomlBacktrace) -> ParsedToml<MonitorDescription> {
-    var vendorID: UInt32?
-    var modelID: UInt32?
-    var serialNumber: String?
-    var displayNamePattern: String?
-    var widthPixels: Int?
-    var heightPixels: Int?
-    var displayUUID: String?
+  var vendorID: UInt32?
+  var modelID: UInt32?
+  var serialNumber: String?
+  var displayNamePattern: String?
+  var widthPixels: Int?
+  var heightPixels: Int?
+  var displayUUID: String?
 
-    for (key, value) in table {
-        let keyBacktrace = backtrace + .key(key)
-        switch key {
-            case "vendor", "vendor_id", "vendorID":
-                // UInt32(exactly:) and a nil check on the hex parse: `vendor_id = -1` or a value
-                // past 32 bits must be a config error, not a crash, and `0xZZZZ` must not be
-                // silently dropped (a dropped field silently WIDENS the match).
-                if let int = value.int, let v = UInt32(exactly: int) {
-                    vendorID = v
-                } else if let string = value.string, string.hasPrefix("0x") || string.hasPrefix("0X"),
-                          let v = UInt32(string.dropFirst(2), radix: 16)
-                {
-                    vendorID = v
-                } else {
-                    return .failure(.semantic(keyBacktrace, "vendor_id must be a 32-bit unsigned integer or hex string (e.g., '0x1234')"))
-                }
-            case "model", "model_id", "modelID":
-                if let int = value.int, let v = UInt32(exactly: int) {
-                    modelID = v
-                } else if let string = value.string, string.hasPrefix("0x") || string.hasPrefix("0X"),
-                          let v = UInt32(string.dropFirst(2), radix: 16)
-                {
-                    modelID = v
-                } else {
-                    return .failure(.semantic(keyBacktrace, "model_id must be a 32-bit unsigned integer or hex string (e.g., '0x5678')"))
-                }
-            case "serial", "serial_number", "serialNumber":
-                guard let string = value.string else {
-                    return .failure(expectedActualTypeError(expected: .string, actual: value.type, keyBacktrace))
-                }
-                serialNumber = string
-            case "name", "display_name", "displayName":
-                guard let string = value.string else {
-                    return .failure(expectedActualTypeError(expected: .string, actual: value.type, keyBacktrace))
-                }
-                displayNamePattern = string
-            case "width", "width_pixels", "widthPixels":
-                guard let int = value.int else {
-                    return .failure(expectedActualTypeError(expected: .int, actual: value.type, keyBacktrace))
-                }
-                widthPixels = int
-            case "height", "height_pixels", "heightPixels":
-                guard let int = value.int else {
-                    return .failure(expectedActualTypeError(expected: .int, actual: value.type, keyBacktrace))
-                }
-                heightPixels = int
-            case "uuid", "display_uuid", "displayUUID":
-                guard let string = value.string else {
-                    return .failure(expectedActualTypeError(expected: .string, actual: value.type, keyBacktrace))
-                }
-                displayUUID = string
-            default:
-                return .failure(unknownKeyError(keyBacktrace))
+  for (key, value) in table {
+    let keyBacktrace = backtrace + .key(key)
+    switch key {
+      case "vendor", "vendor_id", "vendorID":
+        // UInt32(exactly:) and a nil check on the hex parse: `vendor_id = -1` or a value
+        // past 32 bits must be a config error, not a crash, and `0xZZZZ` must not be
+        // silently dropped (a dropped field silently WIDENS the match).
+        if let int = value.int, let v = UInt32(exactly: int) {
+          vendorID = v
+        } else if let string = value.string, string.hasPrefix("0x") || string.hasPrefix("0X"),
+                  let v = UInt32(string.dropFirst(2), radix: 16)
+        {
+          vendorID = v
+        } else {
+          return .failure(.semantic(keyBacktrace, "vendor_id must be a 32-bit unsigned integer or hex string (e.g., '0x1234')"))
         }
+      case "model", "model_id", "modelID":
+        if let int = value.int, let v = UInt32(exactly: int) {
+          modelID = v
+        } else if let string = value.string, string.hasPrefix("0x") || string.hasPrefix("0X"),
+                  let v = UInt32(string.dropFirst(2), radix: 16)
+        {
+          modelID = v
+        } else {
+          return .failure(.semantic(keyBacktrace, "model_id must be a 32-bit unsigned integer or hex string (e.g., '0x5678')"))
+        }
+      case "serial", "serial_number", "serialNumber":
+        guard let string = value.string else {
+          return .failure(expectedActualTypeError(expected: .string, actual: value.type, keyBacktrace))
+        }
+        serialNumber = string
+      case "name", "display_name", "displayName":
+        guard let string = value.string else {
+          return .failure(expectedActualTypeError(expected: .string, actual: value.type, keyBacktrace))
+        }
+        displayNamePattern = string
+      case "width", "width_pixels", "widthPixels":
+        guard let int = value.int else {
+          return .failure(expectedActualTypeError(expected: .int, actual: value.type, keyBacktrace))
+        }
+        widthPixels = int
+      case "height", "height_pixels", "heightPixels":
+        guard let int = value.int else {
+          return .failure(expectedActualTypeError(expected: .int, actual: value.type, keyBacktrace))
+        }
+        heightPixels = int
+      case "uuid", "display_uuid", "displayUUID":
+        guard let string = value.string else {
+          return .failure(expectedActualTypeError(expected: .string, actual: value.type, keyBacktrace))
+        }
+        displayUUID = string
+      default:
+        return .failure(unknownKeyError(keyBacktrace))
     }
+  }
 
-    let patternData = MonitorFingerprintPatternData(
-        vendorID: vendorID,
-        modelID: modelID,
-        serialNumber: serialNumber,
-        displayNamePattern: displayNamePattern,
-        widthPixels: widthPixels,
-        heightPixels: heightPixels,
-        displayUUID: displayUUID,
-    )
+  let patternData = MonitorFingerprintPatternData(
+    vendorID: vendorID,
+    modelID: modelID,
+    serialNumber: serialNumber,
+    displayNamePattern: displayNamePattern,
+    widthPixels: widthPixels,
+    heightPixels: heightPixels,
+    displayUUID: displayUUID
+  )
 
-    return .success(.fingerprint(patternData))
+  return .success(.fingerprint(patternData))
 }

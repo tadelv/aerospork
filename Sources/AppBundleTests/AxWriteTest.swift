@@ -8,66 +8,66 @@ import XCTest
 /// Reference semantics on purpose: the code under test takes the element as a parameter, and with a
 /// struct every write the production path made would be discarded before the test could see it.
 final class FakeAxElement: AxUiElementMock {
-    /// What the app does with a write. These are the four behaviours seen in production, not
-    /// hypotheticals -- see the individual cases.
-    enum WriteOutcome {
-        /// Well-behaved app: the write lands and a subsequent read observes it.
-        case accept
-        /// `AXUIElementSetAttributeValue` reports success and the window does not move. Chromium /
-        /// Electron with `AXEnhancedUserInterface` on, and apps that re-run their own layout.
-        case ignore
-        /// The app accepts the write but substitutes a value of its own: a minimum window size, or
-        /// a position snapped back onto a screen. The stored value is the *clamped* one.
-        case clamp(AnyObject)
-        /// The AX message never landed (wedged app hitting `AXUIElementSetMessagingTimeout`).
-        case timeout
-    }
+  /// What the app does with a write. These are the four behaviours seen in production, not
+  /// hypotheticals -- see the individual cases.
+  enum WriteOutcome {
+    /// Well-behaved app: the write lands and a subsequent read observes it.
+    case accept
+    /// `AXUIElementSetAttributeValue` reports success and the window does not move. Chromium /
+    /// Electron with `AXEnhancedUserInterface` on, and apps that re-run their own layout.
+    case ignore
+    /// The app accepts the write but substitutes a value of its own: a minimum window size, or
+    /// a position snapped back onto a screen. The stored value is the *clamped* one.
+    case clamp(AnyObject)
+    /// The AX message never landed (wedged app hitting `AXUIElementSetMessagingTimeout`).
+    case timeout
+  }
 
-    private var attrs: [String: AnyObject] = [:]
-    /// AX attribute key of every attempted write, in order.
-    private(set) var writes: [String] = []
-    /// AX attribute key of every read. Recorded because the no-op guard's whole point is trading
-    /// writes for reads -- a guard that reads attributes it does not need is also a regression.
-    private(set) var reads: [String] = []
-    var onWrite: (String) -> WriteOutcome = { _ in .accept }
+  private var attrs: [String: AnyObject] = [:]
+  /// AX attribute key of every attempted write, in order.
+  private(set) var writes: [String] = []
+  /// AX attribute key of every read. Recorded because the no-op guard's whole point is trading
+  /// writes for reads -- a guard that reads attributes it does not need is also a regression.
+  private(set) var reads: [String] = []
+  var onWrite: (String) -> WriteOutcome = { _ in .accept }
 
-    /// Install a value as if the app already had it, bypassing `onWrite` and the counters.
-    func seed<Attr: WritableAttr>(_ attr: Attr, _ value: Attr.T) {
+  /// Install a value as if the app already had it, bypassing `onWrite` and the counters.
+  func seed<Attr: WritableAttr>(_ attr: Attr, _ value: Attr.T) {
+    attrs[attr.key] = attr.setter(value)
+  }
+
+  func get<Attr: ReadableAttr>(_ attr: Attr) -> Attr.T? {
+    reads.append(attr.key)
+    return attrs[attr.key].flatMap { attr.getter($0) }
+  }
+
+  @discardableResult func set<Attr: WritableAttr>(_ attr: Attr, _ value: Attr.T) -> Bool {
+    writes.append(attr.key)
+    switch onWrite(attr.key) {
+      case .accept:
         attrs[attr.key] = attr.setter(value)
+        return true
+      case .ignore:
+        return true // success reported, nothing moved
+      case .clamp(let clamped):
+        attrs[attr.key] = clamped
+        return true
+      case .timeout:
+        return false
     }
+  }
 
-    func get<Attr: ReadableAttr>(_ attr: Attr) -> Attr.T? {
-        reads.append(attr.key)
-        return attrs[attr.key].flatMap { attr.getter($0) }
-    }
+  func containingWindowId() -> CGWindowID? { 1 }
 
-    @discardableResult func set<Attr: WritableAttr>(_ attr: Attr, _ value: Attr.T) -> Bool {
-        writes.append(attr.key)
-        switch onWrite(attr.key) {
-            case .accept:
-                attrs[attr.key] = attr.setter(value)
-                return true
-            case .ignore:
-                return true // success reported, nothing moved
-            case .clamp(let clamped):
-                attrs[attr.key] = clamped
-                return true
-            case .timeout:
-                return false
-        }
-    }
-
-    func containingWindowId() -> CGWindowID? { 1 }
-
-    func resetCounters() {
-        writes = []
-        reads = []
-    }
+  func resetCounters() {
+    writes = []
+    reads = []
+  }
 }
 
 /// Value a test can hand to `.clamp`, boxed through the same setter the production path uses.
 private func axValue<Attr: WritableAttr>(_ attr: Attr, _ value: Attr.T) -> AnyObject {
-    attr.setter(value)!
+  attr.setter(value)!
 }
 
 /// The `setAxFrame` body, minus the `RunLoopJob` plumbing that needs a real app thread.
@@ -77,216 +77,216 @@ private func axValue<Attr: WritableAttr>(_ attr: Attr, _ value: Attr.T) -> AnyOb
 /// inside `MacApp.setAxFrame` -- sinking the guard back inside `disableAnimations` there would not
 /// turn anything red here.
 private func setAxFramePass(_ app: FakeAxElement, _ window: FakeAxElement, _ topLeft: CGPoint?, _ size: CGSize?) {
-    if isFrameSatisfied(window, topLeft, size) { return }
-    disableAnimations(app: app) {
-        setFrame(window, topLeft, size)
-    }
+  if isFrameSatisfied(window, topLeft, size) { return }
+  disableAnimations(app: app) {
+    setFrame(window, topLeft, size)
+  }
 }
 
 private let targetTopLeft = CGPoint(x: 100, y: 200)
 private let targetSize = CGSize(width: 800, height: 600)
 
 final class AxWriteTest: XCTestCase {
-    private func window(topLeft: CGPoint = targetTopLeft, size: CGSize = targetSize) -> FakeAxElement {
-        let w = FakeAxElement()
-        w.seed(Ax.topLeftCornerAttr, topLeft)
-        w.seed(Ax.sizeAttr, size)
-        return w
-    }
+  private func window(topLeft: CGPoint = targetTopLeft, size: CGSize = targetSize) -> FakeAxElement {
+    let w = FakeAxElement()
+    w.seed(Ax.topLeftCornerAttr, topLeft)
+    w.seed(Ax.sizeAttr, size)
+    return w
+  }
 
-    // MARK: the no-op guard
+  // MARK: the no-op guard
 
-    /// The performance claim in dev-docs/performance.md item 6: a window already at its target
-    /// frame costs zero AX writes, on every refresh, forever.
-    func testGuardSkipsAllWritesWhenFrameAlreadyMatches() {
-        let app = FakeAxElement()
-        let win = window()
-        setAxFramePass(app, win, targetTopLeft, targetSize)
-        assertEquals(win.writes, [])
-        // Zero AX traffic on the *app* element too: `isFrameSatisfied` touches only the window, so
-        // hoisting it above `disableAnimations` (a read plus two writes on the app) costs nothing.
-        assertEquals(app.writes, [])
-        assertEquals(app.reads, [])
-    }
+  /// The performance claim in dev-docs/performance.md item 6: a window already at its target
+  /// frame costs zero AX writes, on every refresh, forever.
+  func testGuardSkipsAllWritesWhenFrameAlreadyMatches() {
+    let app = FakeAxElement()
+    let win = window()
+    setAxFramePass(app, win, targetTopLeft, targetSize)
+    assertEquals(win.writes, [])
+    // Zero AX traffic on the *app* element too: `isFrameSatisfied` touches only the window, so
+    // hoisting it above `disableAnimations` (a read plus two writes on the app) costs nothing.
+    assertEquals(app.writes, [])
+    assertEquals(app.reads, [])
+  }
 
-    func testGuardToleratesSubPixelDrift() {
-        // AX rounds; a window reporting 0.5pt off is at the target for our purposes.
-        let win = window(topLeft: CGPoint(x: 100.5, y: 199.5), size: CGSize(width: 799.5, height: 600.5))
-        assertTrue(isFrameSatisfied(win, targetTopLeft, targetSize))
-    }
+  func testGuardToleratesSubPixelDrift() {
+    // AX rounds; a window reporting 0.5pt off is at the target for our purposes.
+    let win = window(topLeft: CGPoint(x: 100.5, y: 199.5), size: CGSize(width: 799.5, height: 600.5))
+    assertTrue(isFrameSatisfied(win, targetTopLeft, targetSize))
+  }
 
-    func testGuardRejectsDriftAtOrBeyondOnePoint() {
-        assertFalse(isFrameSatisfied(window(topLeft: CGPoint(x: 101.5, y: 200)), targetTopLeft, targetSize))
-        assertFalse(isFrameSatisfied(window(size: CGSize(width: 802, height: 600)), targetTopLeft, targetSize))
-    }
+  func testGuardRejectsDriftAtOrBeyondOnePoint() {
+    assertFalse(isFrameSatisfied(window(topLeft: CGPoint(x: 101.5, y: 200)), targetTopLeft, targetSize))
+    assertFalse(isFrameSatisfied(window(size: CGSize(width: 802, height: 600)), targetTopLeft, targetSize))
+  }
 
-    /// A window whose frame cannot be read (dying, or an app that doesn't answer) must be treated
-    /// as unsatisfied. "Unknown" has to mean "write it", never "skip it" -- otherwise a window that
-    /// hiccups once is never laid out again.
-    func testUnreadableFrameIsNotSatisfied() {
-        let unreadable = FakeAxElement() // nothing seeded, every get returns nil
-        assertFalse(isFrameSatisfied(unreadable, targetTopLeft, targetSize))
-        let app = FakeAxElement()
-        setAxFramePass(app, unreadable, targetTopLeft, targetSize)
-        assertEquals(unreadable.writes, [kAXSizeAttribute, kAXPositionAttribute, kAXSizeAttribute])
-    }
+  /// A window whose frame cannot be read (dying, or an app that doesn't answer) must be treated
+  /// as unsatisfied. "Unknown" has to mean "write it", never "skip it" -- otherwise a window that
+  /// hiccups once is never laid out again.
+  func testUnreadableFrameIsNotSatisfied() {
+    let unreadable = FakeAxElement() // nothing seeded, every get returns nil
+    assertFalse(isFrameSatisfied(unreadable, targetTopLeft, targetSize))
+    let app = FakeAxElement()
+    setAxFramePass(app, unreadable, targetTopLeft, targetSize)
+    assertEquals(unreadable.writes, [kAXSizeAttribute, kAXPositionAttribute, kAXSizeAttribute])
+  }
 
-    /// The guard must stop at the first attribute that already disagrees.
-    ///
-    /// Both reads used to be evaluated and then `&&`ed, so a window that needed moving -- i.e. every
-    /// window on the workspace you just switched to -- paid a second cross-thread AX round trip
-    /// whose answer could not change the outcome. Counted, not timed.
-    func testGuardStopsReadingAtFirstDisagreement() {
-        let wrongSize = window(size: CGSize(width: 10, height: 10))
-        assertFalse(isFrameSatisfied(wrongSize, targetTopLeft, targetSize))
-        assertEquals(wrongSize.reads, [kAXSizeAttribute])
+  /// The guard must stop at the first attribute that already disagrees.
+  ///
+  /// Both reads used to be evaluated and then `&&`ed, so a window that needed moving -- i.e. every
+  /// window on the workspace you just switched to -- paid a second cross-thread AX round trip
+  /// whose answer could not change the outcome. Counted, not timed.
+  func testGuardStopsReadingAtFirstDisagreement() {
+    let wrongSize = window(size: CGSize(width: 10, height: 10))
+    assertFalse(isFrameSatisfied(wrongSize, targetTopLeft, targetSize))
+    assertEquals(wrongSize.reads, [kAXSizeAttribute])
 
-        // ...and when the size does match, the position still has to be checked.
-        let wrongPosition = window(topLeft: .zero)
-        assertFalse(isFrameSatisfied(wrongPosition, targetTopLeft, targetSize))
-        assertEquals(wrongPosition.reads, [kAXSizeAttribute, kAXPositionAttribute])
-    }
+    // ...and when the size does match, the position still has to be checked.
+    let wrongPosition = window(topLeft: .zero)
+    assertFalse(isFrameSatisfied(wrongPosition, targetTopLeft, targetSize))
+    assertEquals(wrongPosition.reads, [kAXSizeAttribute, kAXPositionAttribute])
+  }
 
-    /// `hideInCorner` passes a position and no size, for every window of every invisible workspace
-    /// on every refresh. Reading the size there would be pure waste.
-    func testGuardOnlyReadsWhatItWasAsked() {
-        let posOnly = window()
-        _ = isFrameSatisfied(posOnly, targetTopLeft, nil)
-        assertEquals(posOnly.reads, [kAXPositionAttribute])
+  /// `hideInCorner` passes a position and no size, for every window of every invisible workspace
+  /// on every refresh. Reading the size there would be pure waste.
+  func testGuardOnlyReadsWhatItWasAsked() {
+    let posOnly = window()
+    _ = isFrameSatisfied(posOnly, targetTopLeft, nil)
+    assertEquals(posOnly.reads, [kAXPositionAttribute])
 
-        let sizeOnly = window()
-        _ = isFrameSatisfied(sizeOnly, nil, targetSize)
-        assertEquals(sizeOnly.reads, [kAXSizeAttribute])
-    }
+    let sizeOnly = window()
+    _ = isFrameSatisfied(sizeOnly, nil, targetSize)
+    assertEquals(sizeOnly.reads, [kAXSizeAttribute])
+  }
 
-    // MARK: write ordering
+  // MARK: write ordering
 
-    /// size, then position, then size again -- issues #143 and #335. The trailing size write is
-    /// what un-breaks apps that resize themselves when moved, so losing it is a real regression.
-    func testSetFrameWritesSizePositionSize() {
-        let win = window()
-        setFrame(win, targetTopLeft, targetSize)
-        assertEquals(win.writes, [kAXSizeAttribute, kAXPositionAttribute, kAXSizeAttribute])
-    }
+  /// size, then position, then size again -- issues #143 and #335. The trailing size write is
+  /// what un-breaks apps that resize themselves when moved, so losing it is a real regression.
+  func testSetFrameWritesSizePositionSize() {
+    let win = window()
+    setFrame(win, targetTopLeft, targetSize)
+    assertEquals(win.writes, [kAXSizeAttribute, kAXPositionAttribute, kAXSizeAttribute])
+  }
 
-    func testSetFrameWithoutPositionWritesSizeOnce() {
-        let win = window()
-        setFrame(win, nil, targetSize)
-        assertEquals(win.writes, [kAXSizeAttribute])
-    }
+  func testSetFrameWithoutPositionWritesSizeOnce() {
+    let win = window()
+    setFrame(win, nil, targetSize)
+    assertEquals(win.writes, [kAXSizeAttribute])
+  }
 
-    // MARK: failing writes
+  // MARK: failing writes
 
-    /// An app that reports success and ignores the write: the guard stays unsatisfied, so the next
-    /// refresh retries. That retry is *bounded* -- one `setFrame` per pass, not a loop -- which is
-    /// the property that keeps a stubborn app from wedging a refresh.
-    func testIgnoredWriteRetriesOncePerPassAndDoesNotSpin() {
-        let app = FakeAxElement()
-        let win = window(topLeft: .zero, size: .zero)
-        win.onWrite = { _ in .ignore }
+  /// An app that reports success and ignores the write: the guard stays unsatisfied, so the next
+  /// refresh retries. That retry is *bounded* -- one `setFrame` per pass, not a loop -- which is
+  /// the property that keeps a stubborn app from wedging a refresh.
+  func testIgnoredWriteRetriesOncePerPassAndDoesNotSpin() {
+    let app = FakeAxElement()
+    let win = window(topLeft: .zero, size: .zero)
+    win.onWrite = { _ in .ignore }
 
-        setAxFramePass(app, win, targetTopLeft, targetSize)
-        assertEquals(win.writes.count, 3)
-        assertFalse(isFrameSatisfied(win, targetTopLeft, targetSize))
+    setAxFramePass(app, win, targetTopLeft, targetSize)
+    assertEquals(win.writes.count, 3)
+    assertFalse(isFrameSatisfied(win, targetTopLeft, targetSize))
 
-        win.resetCounters()
-        setAxFramePass(app, win, targetTopLeft, targetSize)
-        assertEquals(win.writes.count, 3)
-    }
+    win.resetCounters()
+    setAxFramePass(app, win, targetTopLeft, targetSize)
+    assertEquals(win.writes.count, 3)
+  }
 
-    /// The clamping app (minimum window size). Two things must hold and they pull in opposite
-    /// directions: the clamped window must not be *permanently skipped* (so the guard keeps
-    /// reporting unsatisfied and we keep correcting it), and a pass must not spin trying to
-    /// converge on a value the app will never accept.
-    func testClampedWriteRetriesButNeverSpinsWithinAPass() {
-        let app = FakeAxElement()
-        let win = window(topLeft: .zero, size: .zero)
-        let minimumSize = axValue(Ax.sizeAttr, CGSize(width: 400, height: 300))
-        win.onWrite = { $0 == kAXSizeAttribute ? .clamp(minimumSize) : .accept }
+  /// The clamping app (minimum window size). Two things must hold and they pull in opposite
+  /// directions: the clamped window must not be *permanently skipped* (so the guard keeps
+  /// reporting unsatisfied and we keep correcting it), and a pass must not spin trying to
+  /// converge on a value the app will never accept.
+  func testClampedWriteRetriesButNeverSpinsWithinAPass() {
+    let app = FakeAxElement()
+    let win = window(topLeft: .zero, size: .zero)
+    let minimumSize = axValue(Ax.sizeAttr, CGSize(width: 400, height: 300))
+    win.onWrite = { $0 == kAXSizeAttribute ? .clamp(minimumSize) : .accept }
 
-        setAxFramePass(app, win, targetTopLeft, targetSize)
-        assertEquals(win.writes.count, 3) // bounded: no retry loop inside a single pass
-        assertEquals(win.get(Ax.sizeAttr), CGSize(width: 400, height: 300))
-        assertFalse(isFrameSatisfied(win, targetTopLeft, targetSize)) // not permanently satisfied
+    setAxFramePass(app, win, targetTopLeft, targetSize)
+    assertEquals(win.writes.count, 3) // bounded: no retry loop inside a single pass
+    assertEquals(win.get(Ax.sizeAttr), CGSize(width: 400, height: 300))
+    assertFalse(isFrameSatisfied(win, targetTopLeft, targetSize)) // not permanently satisfied
 
-        win.resetCounters()
-        setAxFramePass(app, win, targetTopLeft, targetSize)
-        assertEquals(win.writes.count, 3) // still bounded on the next refresh
+    win.resetCounters()
+    setAxFramePass(app, win, targetTopLeft, targetSize)
+    assertEquals(win.writes.count, 3) // still bounded on the next refresh
 
-        // ...and once layout asks for a frame the app is willing to hold, the guard goes quiet.
-        win.resetCounters()
-        setAxFramePass(app, win, targetTopLeft, CGSize(width: 400, height: 300))
-        assertEquals(win.writes, [])
-    }
+    // ...and once layout asks for a frame the app is willing to hold, the guard goes quiet.
+    win.resetCounters()
+    setAxFramePass(app, win, targetTopLeft, CGSize(width: 400, height: 300))
+    assertEquals(win.writes, [])
+  }
 
-    /// A wedged app: the write returns failure and the value never changes. Nothing may crash, and
-    /// the guard must not conclude the window is placed.
-    func testTimedOutWriteReportsFailureAndChangesNothing() {
-        let win = window(topLeft: .zero, size: .zero)
-        win.onWrite = { _ in .timeout }
-        assertFalse(win.set(Ax.sizeAttr, targetSize))
-        assertEquals(win.get(Ax.sizeAttr), CGSize.zero)
-        assertFalse(isFrameSatisfied(win, targetTopLeft, targetSize))
-    }
+  /// A wedged app: the write returns failure and the value never changes. Nothing may crash, and
+  /// the guard must not conclude the window is placed.
+  func testTimedOutWriteReportsFailureAndChangesNothing() {
+    let win = window(topLeft: .zero, size: .zero)
+    win.onWrite = { _ in .timeout }
+    assertFalse(win.set(Ax.sizeAttr, targetSize))
+    assertEquals(win.get(Ax.sizeAttr), CGSize.zero)
+    assertFalse(isFrameSatisfied(win, targetTopLeft, targetSize))
+  }
 
-    // MARK: AXEnhancedUserInterface
+  // MARK: AXEnhancedUserInterface
 
-    /// The Electron fight: the flag must be put back exactly as it was found, even though the body
-    /// in between is what moves the window.
-    func testDisableAnimationsRestoresEnhancedUserInterface() {
-        let app = FakeAxElement()
-        app.seed(Ax.enhancedUserInterfaceAttr, true)
-        var bodyRan = false
-        disableAnimations(app: app) { bodyRan = true }
-        assertTrue(bodyRan)
-        assertEquals(app.writes, ["AXEnhancedUserInterface", "AXEnhancedUserInterface"])
-        assertEquals(app.get(Ax.enhancedUserInterfaceAttr), true)
-    }
+  /// The Electron fight: the flag must be put back exactly as it was found, even though the body
+  /// in between is what moves the window.
+  func testDisableAnimationsRestoresEnhancedUserInterface() {
+    let app = FakeAxElement()
+    app.seed(Ax.enhancedUserInterfaceAttr, true)
+    var bodyRan = false
+    disableAnimations(app: app) { bodyRan = true }
+    assertTrue(bodyRan)
+    assertEquals(app.writes, ["AXEnhancedUserInterface", "AXEnhancedUserInterface"])
+    assertEquals(app.get(Ax.enhancedUserInterfaceAttr), true)
+  }
 
-    /// An app that never had the flag must not have it *introduced* by us -- writing `false` there
-    /// would be two AX writes per frame change for no reason, and would leave the app in a state it
-    /// never asked for.
-    func testDisableAnimationsWritesNothingWhenFlagIsAbsent() {
-        let app = FakeAxElement()
-        disableAnimations(app: app) {}
-        assertEquals(app.writes, [])
-        assertNil(app.get(Ax.enhancedUserInterfaceAttr))
-    }
+  /// An app that never had the flag must not have it *introduced* by us -- writing `false` there
+  /// would be two AX writes per frame change for no reason, and would leave the app in a state it
+  /// never asked for.
+  func testDisableAnimationsWritesNothingWhenFlagIsAbsent() {
+    let app = FakeAxElement()
+    disableAnimations(app: app) {}
+    assertEquals(app.writes, [])
+    assertNil(app.get(Ax.enhancedUserInterfaceAttr))
+  }
 }
 
 /// Focus is handed over by an AX write, and for a long time it was the *wrong* write.
 final class AxFocusWriteTest: XCTestCase {
-    /// The regression. `kAXFocusedAttribute` is the attribute `kAXFocusedWindowAttribute` reports
-    /// back, and `getNativeFocusedWindow` reads exactly that -- so a focus path that never writes it
-    /// is telling macOS nothing and reading macOS's unchanged answer one refresh later.
-    ///
-    /// Symptom when it was missing: switching to a workspace whose app ALSO had windows on another
-    /// workspace bounced focus (and the active workspace, and the mouse) to that other workspace.
-    /// Raising and setting `isMain` reorder windows; neither moves the app's focused-window pointer.
-    func testFocusWritesTheAttributeMacOsReadsBack() {
-        let win = FakeAxElement()
-        setAxFocus(win)
-        XCTAssertTrue(win.writes.contains(kAXFocusedAttribute), "focus never wrote \(kAXFocusedAttribute): \(win.writes)")
-        assertEquals(win.get(Ax.isFocused), true)
-    }
+  /// The regression. `kAXFocusedAttribute` is the attribute `kAXFocusedWindowAttribute` reports
+  /// back, and `getNativeFocusedWindow` reads exactly that -- so a focus path that never writes it
+  /// is telling macOS nothing and reading macOS's unchanged answer one refresh later.
+  ///
+  /// Symptom when it was missing: switching to a workspace whose app ALSO had windows on another
+  /// workspace bounced focus (and the active workspace, and the mouse) to that other workspace.
+  /// Raising and setting `isMain` reorder windows; neither moves the app's focused-window pointer.
+  func testFocusWritesTheAttributeMacOsReadsBack() {
+    let win = FakeAxElement()
+    setAxFocus(win)
+    XCTAssertTrue(win.writes.contains(kAXFocusedAttribute), "focus never wrote \(kAXFocusedAttribute): \(win.writes)")
+    assertEquals(win.get(Ax.isFocused), true)
+  }
 
-    /// Order matters: point the app at the window before reordering, so a raise cannot be applied
-    /// against a stale focused window.
-    func testFocusedIsWrittenBeforeMain() {
-        let win = FakeAxElement()
-        setAxFocus(win)
-        assertEquals(win.writes, [kAXFocusedAttribute, kAXMainAttribute])
-    }
+  /// Order matters: point the app at the window before reordering, so a raise cannot be applied
+  /// against a stale focused window.
+  func testFocusedIsWrittenBeforeMain() {
+    let win = FakeAxElement()
+    setAxFocus(win)
+    assertEquals(win.writes, [kAXFocusedAttribute, kAXMainAttribute])
+  }
 
-    /// An app that ignores the write must not leave us believing it took. `nativeFocus` is
-    /// best-effort by nature, but `updateFocusCache`'s grace period is what covers this -- the write
-    /// silently doing nothing is the case that used to be indistinguishable from success.
-    func testAnAppThatIgnoresTheWriteDoesNotReportFocused() {
-        let win = FakeAxElement()
-        win.onWrite = { _ in .ignore }
-        setAxFocus(win)
-        assertNil(win.get(Ax.isFocused))
-    }
+  /// An app that ignores the write must not leave us believing it took. `nativeFocus` is
+  /// best-effort by nature, but `updateFocusCache`'s grace period is what covers this -- the write
+  /// silently doing nothing is the case that used to be indistinguishable from success.
+  func testAnAppThatIgnoresTheWriteDoesNotReportFocused() {
+    let win = FakeAxElement()
+    win.onWrite = { _ in .ignore }
+    setAxFocus(win)
+    assertNil(win.get(Ax.isFocused))
+  }
 }
 
 /// The paired native-state read behind `normalizeLayoutReason`.
@@ -296,43 +296,43 @@ final class AxFocusWriteTest: XCTestCase {
 /// window; `readMacosNativeState` is the single-traversal form. Asserted on the AX mock's recorded
 /// operations rather than on wall-clock, per dev-docs/performance.md.
 final class AxNativeStateReadTest: XCTestCase {
-    func testAnOrdinaryWindowIsAskedBothFlagsOnce() {
-        let win = FakeAxElement()
-        win.seed(Ax.isFullscreenAttr, false)
-        win.seed(Ax.minimizedAttr, false)
+  func testAnOrdinaryWindowIsAskedBothFlagsOnce() {
+    let win = FakeAxElement()
+    win.seed(Ax.isFullscreenAttr, false)
+    win.seed(Ax.minimizedAttr, false)
 
-        let state = readMacosNativeState(win)
-        assertEquals(state.fullscreen, false)
-        assertEquals(state.minimized, false)
-        // Exactly one read each -- no duplicate probing.
-        assertEquals(win.reads, [Ax.isFullscreenAttr.key, Ax.minimizedAttr.key])
-    }
+    let state = readMacosNativeState(win)
+    assertEquals(state.fullscreen, false)
+    assertEquals(state.minimized, false)
+    // Exactly one read each -- no duplicate probing.
+    assertEquals(win.reads, [Ax.isFullscreenAttr.key, Ax.minimizedAttr.key])
+  }
 
-    /// The short-circuit, and the reason it is worth keeping: the minimized read is an IPC to an app
-    /// that may be wedged, and a fullscreen window cannot be minimized.
-    func testAFullscreenWindowIsNeverAskedAboutMinimized() {
-        let win = FakeAxElement()
-        win.seed(Ax.isFullscreenAttr, true)
-        win.seed(Ax.minimizedAttr, true) // would be a lie; must not be consulted
+  /// The short-circuit, and the reason it is worth keeping: the minimized read is an IPC to an app
+  /// that may be wedged, and a fullscreen window cannot be minimized.
+  func testAFullscreenWindowIsNeverAskedAboutMinimized() {
+    let win = FakeAxElement()
+    win.seed(Ax.isFullscreenAttr, true)
+    win.seed(Ax.minimizedAttr, true) // would be a lie; must not be consulted
 
-        let state = readMacosNativeState(win)
-        assertEquals(state.fullscreen, true)
-        assertEquals(state.minimized, false)
-        assertEquals(win.reads, [Ax.isFullscreenAttr.key])
-    }
+    let state = readMacosNativeState(win)
+    assertEquals(state.fullscreen, true)
+    assertEquals(state.minimized, false)
+    assertEquals(win.reads, [Ax.isFullscreenAttr.key])
+  }
 
-    /// A window that answers nothing (dying, or an unresponsive app) must read as "conventional",
-    /// not crash and not get bound into the minimized container.
-    func testAnUnreadableWindowIsNeitherFullscreenNorMinimized() {
-        let state = readMacosNativeState(FakeAxElement())
-        assertEquals(state.fullscreen, false)
-        assertEquals(state.minimized, false)
-    }
+  /// A window that answers nothing (dying, or an unresponsive app) must read as "conventional",
+  /// not crash and not get bound into the minimized container.
+  func testAnUnreadableWindowIsNeitherFullscreenNorMinimized() {
+    let state = readMacosNativeState(FakeAxElement())
+    assertEquals(state.fullscreen, false)
+    assertEquals(state.minimized, false)
+  }
 
-    func testMinimizedIsReported() {
-        let win = FakeAxElement()
-        win.seed(Ax.isFullscreenAttr, false)
-        win.seed(Ax.minimizedAttr, true)
-        assertEquals(readMacosNativeState(win).minimized, true)
-    }
+  func testMinimizedIsReported() {
+    let win = FakeAxElement()
+    win.seed(Ax.isFullscreenAttr, false)
+    win.seed(Ax.minimizedAttr, true)
+    assertEquals(readMacosNativeState(win).minimized, true)
+  }
 }

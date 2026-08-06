@@ -4,10 +4,10 @@ public var isServer: Bool { !isCli }
 public nonisolated(unsafe) var terminationHandler: TerminationHandler = EmptyTerminationHandler()
 
 struct EmptyTerminationHandler: TerminationHandler {
-    func beforeTermination() {}
+  func beforeTermination() {}
 }
 
 @MainActor
 public protocol TerminationHandler: Sendable {
-    func beforeTermination() async throws
+  func beforeTermination() async throws
 }

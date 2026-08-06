@@ -16,30 +16,30 @@ import Common
 /// -- what logout, restart and `killall` actually send -- was not among them.
 @MainActor
 public final class AeroSporkAppDelegate: NSObject, NSApplicationDelegate {
-    /// The menu bar's Quit reaches `NSApp.terminate` too, so this can be entered twice. Restoring an
-    /// already-restored window is harmless but slow, and the second pass would run while the first
-    /// is still moving windows.
-    private var cleanupStarted = false
+  /// The menu bar's Quit reaches `NSApp.terminate` too, so this can be entered twice. Restoring an
+  /// already-restored window is harmless but slow, and the second pass would run while the first
+  /// is still moving windows.
+  private var cleanupStarted = false
 
-    public func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
-        if cleanupStarted { return .terminateNow }
-        cleanupStarted = true
-        // `.terminateLater` rather than doing this synchronously: the cleanup is a batch of
-        // Accessibility writes across every hidden window, and blocking the main thread through it
-        // is what makes a logout appear to hang.
-        Task {
-            defer { sender.reply(toApplicationShouldTerminate: true) }
-            // If something else vetoes the logout, this process keeps running -- and would keep
-            // running with the memory frozen, so nothing would be saved again for the rest of the
-            // session. Cheap to make recoverable; `cleanupStarted` is deliberately not reset,
-            // because the window-restoring half of the cleanup is idempotent but not free.
-            defer { WorkspaceMemory.unfreezeAfterCancelledQuit() }
-            do {
-                try await terminationHandler.beforeTermination()
-            } catch {
-                AppLog.session.error("Cleanup before quit failed: \(error.localizedDescription, privacy: .public)")
-            }
-        }
-        return .terminateLater
+  public func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+    if cleanupStarted { return .terminateNow }
+    cleanupStarted = true
+    // `.terminateLater` rather than doing this synchronously: the cleanup is a batch of
+    // Accessibility writes across every hidden window, and blocking the main thread through it
+    // is what makes a logout appear to hang.
+    Task {
+      defer { sender.reply(toApplicationShouldTerminate: true) }
+      // If something else vetoes the logout, this process keeps running -- and would keep
+      // running with the memory frozen, so nothing would be saved again for the rest of the
+      // session. Cheap to make recoverable; `cleanupStarted` is deliberately not reset,
+      // because the window-restoring half of the cleanup is idempotent but not free.
+      defer { WorkspaceMemory.unfreezeAfterCancelledQuit() }
+      do {
+        try await terminationHandler.beforeTermination()
+      } catch {
+        AppLog.session.error("Cleanup before quit failed: \(error.localizedDescription, privacy: .public)")
+      }
     }
+    return .terminateLater
+  }
 }

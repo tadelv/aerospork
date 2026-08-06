@@ -14,34 +14,34 @@ import XCTest
 /// Only when neither applies does the choice below happen.
 @MainActor
 final class StubWorkspaceTest: XCTestCase {
-    override func setUp() async throws { setUpWorkspacesForTests() }
+  override func setUp() async throws { setUpWorkspacesForTests() }
 
-    func testAnIdleMonitorGetsTheLowestWorkspaceTheUserBound() {
-        config.preservedWorkspaceNames = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
-        assertEquals(getStubWorkspace(for: mainMonitor).name, "1")
-    }
+  func testAnIdleMonitorGetsTheLowestWorkspaceTheUserBound() {
+    config.preservedWorkspaceNames = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+    assertEquals(getStubWorkspace(for: mainMonitor).name, "1")
+  }
 
-    /// Logical, not lexicographic: "2" must beat "10", and digits must beat letters.
-    func testBoundNamesAreOrderedLogically() {
-        config.preservedWorkspaceNames = ["A", "10", "2"]
-        assertEquals(getStubWorkspace(for: mainMonitor).name, "2")
-    }
+  /// Logical, not lexicographic: "2" must beat "10", and digits must beat letters.
+  func testBoundNamesAreOrderedLogically() {
+    config.preservedWorkspaceNames = ["A", "10", "2"]
+    assertEquals(getStubWorkspace(for: mainMonitor).name, "2")
+  }
 
-    /// The reported symptom, stated directly: on the real config the two idle monitors read `10`
-    /// and `11`, neither of which any binding could reach.
-    func testTheChosenWorkspaceIsAlwaysOneTheUserCanReach() {
-        let bound = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C"]
-        config.preservedWorkspaceNames = bound
-        let stub = getStubWorkspace(for: mainMonitor)
-        XCTAssertTrue(bound.contains(stub.name), "idle monitor got '\(stub.name)', which has no keybinding")
-    }
+  /// The reported symptom, stated directly: on the real config the two idle monitors read `10`
+  /// and `11`, neither of which any binding could reach.
+  func testTheChosenWorkspaceIsAlwaysOneTheUserCanReach() {
+    let bound = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C"]
+    config.preservedWorkspaceNames = bound
+    let stub = getStubWorkspace(for: mainMonitor)
+    XCTAssertTrue(bound.contains(stub.name), "idle monitor got '\(stub.name)', which has no keybinding")
+  }
 
-    /// With nothing bound there is no user intent to honour, so inventing a name is correct --
-    /// and it must still be an empty one.
-    func testWithNoBoundWorkspacesItStillInventsAnEmptyOne() {
-        config.preservedWorkspaceNames = []
-        let stub = getStubWorkspace(for: mainMonitor)
-        XCTAssertFalse(stub.name.isEmpty)
-        XCTAssertTrue(stub.isEffectivelyEmpty)
-    }
+  /// With nothing bound there is no user intent to honour, so inventing a name is correct --
+  /// and it must still be an empty one.
+  func testWithNoBoundWorkspacesItStillInventsAnEmptyOne() {
+    config.preservedWorkspaceNames = []
+    let stub = getStubWorkspace(for: mainMonitor)
+    XCTAssertFalse(stub.name.isEmpty)
+    XCTAssertTrue(stub.isEffectivelyEmpty)
+  }
 }

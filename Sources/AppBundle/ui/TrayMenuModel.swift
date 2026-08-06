@@ -2,18 +2,18 @@ import AppKit
 import Common
 
 public class TrayMenuModel: ObservableObject {
-    @MainActor public static let shared = TrayMenuModel()
+  @MainActor public static let shared = TrayMenuModel()
 
-    private init() {}
+  private init() {}
 
-    @Published var trayText: String = ""
-    @Published var trayItems: [TrayItem] = []
-    /// Is "layouting" enabled
-    @Published var isEnabled: Bool = true
-    @Published var workspaces: [WorkspaceViewModel] = []
-    /// Drives `MenuBarExtra(isInserted:)`. Defaults to the same value `AppVisibility` derives from a
-    /// default `Config`, so the very first `syncAppVisibility()` publishes nothing.
-    @Published var showsMenuBarIcon: Bool = true
+  @Published var trayText: String = ""
+  @Published var trayItems: [TrayItem] = []
+  /// Is "layouting" enabled
+  @Published var isEnabled: Bool = true
+  @Published var workspaces: [WorkspaceViewModel] = []
+  /// Drives `MenuBarExtra(isInserted:)`. Defaults to the same value `AppVisibility` derives from a
+  /// default `Config`, so the very first `syncAppVisibility()` publishes nothing.
+  @Published var showsMenuBarIcon: Bool = true
 }
 
 /// Which of the two ways into the GUI are on screen.
@@ -33,17 +33,17 @@ public class TrayMenuModel: ObservableObject {
 /// A pure value rather than a branch inside the sync function, because "what the two config keys
 /// mean together" is the part worth pinning with a test.
 struct AppVisibility: Equatable {
-    let showsMenuBarIcon: Bool
-    let showsDockIcon: Bool
-    /// True only when the Dock icon is on screen *because* the rule above put it there — not when
-    /// the user asked for a Dock-only setup, which is a perfectly ordinary thing to want.
-    let dockIconIsForced: Bool
+  let showsMenuBarIcon: Bool
+  let showsDockIcon: Bool
+  /// True only when the Dock icon is on screen *because* the rule above put it there — not when
+  /// the user asked for a Dock-only setup, which is a perfectly ordinary thing to want.
+  let dockIconIsForced: Bool
 
-    init(showMenuBarIcon: Bool, showDockIcon: Bool) {
-        showsMenuBarIcon = showMenuBarIcon
-        showsDockIcon = showDockIcon || !showMenuBarIcon
-        dockIconIsForced = !showDockIcon && !showMenuBarIcon
-    }
+  init(showMenuBarIcon: Bool, showDockIcon: Bool) {
+    showsMenuBarIcon = showMenuBarIcon
+    showsDockIcon = showDockIcon || !showMenuBarIcon
+    dockIconIsForced = !showDockIcon && !showMenuBarIcon
+  }
 }
 
 /// Push `show-menu-bar-icon` / `show-dock-icon` at AppKit and at the menu bar scene.
@@ -59,13 +59,13 @@ struct AppVisibility: Equatable {
 /// Skipped under XCTest: `setActivationPolicy` mutates the *test runner's* process, and there is
 /// nothing to assert about it from a headless bundle. `AppVisibility` is the testable part.
 @MainActor func syncAppVisibility() {
-    guard !isUnitTest else { return }
-    let visibility = AppVisibility(showMenuBarIcon: config.showMenuBarIcon, showDockIcon: config.showDockIcon)
-    setIfChanged(\.showsMenuBarIcon, visibility.showsMenuBarIcon)
-    let policy: NSApplication.ActivationPolicy = visibility.showsDockIcon ? .regular : .accessory
-    if NSApp.activationPolicy() != policy {
-        NSApp.setActivationPolicy(policy)
-    }
+  guard !isUnitTest else { return }
+  let visibility = AppVisibility(showMenuBarIcon: config.showMenuBarIcon, showDockIcon: config.showDockIcon)
+  setIfChanged(\.showsMenuBarIcon, visibility.showsMenuBarIcon)
+  let policy: NSApplication.ActivationPolicy = visibility.showsDockIcon ? .regular : .accessory
+  if NSApp.activationPolicy() != policy {
+    NSApp.setActivationPolicy(policy)
+  }
 }
 
 /// Assign only when the value actually changed. Every `@Published` write invalidates
@@ -73,58 +73,58 @@ struct AppVisibility: Equatable {
 /// on the main thread. `updateTrayText` runs on every refresh, so unguarded assignment meant a
 /// full SwiftUI-to-CGImage pass at up to 20Hz producing a byte-identical image nearly every time.
 @MainActor private func setIfChanged<T: Equatable>(_ keyPath: ReferenceWritableKeyPath<TrayMenuModel, T>, _ value: T) {
-    if TrayMenuModel.shared[keyPath: keyPath] != value {
-        TrayMenuModel.shared[keyPath: keyPath] = value
-    }
+  if TrayMenuModel.shared[keyPath: keyPath] != value {
+    TrayMenuModel.shared[keyPath: keyPath] = value
+  }
 }
 
 @MainActor func updateTrayText() {
-    syncAppVisibility()
-    let sortedMonitors = sortedMonitors
-    let focus = focus
-    setIfChanged(\.trayText, (activeMode?.takeIf { $0 != mainModeId }?.first.map { "[\($0.uppercased())] " } ?? "") +
-        sortedMonitors
-        .map {
-            ($0.activeWorkspace == focus.workspace && sortedMonitors.count > 1 ? "*" : "") + $0.activeWorkspace.name
-        }
-        .joined(separator: " │ "))
-    let workspaces = Workspace.all.map {
-        let apps = $0.allLeafWindowsRecursive.map { $0.app.name?.takeIf { !$0.isEmpty } }.filterNotNil().toSet()
-        let dash = " - "
-        let suffix = switch () {
-            case _ where !apps.isEmpty: dash + apps.sorted().joinTruncating(separator: ", ", length: 25)
-            case _ where $0.isVisible: dash + $0.workspaceMonitor.name
-            default: ""
-        }
-        return WorkspaceViewModel(name: $0.name, suffix: suffix, isFocused: focus.workspace == $0)
+  syncAppVisibility()
+  let sortedMonitors = sortedMonitors
+  let focus = focus
+  setIfChanged(\.trayText, (activeMode?.takeIf { $0 != mainModeId }?.first.map { "[\($0.uppercased())] " } ?? "") +
+    sortedMonitors
+    .map {
+      ($0.activeWorkspace == focus.workspace && sortedMonitors.count > 1 ? "*" : "") + $0.activeWorkspace.name
     }
-    setIfChanged(\.workspaces, workspaces)
-    var items = sortedMonitors.map {
-        TrayItem(type: .workspace, name: $0.activeWorkspace.name, isActive: $0.activeWorkspace == focus.workspace)
+    .joined(separator: " │ "))
+  let workspaces = Workspace.all.map {
+    let apps = $0.allLeafWindowsRecursive.map { $0.app.name?.takeIf { !$0.isEmpty } }.filterNotNil().toSet()
+    let dash = " - "
+    let suffix = switch () {
+      case _ where !apps.isEmpty: dash + apps.sorted().joinTruncating(separator: ", ", length: 25)
+      case _ where $0.isVisible: dash + $0.workspaceMonitor.name
+      default: ""
     }
-    let mode = activeMode?.takeIf { $0 != mainModeId }?.first.map { TrayItem(type: .mode, name: $0.uppercased(), isActive: true) }
-    if let mode {
-        items.insert(mode, at: 0)
-    }
-    setIfChanged(\.trayItems, items)
+    return WorkspaceViewModel(name: $0.name, suffix: suffix, isFocused: focus.workspace == $0)
+  }
+  setIfChanged(\.workspaces, workspaces)
+  var items = sortedMonitors.map {
+    TrayItem(type: .workspace, name: $0.activeWorkspace.name, isActive: $0.activeWorkspace == focus.workspace)
+  }
+  let mode = activeMode?.takeIf { $0 != mainModeId }?.first.map { TrayItem(type: .mode, name: $0.uppercased(), isActive: true) }
+  if let mode {
+    items.insert(mode, at: 0)
+  }
+  setIfChanged(\.trayItems, items)
 }
 
 struct WorkspaceViewModel: Hashable {
-    let name: String
-    /// " - Safari, Terminal" or " - Built-in Display". Kept out of `name` so the menu can render
-    /// the name monospaced and the context in the system font.
-    let suffix: String
-    let isFocused: Bool
+  let name: String
+  /// " - Safari, Terminal" or " - Built-in Display". Kept out of `name` so the menu can render
+  /// the name monospaced and the context in the system font.
+  let suffix: String
+  let isFocused: Bool
 }
 
 enum TrayItemType: String, Hashable {
-    case mode
-    case workspace
+  case mode
+  case workspace
 }
 
 struct TrayItem: Hashable, Identifiable {
-    let type: TrayItemType
-    let name: String
-    let isActive: Bool
-    var id: String { type.rawValue + name }
+  let type: TrayItemType
+  let name: String
+  let isActive: Bool
+  var id: String { type.rawValue + name }
 }

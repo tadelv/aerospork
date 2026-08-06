@@ -4,22 +4,22 @@ import XCTest
 
 @MainActor
 final class JoinWithCommandTest: XCTestCase {
-    override func setUp() async throws { setUpWorkspacesForTests() }
+  override func setUp() async throws { setUpWorkspacesForTests() }
 
-    func testMoveIn() async throws {
-        let root = Workspace.get(byName: name).rootTilingContainer.apply {
-            TestWindow.new(id: 0, parent: $0)
-            assertEquals(TestWindow.new(id: 1, parent: $0).focusWindow(), true)
-            TestWindow.new(id: 2, parent: $0)
-        }
-
-        try await JoinWithCommand(args: JoinWithCmdArgs(rawArgs: [], direction: .right)).run(.defaultEnv, .emptyStdin)
-        assertEquals(root.layoutDescription, .h_tiles([
-            .window(0),
-            .v_tiles([
-                .window(1),
-                .window(2),
-            ]),
-        ]))
+  func testMoveIn() async throws {
+    let root = Workspace.get(byName: name).rootTilingContainer.apply {
+      TestWindow.new(id: 0, parent: $0)
+      assertEquals(TestWindow.new(id: 1, parent: $0).focusWindow(), true)
+      TestWindow.new(id: 2, parent: $0)
     }
+
+    try await JoinWithCommand(args: JoinWithCmdArgs(rawArgs: [], direction: .right)).run(.defaultEnv, .emptyStdin)
+    assertEquals(root.layoutDescription, .h_tiles([
+      .window(0),
+      .v_tiles([
+        .window(1),
+        .window(2)
+      ])
+    ]))
+  }
 }

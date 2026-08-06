@@ -4,29 +4,29 @@ import TOMLKit
 
 let testEnv = ["PATH": "AEROSPORK_TEST_PATH", "AEROSPORK_INHERITED_TEST_ENV": "inherited"]
 private var env: [String: String] {
-    isUnitTest ? testEnv : ProcessInfo.processInfo.environment
+  isUnitTest ? testEnv : ProcessInfo.processInfo.environment
 }
 
 private let rawExecConfigParser: [String: any ParserProtocol<RawExecConfig>] = [
-    "inherit-env-vars": Parser(\.inheritEnvVariables, parseBool),
-    "env-vars": Parser(\.overriddenVars, parseEnvVariables),
+  "inherit-env-vars": Parser(\.inheritEnvVariables, parseBool),
+  "env-vars": Parser(\.overriddenVars, parseEnvVariables)
 ]
 
 let defaultOverriddenEnvVars = ["PATH": "/opt/homebrew/bin:/opt/homebrew/sbin:\(env["PATH"] ?? "")"]
 
 struct ExecConfig: Equatable {
-    var envVariables: [String: String] = env + defaultOverriddenEnvVars
+  var envVariables: [String: String] = env + defaultOverriddenEnvVars
 }
 
 struct RawExecConfig: ConvenienceCopyable, Equatable {
-    var inheritEnvVariables = true
-    // Already interpolated value of overridden vars
-    var overriddenVars: [String: String] = [:]
+  var inheritEnvVariables = true
+  // Already interpolated value of overridden vars
+  var overriddenVars: [String: String] = [:]
 
-    func expand() -> ExecConfig {
-        let base: [String: String] = inheritEnvVariables ? env : [:]
-        return ExecConfig(envVariables: base + overriddenVars)
-    }
+  func expand() -> ExecConfig {
+    let base: [String: String] = inheritEnvVariables ? env : [:]
+    return ExecConfig(envVariables: base + overriddenVars)
+  }
 }
 
 /// Environment for an `exec-on-workspace-change` child process.
@@ -34,36 +34,36 @@ struct RawExecConfig: ConvenienceCopyable, Equatable {
 /// One spelling only. The upstream-branded aliases were removed rather than deprecated, so a
 /// script reading the old names now sees an empty variable.
 func workspaceChangeEnvVars(_ base: [String: String], from oldWorkspace: String, to newWorkspace: String) -> [String: String] {
-    var env = base
-    env["AEROSPORK_FOCUSED_WORKSPACE"] = newWorkspace
-    env["AEROSPORK_PREV_WORKSPACE"] = oldWorkspace
-    return env
+  var env = base
+  env["AEROSPORK_FOCUSED_WORKSPACE"] = newWorkspace
+  env["AEROSPORK_PREV_WORKSPACE"] = oldWorkspace
+  return env
 }
 
 func parseExecConfig(_ raw: TOMLValueConvertible, _ backtrace: TomlBacktrace, _ errors: inout [TomlParseError]) -> ExecConfig {
-    parseTable(raw, RawExecConfig(), rawExecConfigParser, backtrace, &errors).expand()
+  parseTable(raw, RawExecConfig(), rawExecConfigParser, backtrace, &errors).expand()
 }
 
 private func parseEnvVariables(_ raw: TOMLValueConvertible, _ backtrace: TomlBacktrace, _ errors: inout [TomlParseError]) -> [String: String] {
-    guard let table = raw.expectTable(backtrace).unwrapOrCollect(&errors) else {
-        return [:]
+  guard let table = raw.expectTable(backtrace).unwrapOrCollect(&errors) else {
+    return [:]
+  }
+  let mutated = table.keys
+  let fullEnv: [String: String] = env
+  let baseEnv: [String: String] = fullEnv.filter { (key, _) -> Bool in !mutated.contains(key) }
+  var result: [String: String] = [:]
+  for (key, value) in table {
+    let backtrace = backtrace + .key(key)
+    if key == "PWD" { errors.append(.semantic(backtrace, "Changing 'PWD' is not allowed")) }
+    guard let rawStr = value.expectString(backtrace).unwrapOrCollect(&errors) else { continue }
+    var env = baseEnv
+    if let add: String = fullEnv[key] {
+      env[key] = add
     }
-    let mutated = table.keys
-    let fullEnv: [String: String] = env
-    let baseEnv: [String: String] = fullEnv.filter { (key, _) -> Bool in !mutated.contains(key) }
-    var result: [String: String] = [:]
-    for (key, value) in table {
-        let backtrace = backtrace + .key(key)
-        if key == "PWD" { errors.append(.semantic(backtrace, "Changing 'PWD' is not allowed")) }
-        guard let rawStr = value.expectString(backtrace).unwrapOrCollect(&errors) else { continue }
-        var env = baseEnv
-        if let add: String = fullEnv[key] {
-            env[key] = add
-        }
-        switch rawStr.interpolate(with: env) {
-            case .success(let interpolated): result[key] = interpolated
-            case .failure(let _errros): errors += _errros.map { .semantic(backtrace, $0) }
-        }
+    switch rawStr.interpolate(with: env) {
+      case .success(let interpolated): result[key] = interpolated
+      case .failure(let _errros): errors += _errros.map { .semantic(backtrace, $0) }
     }
-    return result
+  }
+  return result
 }

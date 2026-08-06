@@ -1,106 +1,106 @@
 public func parseCmdArgs(_ args: [String]) -> ParsedCmd<any CmdArgs> {
-    let subcommand = String(args.first ?? "")
-    debugLog("PARSECMDARGS: Parsing args: \(args), subcommand: '\(subcommand)'")
-    if subcommand.isEmpty {
-        return .failure("Can't parse empty string command")
+  let subcommand = String(args.first ?? "")
+  debugLog("PARSECMDARGS: Parsing args: \(args), subcommand: '\(subcommand)'")
+  if subcommand.isEmpty {
+    return .failure("Can't parse empty string command")
+  }
+  if let subcommandParser: any SubCommandParserProtocol = subcommandParsers[subcommand] {
+    debugLog("PARSECMDARGS: Found parser for subcommand '\(subcommand)'")
+    let result = subcommandParser.parse(args: Array(args.dropFirst()))
+    switch result {
+      case .cmd(let cmdArgs):
+        debugLog("PARSECMDARGS: Successfully parsed to \(type(of: cmdArgs))")
+      case .failure(let error):
+        debugLog("PARSECMDARGS: Failed to parse: \(error)")
+      case .help:
+        debugLog("PARSECMDARGS: Help requested")
     }
-    if let subcommandParser: any SubCommandParserProtocol = subcommandParsers[subcommand] {
-        debugLog("PARSECMDARGS: Found parser for subcommand '\(subcommand)'")
-        let result = subcommandParser.parse(args: Array(args.dropFirst()))
-        switch result {
-            case .cmd(let cmdArgs):
-                debugLog("PARSECMDARGS: Successfully parsed to \(type(of: cmdArgs))")
-            case .failure(let error):
-                debugLog("PARSECMDARGS: Failed to parse: \(error)")
-            case .help:
-                debugLog("PARSECMDARGS: Help requested")
-        }
-        return result
-    } else {
-        debugLog("PARSECMDARGS: No parser found for subcommand '\(subcommand)'")
-        // A command that exists but is config-only. `exec-and-forget` is parsed by the config
-        // reader, never registered as a CLI subcommand, yet it has a man page and a documented
-        // synopsis -- so a user following the docs typed it here and got "Unrecognized subcommand",
-        // which is true and useless.
-        if CmdKind(rawValue: subcommand) != nil {
-            return .failure(
-                "'\(subcommand)' is available in the config file, not on the command line.\n" +
-                    "Put it in a binding or a callback, e.g.\n" +
-                    "    [mode.main.binding]\n" +
-                    "    alt-enter = '\(subcommand) <your-command>'",
-            )
-        }
+    return result
+  } else {
+    debugLog("PARSECMDARGS: No parser found for subcommand '\(subcommand)'")
+    // A command that exists but is config-only. `exec-and-forget` is parsed by the config
+    // reader, never registered as a CLI subcommand, yet it has a man page and a documented
+    // synopsis -- so a user following the docs typed it here and got "Unrecognized subcommand",
+    // which is true and useless.
+    if CmdKind(rawValue: subcommand) != nil {
+      return .failure(
+        "'\(subcommand)' is available in the config file, not on the command line.\n" +
+          "Put it in a binding or a callback, e.g.\n" +
+          "    [mode.main.binding]\n" +
+          "    alt-enter = '\(subcommand) <your-command>'"
+      )
+    }
 
-        // Say what to do next, not just what went wrong.
-        let known = subcommandParsers.keys.sorted()
-        return .failure(
-            "Unrecognized subcommand '\(subcommand)'\(didYouMeanSuffix(subcommand, from: known))\n" +
-                "Run 'aerospork --help' for the list of commands.",
-        )
-    }
+    // Say what to do next, not just what went wrong.
+    let known = subcommandParsers.keys.sorted()
+    return .failure(
+      "Unrecognized subcommand '\(subcommand)'\(didYouMeanSuffix(subcommand, from: known))\n" +
+        "Run 'aerospork --help' for the list of commands."
+    )
+  }
 }
 
 public protocol CmdArgs: ConvenienceCopyable, Equatable, CustomStringConvertible, AeroAny, Sendable {
-    static var parser: CmdParser<Self> { get }
-    var rawArgs: EquatableNoop<[String]> { get } // Non Equatable because test comparion
+  static var parser: CmdParser<Self> { get }
+  var rawArgs: EquatableNoop<[String]> { get } // Non Equatable because test comparion
 
-    // Two very common flags among commands
-    var windowId: UInt32? { get set }
-    var workspaceName: WorkspaceName? { get set }
+  // Two very common flags among commands
+  var windowId: UInt32? { get set }
+  var workspaceName: WorkspaceName? { get set }
 }
 
 extension CmdArgs {
-    public static var info: CmdStaticInfo { Self.parser.info }
+  public static var info: CmdStaticInfo { Self.parser.info }
 
-    public func equals(_ other: any CmdArgs) -> Bool { // My brain is cursed with Java
-        (other as? Self).flatMap { self == $0 } ?? false
-    }
+  public func equals(_ other: any CmdArgs) -> Bool { // My brain is cursed with Java
+    (other as? Self).flatMap { self == $0 } ?? false
+  }
 
-    public var description: String {
-        switch Self.info.kind {
-            case .execAndForget:
-                CmdKind.execAndForget.rawValue + " " + (self as! ExecAndForgetCmdArgs).bashScript
-            default:
-                ([Self.info.kind.rawValue] + rawArgs.value).joinArgs()
-        }
+  public var description: String {
+    switch Self.info.kind {
+      case .execAndForget:
+        CmdKind.execAndForget.rawValue + " " + (self as! ExecAndForgetCmdArgs).bashScript
+      default:
+        ([Self.info.kind.rawValue] + rawArgs.value).joinArgs()
     }
+  }
 }
 
 public struct CmdParser<T: ConvenienceCopyable>: Sendable {
-    let info: CmdStaticInfo
-    let options: [String: any ArgParserProtocol<T>]
-    let arguments: [any ArgParserProtocol<T>]
-    let conflictingOptions: [Set<String>]
+  let info: CmdStaticInfo
+  let options: [String: any ArgParserProtocol<T>]
+  let arguments: [any ArgParserProtocol<T>]
+  let conflictingOptions: [Set<String>]
 }
 
 public func cmdParser<T>(
-    kind: CmdKind,
-    allowInConfig: Bool,
-    help: String,
-    options: [String: any ArgParserProtocol<T>],
-    arguments: [any ArgParserProtocol<T>],
-    conflictingOptions: [Set<String>] = [],
+  kind: CmdKind,
+  allowInConfig: Bool,
+  help: String,
+  options: [String: any ArgParserProtocol<T>],
+  arguments: [any ArgParserProtocol<T>],
+  conflictingOptions: [Set<String>] = []
 ) -> CmdParser<T> {
-    CmdParser(
-        info: CmdStaticInfo(help: help, kind: kind, allowInConfig: allowInConfig),
-        options: options,
-        arguments: arguments,
-        conflictingOptions: conflictingOptions,
-    )
+  CmdParser(
+    info: CmdStaticInfo(help: help, kind: kind, allowInConfig: allowInConfig),
+    options: options,
+    arguments: arguments,
+    conflictingOptions: conflictingOptions
+  )
 }
 
 public struct CmdStaticInfo: Equatable, Sendable {
-    public let help: String
-    public let kind: CmdKind
-    public let allowInConfig: Bool // Query commands are prohibited in config
+  public let help: String
+  public let kind: CmdKind
+  public let allowInConfig: Bool // Query commands are prohibited in config
 
-    public init(
-        help: String,
-        kind: CmdKind,
-        allowInConfig: Bool,
-    ) {
-        self.help = help
-        self.kind = kind
-        self.allowInConfig = allowInConfig
-    }
+  public init(
+    help: String,
+    kind: CmdKind,
+    allowInConfig: Bool
+  ) {
+    self.help = help
+    self.kind = kind
+    self.allowInConfig = allowInConfig
+  }
 }

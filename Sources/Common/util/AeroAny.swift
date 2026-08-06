@@ -4,22 +4,22 @@ import AppKit
 public protocol AeroAny {}
 
 extension AeroAny {
-    @discardableResult
-    @inlinable
-    public func apply(_ block: (Self) -> Void) -> Self {
-        block(self)
-        return self
-    }
+  @discardableResult
+  @inlinable
+  public func apply(_ block: (Self) -> Void) -> Self {
+    block(self)
+    return self
+  }
 
-    @discardableResult
-    @inlinable
-    public func also(_ block: (Self) -> Void) -> Self {
-        block(self)
-        return self
-    }
+  @discardableResult
+  @inlinable
+  public func also(_ block: (Self) -> Void) -> Self {
+    block(self)
+    return self
+  }
 
-    @inlinable public func takeIf(_ predicate: (Self) -> Bool) -> Self? { predicate(self) ? self : nil }
-    @inlinable public func then<R>(_ body: (Self) -> R) -> R { body(self) }
+  @inlinable public func takeIf(_ predicate: (Self) -> Bool) -> Self? { predicate(self) ? self : nil }
+  @inlinable public func then<R>(_ body: (Self) -> R) -> R { body(self) }
 }
 
 extension Int: AeroAny {}

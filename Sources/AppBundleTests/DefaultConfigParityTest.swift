@@ -16,35 +16,35 @@ import XCTest
 /// A symlink would also solve it, but the Xcode resource copy phase does not reliably preserve one
 /// into the bundle, so the guarantee is asserted here instead.
 final class DefaultConfigParityTest: XCTestCase {
-    func testShippedAndDocumentedDefaultConfigsAreIdentical() throws {
-        let shipped = projectRoot.appending(path: "resources/default-config.toml")
-        let documented = projectRoot.appending(path: "docs/config-examples/default-config.toml")
+  func testShippedAndDocumentedDefaultConfigsAreIdentical() throws {
+    let shipped = projectRoot.appending(path: "resources/default-config.toml")
+    let documented = projectRoot.appending(path: "docs/config-examples/default-config.toml")
 
-        let a = try String(contentsOf: shipped, encoding: .utf8)
-        let b = try String(contentsOf: documented, encoding: .utf8)
+    let a = try String(contentsOf: shipped, encoding: .utf8)
+    let b = try String(contentsOf: documented, encoding: .utf8)
 
-        guard a != b else { return }
+    guard a != b else { return }
 
-        // Report the first differing line rather than dumping two 100-line files at the reader.
-        let aLines = a.split(separator: "\n", omittingEmptySubsequences: false)
-        let bLines = b.split(separator: "\n", omittingEmptySubsequences: false)
-        let firstDiffIndex = (0 ..< min(aLines.count, bLines.count)).first { aLines[$0] != bLines[$0] }
-        let detail: String = if let firstDiffIndex {
-            """
-            first difference at line \(firstDiffIndex + 1):
-              resources/            \(aLines[firstDiffIndex])
-              docs/config-examples/ \(bLines[firstDiffIndex])
-            """
-        } else {
-            "same prefix, different length: \(aLines.count) vs \(bLines.count) lines"
-        }
-        XCTFail(
-            """
-            resources/default-config.toml and docs/config-examples/default-config.toml have diverged.
-            The first is what ships inside the .app; the second is what the docs show and what tests
-            read. Copy one over the other.
-            \(detail)
-            """,
-        )
+    // Report the first differing line rather than dumping two 100-line files at the reader.
+    let aLines = a.split(separator: "\n", omittingEmptySubsequences: false)
+    let bLines = b.split(separator: "\n", omittingEmptySubsequences: false)
+    let firstDiffIndex = (0..<min(aLines.count, bLines.count)).first { aLines[$0] != bLines[$0] }
+    let detail: String = if let firstDiffIndex {
+      """
+      first difference at line \(firstDiffIndex + 1):
+        resources/            \(aLines[firstDiffIndex])
+        docs/config-examples/ \(bLines[firstDiffIndex])
+      """
+    } else {
+      "same prefix, different length: \(aLines.count) vs \(bLines.count) lines"
     }
+    XCTFail(
+      """
+      resources/default-config.toml and docs/config-examples/default-config.toml have diverged.
+      The first is what ships inside the .app; the second is what the docs show and what tests
+      read. Copy one over the other.
+      \(detail)
+      """
+    )
+  }
 }

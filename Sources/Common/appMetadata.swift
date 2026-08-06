@@ -7,9 +7,9 @@
 /// `"aerospork"`, which made the app contradict itself — the crash dialog said `AeroSpork` while
 /// the menu bar said "Quit aerospork".
 #if DEBUG
-    public let aeroSporkAppId: String = "com.wbs.aerospork.debug"
-    public let aeroSporkAppName: String = "AeroSpork-Debug"
+  public let aeroSporkAppId: String = "com.wbs.aerospork.debug"
+  public let aeroSporkAppName: String = "AeroSpork-Debug"
 #else
-    public let aeroSporkAppId: String = "com.wbs.aerospork"
-    public let aeroSporkAppName: String = "AeroSpork"
+  public let aeroSporkAppId: String = "com.wbs.aerospork"
+  public let aeroSporkAppName: String = "AeroSpork"
 #endif

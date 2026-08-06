@@ -22,10 +22,10 @@ import os
 /// `BrandingTest.testLoggersUseTheBuildsOwnBundleId` rejects the literal.
 ///
 enum AppLog {
-    /// Which config file loaded, and why one didn't.
-    static let config = Logger(subsystem: aeroSporkAppId, category: "config")
-    /// Socket lifecycle and commands that came in over it.
-    static let server = Logger(subsystem: aeroSporkAppId, category: "server")
-    /// Failures inside detached refresh sessions -- see `runDetached`.
-    static let session = Logger(subsystem: aeroSporkAppId, category: "session")
+  /// Which config file loaded, and why one didn't.
+  static let config = Logger(subsystem: aeroSporkAppId, category: "config")
+  /// Socket lifecycle and commands that came in over it.
+  static let server = Logger(subsystem: aeroSporkAppId, category: "server")
+  /// Failures inside detached refresh sessions -- see `runDetached`.
+  static let session = Logger(subsystem: aeroSporkAppId, category: "session")
 }

@@ -2,63 +2,63 @@ import AppKit
 import Common
 
 struct ListWindowsCommand: Command {
-    let args: ListWindowsCmdArgs
+  let args: ListWindowsCmdArgs
 
-    func run(_ env: CmdEnv, _ io: CmdIo) async throws -> Bool {
-        let focus = focus
-        var windows: [Window] = []
+  func run(_ env: CmdEnv, _ io: CmdIo) async throws -> Bool {
+    let focus = focus
+    var windows: [Window] = []
 
-        if args.filteringOptions.focused {
-            if let window = focus.windowOrNil {
-                windows = [window]
-            } else {
-                return io.err(noWindowIsFocused)
+    if args.filteringOptions.focused {
+      if let window = focus.windowOrNil {
+        windows = [window]
+      } else {
+        return io.err(noWindowIsFocused)
+      }
+    } else {
+      var workspaces: Set<Workspace> = args.filteringOptions.workspaces.isEmpty
+        ? Workspace.all.toSet()
+        : args.filteringOptions.workspaces
+          .flatMap { filter in
+            switch filter {
+              case .focused: [focus.workspace]
+              case .visible: Workspace.all.filter(\.isVisible)
+              case .name(let name): [Workspace.get(byName: name.raw)]
             }
-        } else {
-            var workspaces: Set<Workspace> = args.filteringOptions.workspaces.isEmpty
-                ? Workspace.all.toSet()
-                : args.filteringOptions.workspaces
-                    .flatMap { filter in
-                        switch filter {
-                            case .focused: [focus.workspace]
-                            case .visible: Workspace.all.filter(\.isVisible)
-                            case .name(let name): [Workspace.get(byName: name.raw)]
-                        }
-                    }
-                    .toSet()
-            if !args.filteringOptions.monitors.isEmpty {
-                let monitors: Set<CGPoint> = args.filteringOptions.monitors.resolveMonitors(io)
-                if monitors.isEmpty { return false }
-                workspaces = workspaces.filter { monitors.contains($0.workspaceMonitor.rect.topLeftCorner) }
-            }
-            windows = workspaces.flatMap(\.allLeafWindowsRecursive)
-            if let pid = args.filteringOptions.pidFilter {
-                windows = windows.filter { $0.app.pid == pid }
-            }
-            if let appId = args.filteringOptions.appIdFilter {
-                windows = windows.filter { $0.app.bundleId == appId }
-            }
-        }
-
-        if args.outputOnlyCount {
-            return io.out("\(windows.count)")
-        } else {
-            var windowList: [(window: Window, title: String)] = []
-            for window in windows where window.isBound {
-                windowList.append((window, try await window.title))
-            }
-            windowList = windowList
-                .sortedBy([{ (w: (window: Window, title: String)) -> String in w.window.app.name ?? "" }, \.title])
-
-            return formatListOutput(
-                windowList,
-                countOnly: false, // already handled above
-                json: args.json,
-                format: args.format,
-                ignoreRightPadding: args._format.isEmpty,
-                mapper: { AeroObj.window(window: $0.window, title: $0.title) },
-                io: io,
-            )
-        }
+          }
+          .toSet()
+      if !args.filteringOptions.monitors.isEmpty {
+        let monitors: Set<CGPoint> = args.filteringOptions.monitors.resolveMonitors(io)
+        if monitors.isEmpty { return false }
+        workspaces = workspaces.filter { monitors.contains($0.workspaceMonitor.rect.topLeftCorner) }
+      }
+      windows = workspaces.flatMap(\.allLeafWindowsRecursive)
+      if let pid = args.filteringOptions.pidFilter {
+        windows = windows.filter { $0.app.pid == pid }
+      }
+      if let appId = args.filteringOptions.appIdFilter {
+        windows = windows.filter { $0.app.bundleId == appId }
+      }
     }
+
+    if args.outputOnlyCount {
+      return io.out("\(windows.count)")
+    } else {
+      var windowList: [(window: Window, title: String)] = []
+      for window in windows where window.isBound {
+        windowList.append((window, try await window.title))
+      }
+      windowList = windowList
+        .sortedBy([{ (w: (window: Window, title: String)) -> String in w.window.app.name ?? "" }, \.title])
+
+      return formatListOutput(
+        windowList,
+        countOnly: false, // already handled above
+        json: args.json,
+        format: args.format,
+        ignoreRightPadding: args._format.isEmpty,
+        mapper: { AeroObj.window(window: $0.window, title: $0.title) },
+        io: io
+      )
+    }
+  }
 }

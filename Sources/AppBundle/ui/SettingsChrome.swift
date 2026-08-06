@@ -10,45 +10,45 @@ import SwiftUI
 /// Numeric entry you can *type into*. Every number in this window used to be a bare `Stepper` with
 /// a 0...500 range, i.e. 500 clicks to reach the top of the range.
 struct NumberField: View {
-    let title: String
-    var unit = "pt"
-    var range: ClosedRange<Int> = 0 ... 500
-    @Binding var value: Int
+  let title: String
+  var unit = "pt"
+  var range: ClosedRange<Int> = 0...500
+  @Binding var value: Int
 
-    init(_ title: String, unit: String = "pt", range: ClosedRange<Int> = 0 ... 500, value: Binding<Int>) {
-        self.title = title
-        self.unit = unit
-        self.range = range
-        _value = value
-    }
+  init(_ title: String, unit: String = "pt", range: ClosedRange<Int> = 0...500, value: Binding<Int>) {
+    self.title = title
+    self.unit = unit
+    self.range = range
+    _value = value
+  }
 
-    /// Clamped, because the text field can produce anything and an out-of-range value would only
-    /// surface much later as a config validation error under a control that looks fine.
-    private var clamped: Binding<Int> {
-        Binding(get: { value }, set: { value = min(max($0, range.lowerBound), range.upperBound) })
-    }
+  /// Clamped, because the text field can produce anything and an out-of-range value would only
+  /// surface much later as a config validation error under a control that looks fine.
+  private var clamped: Binding<Int> {
+    Binding(get: { value }, set: { value = min(max($0, range.lowerBound), range.upperBound) })
+  }
 
-    var body: some View {
-        LabeledContent(title) {
-            HStack(spacing: 6) {
-                // Both controls in this row are separately focusable, and `LabeledContent` names
-                // the row rather than either of them. An explicit `accessibilityLabel` on each,
-                // rather than relying on a hidden title surviving `labelsHidden()`.
-                TextField("", value: clamped, format: .number)
-                    .textFieldStyle(.roundedBorder)
-                    .multilineTextAlignment(.trailing)
-                    .frame(width: 58)
-                    .labelsHidden()
-                    .accessibilityLabel(title)
-                Text(unit)
-                    .foregroundStyle(.secondary)
-                    .font(.callout)
-                Stepper(title, value: clamped, in: range)
-                    .labelsHidden()
-                    .accessibilityLabel(title)
-            }
-        }
+  var body: some View {
+    LabeledContent(title) {
+      HStack(spacing: 6) {
+        // Both controls in this row are separately focusable, and `LabeledContent` names
+        // the row rather than either of them. An explicit `accessibilityLabel` on each,
+        // rather than relying on a hidden title surviving `labelsHidden()`.
+        TextField("", value: clamped, format: .number)
+          .textFieldStyle(.roundedBorder)
+          .multilineTextAlignment(.trailing)
+          .frame(width: 58)
+          .labelsHidden()
+          .accessibilityLabel(title)
+        Text(unit)
+          .foregroundStyle(.secondary)
+          .font(.callout)
+        Stepper(title, value: clamped, in: range)
+          .labelsHidden()
+          .accessibilityLabel(title)
+      }
     }
+  }
 }
 
 /// Text entry in a settings row. Use this rather than a bare `TextField`.
@@ -63,31 +63,31 @@ struct NumberField: View {
 /// `prompt:` is the placeholder. `labelsHidden()` keeps the label for VoiceOver while stopping it
 /// competing with the row's own.
 struct SettingsField: View {
-    let label: String
-    let prompt: String
-    /// Monospaced by default: these fields hold app ids, commands, key notation and workspace
-    /// names, all of which are things the user could type into the config file. Pass `code: false`
-    /// for a field that holds prose, like a filter box.
-    var code = true
-    @Binding var text: String
+  let label: String
+  let prompt: String
+  /// Monospaced by default: these fields hold app ids, commands, key notation and workspace
+  /// names, all of which are things the user could type into the config file. Pass `code: false`
+  /// for a field that holds prose, like a filter box.
+  var code = true
+  @Binding var text: String
 
-    init(_ label: String, prompt: String, code: Bool = true, text: Binding<String>) {
-        self.label = label
-        self.prompt = prompt
-        self.code = code
-        _text = text
-    }
+  init(_ label: String, prompt: String, code: Bool = true, text: Binding<String>) {
+    self.label = label
+    self.prompt = prompt
+    self.code = code
+    _text = text
+  }
 
-    var body: some View {
-        TextField(label, text: $text, prompt: Text(prompt))
-            .textFieldStyle(.roundedBorder)
-            .labelsHidden()
-            .font(code ? .system(.body, design: .monospaced) : .body)
-            // As the trailing half of a `LabeledContent`, a field inherits that row's trailing
-            // alignment and puts the caret against the right edge -- so an app id typed left to
-            // right appears to grow backwards out of the corner.
-            .multilineTextAlignment(.leading)
-    }
+  var body: some View {
+    TextField(label, text: $text, prompt: Text(prompt))
+      .textFieldStyle(.roundedBorder)
+      .labelsHidden()
+      .font(code ? .system(.body, design: .monospaced) : .body)
+      // As the trailing half of a `LabeledContent`, a field inherits that row's trailing
+      // alignment and puts the caret against the right edge -- so an app id typed left to
+      // right appears to grow backwards out of the corner.
+      .multilineTextAlignment(.leading)
+  }
 }
 
 /// A symbol-only action with one accessibility contract everywhere it appears.
@@ -96,76 +96,76 @@ struct SettingsField: View {
 /// otherwise announced as only “button”, and locally invented variants were the main source of
 /// inconsistent hover targets and destructive styling in the settings panes.
 struct IconButton: View {
-    let systemImage: String
-    let label: String
-    var role: ButtonRole?
-    var isEnabled = true
-    let action: () -> Void
+  let systemImage: String
+  let label: String
+  var role: ButtonRole?
+  var isEnabled = true
+  let action: () -> Void
 
-    var body: some View {
-        Button(role: role, action: action) {
-            Image(systemName: systemImage)
-                .frame(width: 16, height: 16)
-                .contentShape(Rectangle())
-        }
-        .buttonStyle(.borderless)
-        .disabled(!isEnabled)
-        .help(label)
-        .accessibilityLabel(label)
+  var body: some View {
+    Button(role: role, action: action) {
+      Image(systemName: systemImage)
+        .frame(width: 16, height: 16)
+        .contentShape(Rectangle())
     }
+    .buttonStyle(.borderless)
+    .disabled(!isEnabled)
+    .help(label)
+    .accessibilityLabel(label)
+  }
 }
 
 /// The standard inset title used above a list or split-view pane.
 struct PanelHeader: View {
-    let title: String
-    let icon: String
+  let title: String
+  let icon: String
 
-    init(_ title: String, _ icon: String) {
-        self.title = title
-        self.icon = icon
-    }
+  init(_ title: String, _ icon: String) {
+    self.title = title
+    self.icon = icon
+  }
 
-    var body: some View {
-        // 16/14/8 is the padding the redesign synthesis fixed for every non-Form panel header;
-        // hand-rolled variants drifted, which is why this component exists.
-        SectionLabel(title, icon)
-            .padding(.horizontal, 16)
-            .padding(.top, 14)
-            .padding(.bottom, 8)
-    }
+  var body: some View {
+    // 16/14/8 is the padding the redesign synthesis fixed for every non-Form panel header;
+    // hand-rolled variants drifted, which is why this component exists.
+    SectionLabel(title, icon)
+      .padding(.horizontal, 16)
+      .padding(.top, 14)
+      .padding(.bottom, 8)
+  }
 }
 
 /// The one hint style in this window. Markdown-aware, so `code` spans render as code without every
 /// call site building an AttributedString.
 struct SettingsHint: View {
-    let text: String
+  let text: String
 
-    init(_ text: String) { self.text = text }
+  init(_ text: String) { self.text = text }
 
-    var body: some View {
-        Text(LocalizedStringKey(text))
-            .font(.callout)
-            .foregroundStyle(.secondary)
-            .fixedSize(horizontal: false, vertical: true)
-            .frame(maxWidth: .infinity, alignment: .leading)
-    }
+  var body: some View {
+    Text(LocalizedStringKey(text))
+      .font(.callout)
+      .foregroundStyle(.secondary)
+      .fixedSize(horizontal: false, vertical: true)
+      .frame(maxWidth: .infinity, alignment: .leading)
+  }
 }
 
 /// A hint pinned to the bottom of a tab that has no action bar of its own to hang it off.
 struct SettingsFooter: View {
-    let text: String
+  let text: String
 
-    init(_ text: String) { self.text = text }
+  init(_ text: String) { self.text = text }
 
-    var body: some View {
-        VStack(spacing: 0) {
-            Divider()
-            SettingsHint(text)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 9)
-        }
-        .background(.bar)
+  var body: some View {
+    VStack(spacing: 0) {
+      Divider()
+      SettingsHint(text)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 9)
     }
+    .background(.bar)
+  }
 }
 
 /// The macOS "table with a +/- strip glued to its bottom edge" idiom, once instead of three times.
@@ -173,45 +173,45 @@ struct SettingsFooter: View {
 /// The caveat text lives in here rather than in a separate `SettingsFooter` below it, because two
 /// stacked `.bar` strips with two dividers is more chrome than the content it explains.
 struct ListActionBar: View {
-    let addHelp: String
-    let removeHelp: String
-    let onAdd: () -> Void
-    /// `nil` means nothing is selected, so Remove is disabled.
-    let onRemove: (() -> Void)?
-    var hint: String?
+  let addHelp: String
+  let removeHelp: String
+  let onAdd: () -> Void
+  /// `nil` means nothing is selected, so Remove is disabled.
+  let onRemove: (() -> Void)?
+  var hint: String?
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Divider()
-            HStack(spacing: 10) {
-                // Icon-only buttons carry no title, so the help text has to double as the label or
-                // VoiceOver reads them as "button".
-                Button(action: onAdd) { Image(systemName: "plus") }
-                    .help(addHelp)
-                    .accessibilityLabel(addHelp)
-                Button { onRemove?() } label: { Image(systemName: "minus") }
-                    .disabled(onRemove == nil)
-                    .help(removeHelp)
-                    .accessibilityLabel(removeHelp)
-                Spacer(minLength: 12)
-            }
-            .buttonStyle(.borderless)
-            .padding(.horizontal, 12)
-            .padding(.top, 7)
-            .padding(.bottom, hint == nil ? 7 : 3)
+  var body: some View {
+    VStack(alignment: .leading, spacing: 0) {
+      Divider()
+      HStack(spacing: 10) {
+        // Icon-only buttons carry no title, so the help text has to double as the label or
+        // VoiceOver reads them as "button".
+        Button(action: onAdd) { Image(systemName: "plus") }
+          .help(addHelp)
+          .accessibilityLabel(addHelp)
+        Button { onRemove?() } label: { Image(systemName: "minus") }
+          .disabled(onRemove == nil)
+          .help(removeHelp)
+          .accessibilityLabel(removeHelp)
+        Spacer(minLength: 12)
+      }
+      .buttonStyle(.borderless)
+      .padding(.horizontal, 12)
+      .padding(.top, 7)
+      .padding(.bottom, hint == nil ? 7 : 3)
 
-            if let hint {
-                // Two lines is the ceiling for pinned chrome: an uncapped hint grew to 60-75pt at
-                // 780pt and pushed list content off-screen. The full text lives in the tooltip.
-                SettingsHint(hint)
-                    .lineLimit(2)
-                    .help(hint)
-                    .padding(.horizontal, 14)
-                    .padding(.bottom, 9)
-            }
-        }
-        .background(.bar)
+      if let hint {
+        // Two lines is the ceiling for pinned chrome: an uncapped hint grew to 60-75pt at
+        // 780pt and pushed list content off-screen. The full text lives in the tooltip.
+        SettingsHint(hint)
+          .lineLimit(2)
+          .help(hint)
+          .padding(.horizontal, 14)
+          .padding(.bottom, 9)
+      }
     }
+    .background(.bar)
+  }
 }
 
 /// A clickable workspace pill: Badge's shape, a Button's behavior. `help` is mandatory and doubles
@@ -219,98 +219,98 @@ struct ListActionBar: View {
 /// announced alone. Text keeps Badge's measured `.primary` blend: accent-on-accent-wash reads
 /// on-brand but measures ~3.3:1 in light mode, under the 4.5:1 floor for caption text.
 struct WorkspaceChip: View {
-    let name: String
-    let help: String
-    let action: () -> Void
+  let name: String
+  let help: String
+  let action: () -> Void
 
-    var body: some View {
-        Button(action: action) {
-            Text(name)
-                .font(.system(.caption, design: .monospaced).weight(.medium))
-                .foregroundStyle(.primary.opacity(0.72))
-                .padding(.horizontal, 7)
-                .padding(.vertical, 2)
-                .background(Capsule().fill(Color.accentColor.opacity(0.14)))
-                .overlay(Capsule().strokeBorder(Color.accentColor.opacity(0.35), lineWidth: 1))
-        }
-        .buttonStyle(.plain)
-        .settingsHitTarget()
-        .help(help)
-        .accessibilityLabel(help)
+  var body: some View {
+    Button(action: action) {
+      Text(name)
+        .font(.system(.caption, design: .monospaced).weight(.medium))
+        .foregroundStyle(.primary.opacity(0.72))
+        .padding(.horizontal, 7)
+        .padding(.vertical, 2)
+        .background(Capsule().fill(Color.accentColor.opacity(0.14)))
+        .overlay(Capsule().strokeBorder(Color.accentColor.opacity(0.35), lineWidth: 1))
     }
+    .buttonStyle(.plain)
+    .settingsHitTarget()
+    .help(help)
+    .accessibilityLabel(help)
+  }
 }
 
 extension View {
-    /// 24×24 is the WCAG 2.5.8 floor; caption-size pills and 14pt icon buttons are visually right
-    /// but physically too small, so the hit shape grows without moving a pixel.
-    func settingsHitTarget() -> some View {
-        frame(minWidth: 24, minHeight: 24).contentShape(Rectangle())
-    }
+  /// 24×24 is the WCAG 2.5.8 floor; caption-size pills and 14pt icon buttons are visually right
+  /// but physically too small, so the hit shape grows without moving a pixel.
+  func settingsHitTarget() -> some View {
+    frame(minWidth: 24, minHeight: 24).contentShape(Rectangle())
+  }
 }
 
 /// Posts a VoiceOver announcement for state that changes without a focus move — the detail strip
 /// swapping when a monitor is selected would otherwise be silent.
 @MainActor func settingsAnnounce(_ message: String) {
-    NSAccessibility.post(
-        element: NSApp as Any,
-        notification: .announcementRequested,
-        userInfo: [
-            .announcement: message,
-            .priority: NSAccessibilityPriorityLevel.high.rawValue,
-        ],
-    )
+  NSAccessibility.post(
+    element: NSApp as Any,
+    notification: .announcementRequested,
+    userInfo: [
+      .announcement: message,
+      .priority: NSAccessibilityPriorityLevel.high.rawValue
+    ]
+  )
 }
 
 /// `ContentUnavailableView` is macOS 14+; this app supports 13.
 struct ContentUnavailableViewCompat: View {
-    let icon: String
-    let title: String
-    let message: String
-    /// `message` is rendered as markdown so a static one can carry `code` spans. Pass `false` when
-    /// it interpolates anything the user typed: a filter query of `*foo*` would otherwise come back
-    /// italicised instead of as the literal text they are looking for.
-    var messageIsMarkdown = true
-    var actionTitle: String?
-    var action: (() -> Void)?
+  let icon: String
+  let title: String
+  let message: String
+  /// `message` is rendered as markdown so a static one can carry `code` spans. Pass `false` when
+  /// it interpolates anything the user typed: a filter query of `*foo*` would otherwise come back
+  /// italicised instead of as the literal text they are looking for.
+  var messageIsMarkdown = true
+  var actionTitle: String?
+  var action: (() -> Void)?
 
-    var body: some View {
-        VStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.system(size: 34, weight: .light))
-                .foregroundStyle(.tertiary)
-                .padding(.bottom, 2)
-            Text(title).font(.headline)
-            // Markdown, so `code` spans in an empty-state message don't read as literal backticks.
-            (messageIsMarkdown ? Text(LocalizedStringKey(message)) : Text(verbatim: message))
-                .font(.callout)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: 320)
-            if let actionTitle, let action {
-                Button(actionTitle, action: action).padding(.top, 4)
-            }
-        }
-        .padding(24)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+  var body: some View {
+    VStack(spacing: 8) {
+      Image(systemName: icon)
+        .font(.system(size: 34, weight: .light))
+        .foregroundStyle(.tertiary)
+        .padding(.bottom, 2)
+      Text(title).font(.headline)
+      // Markdown, so `code` spans in an empty-state message don't read as literal backticks.
+      (messageIsMarkdown ? Text(LocalizedStringKey(message)) : Text(verbatim: message))
+        .font(.callout)
+        .foregroundStyle(.secondary)
+        .multilineTextAlignment(.center)
+        .fixedSize(horizontal: false, vertical: true)
+        .frame(maxWidth: 320)
+      if let actionTitle, let action {
+        Button(actionTitle, action: action).padding(.top, 4)
+      }
     }
+    .padding(24)
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+  }
 }
 
 /// A section header that carries an icon, so scanning down a long grouped Form gives you shape as
 /// well as text. `Section("…")` alone is a wall of identical grey labels.
 struct SectionLabel: View {
-    let title: String
-    let icon: String
+  let title: String
+  let icon: String
 
-    init(_ title: String, _ icon: String) {
-        self.title = title
-        self.icon = icon
-    }
+  init(_ title: String, _ icon: String) {
+    self.title = title
+    self.icon = icon
+  }
 
-    var body: some View {
-        Label(title, systemImage: icon)
-            .font(.headline)
-    }
+  var body: some View {
+    Label(title, systemImage: icon)
+      .font(.headline)
+  }
 }
 
 /// Marks where a row came from, when that is not visible from the row itself.
@@ -319,42 +319,42 @@ struct SectionLabel: View {
 /// (6/2 and 5/1) and only one of which set a foreground colour or an accessibility label. A badge
 /// is a *label*, so the help text is mandatory: on its own the word "generated" explains nothing.
 struct Badge: View {
-    enum Tone {
-        case standard, muted
+  enum Tone {
+    case standard, muted
 
-        /// `.muted` is a grey wash rather than an ink wash, so a badge that qualifies a row
-        /// (`startup`) sits back from one that explains why a row is read-only (`generated`).
-        var fill: Color {
-            switch self {
-                case .standard: Color.primary.opacity(0.08)
-                case .muted: Color.secondary.opacity(0.2)
-            }
-        }
+    /// `.muted` is a grey wash rather than an ink wash, so a badge that qualifies a row
+    /// (`startup`) sits back from one that explains why a row is read-only (`generated`).
+    var fill: Color {
+      switch self {
+        case .standard: Color.primary.opacity(0.08)
+        case .muted: Color.secondary.opacity(0.2)
+      }
     }
+  }
 
-    let text: String
-    var tone: Tone = .standard
-    let help: String
+  let text: String
+  var tone: Tone = .standard
+  let help: String
 
-    init(_ text: String, tone: Tone = .standard, help: String) {
-        self.text = text
-        self.tone = tone
-        self.help = help
-    }
+  init(_ text: String, tone: Tone = .standard, help: String) {
+    self.text = text
+    self.tone = tone
+    self.help = help
+  }
 
-    var body: some View {
-        Text(text)
-            .font(.caption2)
-            // Not `.secondary`: measured over the light-appearance fill that lands at 3.9:1,
-            // under the 4.5:1 WCAG 1.4.3 floor for caption-size text. This blend measures ~8:1
-            // light and ~7:1 dark.
-            .foregroundStyle(.primary.opacity(0.72))
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
-            .background(Capsule().fill(tone.fill))
-            .help(help)
-            .accessibilityLabel(help)
-    }
+  var body: some View {
+    Text(text)
+      .font(.caption2)
+      // Not `.secondary`: measured over the light-appearance fill that lands at 3.9:1,
+      // under the 4.5:1 WCAG 1.4.3 floor for caption-size text. This blend measures ~8:1
+      // light and ~7:1 dark.
+      .foregroundStyle(.primary.opacity(0.72))
+      .padding(.horizontal, 6)
+      .padding(.vertical, 2)
+      .background(Capsule().fill(tone.fill))
+      .help(help)
+      .accessibilityLabel(help)
+  }
 }
 
 /// Inline validity readout: a tinted symbol plus one line of text, next to the action it describes.
@@ -362,40 +362,40 @@ struct Badge: View {
 /// Colour carries the meaning, so the symbol has to differ too -- red and green are the single most
 /// common confusable pair, and this is the readout that tells you whether your config parsed.
 struct StatusLabel: View {
-    enum Kind {
-        case ok, warning, error, neutral
+  enum Kind {
+    case ok, warning, error, neutral
 
-        var icon: String {
-            switch self {
-                case .ok: "checkmark.circle"
-                case .warning, .error: "exclamationmark.triangle.fill"
-                case .neutral: "equal.circle"
-            }
-        }
-
-        var tint: Color {
-            switch self {
-                case .ok: .green
-                case .warning: .orange
-                case .error: .red
-                case .neutral: .secondary
-            }
-        }
+    var icon: String {
+      switch self {
+        case .ok: "checkmark.circle"
+        case .warning, .error: "exclamationmark.triangle.fill"
+        case .neutral: "equal.circle"
+      }
     }
 
-    let text: String
-    let kind: Kind
-
-    init(_ text: String, kind: Kind) {
-        self.text = text
-        self.kind = kind
+    var tint: Color {
+      switch self {
+        case .ok: .green
+        case .warning: .orange
+        case .error: .red
+        case .neutral: .secondary
+      }
     }
+  }
 
-    var body: some View {
-        Label(text, systemImage: kind.icon)
-            .font(.callout)
-            .foregroundStyle(kind.tint)
-    }
+  let text: String
+  let kind: Kind
+
+  init(_ text: String, kind: Kind) {
+    self.text = text
+    self.kind = kind
+  }
+
+  var body: some View {
+    Label(text, systemImage: kind.icon)
+      .font(.callout)
+      .foregroundStyle(kind.tint)
+  }
 }
 
 /// A condition the user must know about for as long as it lasts, pinned above the content.
@@ -404,501 +404,501 @@ struct StatusLabel: View {
 /// thing standing between "my config failed to parse" and an app that looks completely normal
 /// while running a keymap the user never wrote, so it is persistent and not dismissible.
 struct Banner: View {
-    enum Kind {
-        case error, warning
+  enum Kind {
+    case error, warning
 
-        var icon: String {
-            switch self {
-                case .error: "exclamationmark.octagon.fill"
-                case .warning: "exclamationmark.triangle.fill"
-            }
-        }
-
-        var tint: Color {
-            switch self {
-                case .error: .red
-                case .warning: .orange
-            }
-        }
+    var icon: String {
+      switch self {
+        case .error: "exclamationmark.octagon.fill"
+        case .warning: "exclamationmark.triangle.fill"
+      }
     }
 
-    let text: String
-    let kind: Kind
-
-    init(_ text: String, kind: Kind) {
-        self.text = text
-        self.kind = kind
+    var tint: Color {
+      switch self {
+        case .error: .red
+        case .warning: .orange
+      }
     }
+  }
 
-    var body: some View {
-        HStack(alignment: .top, spacing: 9) {
-            Image(systemName: kind.icon)
-                .foregroundStyle(kind.tint)
-                .font(.title3)
-            Text(text)
-                .font(.callout)
-                // Selectable because the useful half of this text is a parser message someone is
-                // about to paste into a bug report.
-                .textSelection(.enabled)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 11)
-        .background(kind.tint.opacity(0.13))
-        .overlay(alignment: .bottom) { Divider() }
+  let text: String
+  let kind: Kind
+
+  init(_ text: String, kind: Kind) {
+    self.text = text
+    self.kind = kind
+  }
+
+  var body: some View {
+    HStack(alignment: .top, spacing: 9) {
+      Image(systemName: kind.icon)
+        .foregroundStyle(kind.tint)
+        .font(.title3)
+      Text(text)
+        .font(.callout)
+        // Selectable because the useful half of this text is a parser message someone is
+        // about to paste into a bug report.
+        .textSelection(.enabled)
+        .fixedSize(horizontal: false, vertical: true)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
+    .padding(.horizontal, 14)
+    .padding(.vertical, 11)
+    .background(kind.tint.opacity(0.13))
+    .overlay(alignment: .bottom) { Divider() }
+  }
 }
 
 /// Editable text that is code, not prose: monospaced, and with every macOS "helpful" substitution
 /// off. This is not cosmetic -- automatic quote substitution turns the `'` in `key = 'focus left'`
 /// into a curly quote, which is not valid TOML, so the raw editor could corrupt what you typed.
 struct CodeEditor: NSViewRepresentable {
-    @Binding var text: String
-    var jumpToLine: Int?
-    var errorLine: Int?
+  @Binding var text: String
+  var jumpToLine: Int?
+  var errorLine: Int?
+  var onSelectionChange: ((Int, Int) -> Void)?
+
+  init(
+    text: Binding<String>,
+    jumpToLine: Int? = nil,
+    errorLine: Int? = nil,
+    onSelectionChange: ((Int, Int) -> Void)? = nil
+  ) {
+    _text = text
+    self.jumpToLine = jumpToLine
+    self.errorLine = errorLine
+    self.onSelectionChange = onSelectionChange
+  }
+
+  func makeCoordinator() -> Coordinator {
+    Coordinator(text: $text, onSelectionChange: onSelectionChange)
+  }
+
+  func makeNSView(context: Context) -> NSScrollView {
+    let scroll = NSTextView.scrollableTextView()
+    scroll.hasVerticalScroller = true
+    scroll.hasHorizontalScroller = true
+    scroll.drawsBackground = false
+    guard let textView = scroll.documentView as? NSTextView else { return scroll }
+    textView.isRichText = false
+    textView.isAutomaticQuoteSubstitutionEnabled = false
+    textView.isAutomaticDashSubstitutionEnabled = false
+    textView.isAutomaticTextReplacementEnabled = false
+    textView.isAutomaticSpellingCorrectionEnabled = false
+    textView.isContinuousSpellCheckingEnabled = false
+    textView.isGrammarCheckingEnabled = false
+    textView.usesFindBar = true
+    textView.isIncrementalSearchingEnabled = true
+    textView.allowsUndo = true
+    textView.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
+    textView.textContainerInset = NSSize(width: 10, height: 12)
+    textView.isHorizontallyResizable = true
+    textView.textContainer?.widthTracksTextView = false
+    textView.textContainer?.containerSize = NSSize(
+      width: CGFloat.greatestFiniteMagnitude,
+      height: CGFloat.greatestFiniteMagnitude
+    )
+    textView.string = text
+    TomlSyntaxHighlighter.apply(to: textView)
+
+    let ruler = LineNumberRulerView(textView: textView, scrollView: scroll)
+    ruler.errorLine = errorLine
+    scroll.verticalRulerView = ruler
+    scroll.hasVerticalRuler = true
+    scroll.rulersVisible = true
+    context.coordinator.ruler = ruler
+    // Attach last: assigning the initial string can emit a selection notification. Publishing
+    // that during `makeNSView` mutates SwiftUI state in the middle of a render pass.
+    textView.delegate = context.coordinator
+    return scroll
+  }
+
+  func updateNSView(_ scroll: NSScrollView, context: Context) {
+    context.coordinator.text = $text
+    context.coordinator.onSelectionChange = onSelectionChange
+    guard let textView = scroll.documentView as? NSTextView else { return }
+    if textView.string != text {
+      // Only on an external change (Revert / Restore backup): assigning `string` resets the
+      // insertion point, which would fight the user on every keystroke if done unconditionally.
+      textView.string = text
+      TomlSyntaxHighlighter.apply(to: textView)
+      context.coordinator.ruler?.refreshLineStarts()
+    }
+    context.coordinator.ruler?.errorLine = errorLine
+    if context.coordinator.lastJumpToLine != jumpToLine {
+      context.coordinator.lastJumpToLine = jumpToLine
+      if let jumpToLine {
+        // Defer out of the view-update transaction, like publishSelection below: changing
+        // the selection and first responder synchronously here re-enters AppKit mid-render.
+        Task { @MainActor in Self.select(line: jumpToLine, in: textView) }
+      }
+    }
+  }
+
+  private static func select(line target: Int, in textView: NSTextView) {
+    guard target > 0 else { return }
+    let string = textView.string as NSString
+    var location = 0
+    var line = 1
+    while line < target, location < string.length {
+      location = NSMaxRange(string.lineRange(for: NSRange(location: location, length: 0)))
+      line += 1
+    }
+    guard line == target else { return }
+    let range = string.lineRange(for: NSRange(location: min(location, string.length), length: 0))
+    textView.setSelectedRange(range)
+    textView.scrollRangeToVisible(range)
+    textView.window?.makeFirstResponder(textView)
+  }
+
+  @MainActor final class Coordinator: NSObject, NSTextViewDelegate {
+    var text: Binding<String>
     var onSelectionChange: ((Int, Int) -> Void)?
+    fileprivate weak var ruler: LineNumberRulerView?
+    var lastJumpToLine: Int?
+    private var highlightTask: Task<Void, Never>?
 
-    init(
-        text: Binding<String>,
-        jumpToLine: Int? = nil,
-        errorLine: Int? = nil,
-        onSelectionChange: ((Int, Int) -> Void)? = nil,
-    ) {
-        _text = text
-        self.jumpToLine = jumpToLine
-        self.errorLine = errorLine
-        self.onSelectionChange = onSelectionChange
+    init(text: Binding<String>, onSelectionChange: ((Int, Int) -> Void)?) {
+      self.text = text
+      self.onSelectionChange = onSelectionChange
     }
 
-    func makeCoordinator() -> Coordinator {
-        Coordinator(text: $text, onSelectionChange: onSelectionChange)
-    }
-
-    func makeNSView(context: Context) -> NSScrollView {
-        let scroll = NSTextView.scrollableTextView()
-        scroll.hasVerticalScroller = true
-        scroll.hasHorizontalScroller = true
-        scroll.drawsBackground = false
-        guard let textView = scroll.documentView as? NSTextView else { return scroll }
-        textView.isRichText = false
-        textView.isAutomaticQuoteSubstitutionEnabled = false
-        textView.isAutomaticDashSubstitutionEnabled = false
-        textView.isAutomaticTextReplacementEnabled = false
-        textView.isAutomaticSpellingCorrectionEnabled = false
-        textView.isContinuousSpellCheckingEnabled = false
-        textView.isGrammarCheckingEnabled = false
-        textView.usesFindBar = true
-        textView.isIncrementalSearchingEnabled = true
-        textView.allowsUndo = true
-        textView.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
-        textView.textContainerInset = NSSize(width: 10, height: 12)
-        textView.isHorizontallyResizable = true
-        textView.textContainer?.widthTracksTextView = false
-        textView.textContainer?.containerSize = NSSize(
-            width: CGFloat.greatestFiniteMagnitude,
-            height: CGFloat.greatestFiniteMagnitude,
-        )
-        textView.string = text
+    func textDidChange(_ notification: Notification) {
+      guard let textView = notification.object as? NSTextView else { return }
+      text.wrappedValue = textView.string
+      highlightTask?.cancel()
+      highlightTask = Task { @MainActor [weak textView, weak self] in
+        // Styling attributes do not need to race the keystroke that produced them. A
+        // short cancellable delay collapses a typing burst into one linear pass. The
+        // gutter's line-start cache rides the same debounce: rebuilding it is a full
+        // document scan, and per keystroke that scan dwarfs the drawing it feeds.
+        try? await Task.sleep(for: .milliseconds(45))
+        guard !Task.isCancelled, let textView else { return }
         TomlSyntaxHighlighter.apply(to: textView)
-
-        let ruler = LineNumberRulerView(textView: textView, scrollView: scroll)
-        ruler.errorLine = errorLine
-        scroll.verticalRulerView = ruler
-        scroll.hasVerticalRuler = true
-        scroll.rulersVisible = true
-        context.coordinator.ruler = ruler
-        // Attach last: assigning the initial string can emit a selection notification. Publishing
-        // that during `makeNSView` mutates SwiftUI state in the middle of a render pass.
-        textView.delegate = context.coordinator
-        return scroll
+        self?.ruler?.refreshLineStarts()
+      }
+      publishSelection(textView)
     }
 
-    func updateNSView(_ scroll: NSScrollView, context: Context) {
-        context.coordinator.text = $text
-        context.coordinator.onSelectionChange = onSelectionChange
-        guard let textView = scroll.documentView as? NSTextView else { return }
-        if textView.string != text {
-            // Only on an external change (Revert / Restore backup): assigning `string` resets the
-            // insertion point, which would fight the user on every keystroke if done unconditionally.
-            textView.string = text
-            TomlSyntaxHighlighter.apply(to: textView)
-            context.coordinator.ruler?.refreshLineStarts()
-        }
-        context.coordinator.ruler?.errorLine = errorLine
-        if context.coordinator.lastJumpToLine != jumpToLine {
-            context.coordinator.lastJumpToLine = jumpToLine
-            if let jumpToLine {
-                // Defer out of the view-update transaction, like publishSelection below: changing
-                // the selection and first responder synchronously here re-enters AppKit mid-render.
-                Task { @MainActor in Self.select(line: jumpToLine, in: textView) }
-            }
-        }
+    func textViewDidChangeSelection(_ notification: Notification) {
+      guard let textView = notification.object as? NSTextView else { return }
+      publishSelection(textView)
     }
 
-    private static func select(line target: Int, in textView: NSTextView) {
-        guard target > 0 else { return }
-        let string = textView.string as NSString
-        var location = 0
-        var line = 1
-        while line < target, location < string.length {
-            location = NSMaxRange(string.lineRange(for: NSRange(location: location, length: 0)))
-            line += 1
-        }
-        guard line == target else { return }
-        let range = string.lineRange(for: NSRange(location: min(location, string.length), length: 0))
-        textView.setSelectedRange(range)
-        textView.scrollRangeToVisible(range)
-        textView.window?.makeFirstResponder(textView)
+    func publishSelection(_ textView: NSTextView) {
+      // Runs on every keystroke and arrow key, so it counts newlines in place: no substring
+      // copy of everything above the cursor, no per-line allocation. Column is a UTF-16
+      // offset like everything else NSTextView reports.
+      let string = textView.string as NSString
+      let location = min(textView.selectedRange().location, string.length)
+      var line = 1
+      var lineStart = 0
+      while lineStart < location {
+        let newline = string.range(of: "\n", range: NSRange(location: lineStart, length: location - lineStart))
+        if newline.location == NSNotFound { break }
+        line += 1
+        lineStart = NSMaxRange(newline)
+      }
+      let column = location - lineStart + 1
+      // AppKit can report a selection synchronously from `updateNSView`; defer the publish so
+      // it never mutates SwiftUI state during that view-update transaction.
+      Task { @MainActor [weak self] in self?.onSelectionChange?(line, column) }
     }
-
-    @MainActor final class Coordinator: NSObject, NSTextViewDelegate {
-        var text: Binding<String>
-        var onSelectionChange: ((Int, Int) -> Void)?
-        fileprivate weak var ruler: LineNumberRulerView?
-        var lastJumpToLine: Int?
-        private var highlightTask: Task<Void, Never>?
-
-        init(text: Binding<String>, onSelectionChange: ((Int, Int) -> Void)?) {
-            self.text = text
-            self.onSelectionChange = onSelectionChange
-        }
-
-        func textDidChange(_ notification: Notification) {
-            guard let textView = notification.object as? NSTextView else { return }
-            text.wrappedValue = textView.string
-            highlightTask?.cancel()
-            highlightTask = Task { @MainActor [weak textView, weak self] in
-                // Styling attributes do not need to race the keystroke that produced them. A
-                // short cancellable delay collapses a typing burst into one linear pass. The
-                // gutter's line-start cache rides the same debounce: rebuilding it is a full
-                // document scan, and per keystroke that scan dwarfs the drawing it feeds.
-                try? await Task.sleep(for: .milliseconds(45))
-                guard !Task.isCancelled, let textView else { return }
-                TomlSyntaxHighlighter.apply(to: textView)
-                self?.ruler?.refreshLineStarts()
-            }
-            publishSelection(textView)
-        }
-
-        func textViewDidChangeSelection(_ notification: Notification) {
-            guard let textView = notification.object as? NSTextView else { return }
-            publishSelection(textView)
-        }
-
-        func publishSelection(_ textView: NSTextView) {
-            // Runs on every keystroke and arrow key, so it counts newlines in place: no substring
-            // copy of everything above the cursor, no per-line allocation. Column is a UTF-16
-            // offset like everything else NSTextView reports.
-            let string = textView.string as NSString
-            let location = min(textView.selectedRange().location, string.length)
-            var line = 1
-            var lineStart = 0
-            while lineStart < location {
-                let newline = string.range(of: "\n", range: NSRange(location: lineStart, length: location - lineStart))
-                if newline.location == NSNotFound { break }
-                line += 1
-                lineStart = NSMaxRange(newline)
-            }
-            let column = location - lineStart + 1
-            // AppKit can report a selection synchronously from `updateNSView`; defer the publish so
-            // it never mutates SwiftUI state during that view-update transaction.
-            Task { @MainActor [weak self] in self?.onSelectionChange?(line, column) }
-        }
-    }
+  }
 }
 
 /// A restrained line-number gutter built on AppKit's ruler API. It scrolls with the native text
 /// view and adds no SwiftUI rows to a document that can easily contain thousands of lines.
 fileprivate final class LineNumberRulerView: NSRulerView {
-    private weak var textView: NSTextView?
-    private var lineStarts = [0]
-    var errorLine: Int? { didSet { if errorLine != oldValue { needsDisplay = true } } }
+  private weak var textView: NSTextView?
+  private var lineStarts = [0]
+  var errorLine: Int? { didSet { if errorLine != oldValue { needsDisplay = true } } }
 
-    init(textView: NSTextView, scrollView: NSScrollView) {
-        self.textView = textView
-        super.init(scrollView: scrollView, orientation: .verticalRuler)
-        clientView = textView
-        ruleThickness = 42
-        refreshLineStarts()
+  init(textView: NSTextView, scrollView: NSScrollView) {
+    self.textView = textView
+    super.init(scrollView: scrollView, orientation: .verticalRuler)
+    clientView = textView
+    ruleThickness = 42
+    refreshLineStarts()
+  }
+
+  required init(coder: NSCoder) { die("LineNumberRulerView is never loaded from a nib") }
+
+  override var isFlipped: Bool { true }
+
+  /// Cache document line starts when text changes, then use binary search while scrolling. The
+  /// ruler used to rescan every line above the viewport for every draw, making a scroll near the
+  /// end of a long config O(total lines) per frame.
+  func refreshLineStarts() {
+    guard let textView else { return }
+    let string = textView.string as NSString
+    var starts = [0]
+    var location = 0
+    while location < string.length {
+      let next = NSMaxRange(string.lineRange(for: NSRange(location: location, length: 0)))
+      guard next > location else { break }
+      if next < string.length {
+        starts.append(next)
+      } else if next == string.length, string.length > 0 {
+        let last = string.character(at: string.length - 1)
+        if last == 10 || last == 13 { starts.append(next) }
+      }
+      location = next
+    }
+    lineStarts = starts
+    needsDisplay = true
+  }
+
+  private func lineIndex(containing character: Int) -> Int {
+    var lower = 0
+    var upper = lineStarts.count
+    while lower < upper {
+      let middle = (lower + upper) / 2
+      if lineStarts[middle] <= character {
+        lower = middle + 1
+      } else {
+        upper = middle
+      }
+    }
+    return max(0, lower - 1)
+  }
+
+  override func drawHashMarksAndLabels(in rect: NSRect) {
+    guard let textView,
+          let layoutManager = textView.layoutManager,
+          let textContainer = textView.textContainer
+    else { return }
+    NSColor.controlBackgroundColor.setFill()
+    rect.fill()
+
+    let string = textView.string as NSString
+    let normalAttributes: [NSAttributedString.Key: Any] = [
+      .font: NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .regular),
+      .foregroundColor: NSColor.tertiaryLabelColor
+    ]
+    let errorAttributes: [NSAttributedString.Key: Any] = [
+      .font: NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .medium),
+      .foregroundColor: NSColor.systemRed
+    ]
+    let visibleGlyphs = layoutManager.glyphRange(forBoundingRect: textView.visibleRect, in: textContainer)
+    let visibleCharacters = layoutManager.characterRange(forGlyphRange: visibleGlyphs, actualGlyphRange: nil)
+    var index = lineIndex(containing: visibleCharacters.location)
+    while index < lineStarts.count {
+      let location = lineStarts[index]
+      let glyph = location < string.length
+        ? layoutManager.glyphIndexForCharacter(at: location)
+        : layoutManager.numberOfGlyphs
+      let lineRect: NSRect = if glyph < layoutManager.numberOfGlyphs {
+        layoutManager.lineFragmentRect(forGlyphAt: glyph, effectiveRange: nil)
+      } else {
+        layoutManager.extraLineFragmentRect
+      }
+      let point = convert(
+        NSPoint(x: 0, y: lineRect.minY + textView.textContainerOrigin.y),
+        from: textView
+      )
+      if point.y > rect.maxY { break }
+      let value = String(index + 1) as NSString
+      let attributes = index + 1 == errorLine ? errorAttributes : normalAttributes
+      let size = value.size(withAttributes: attributes)
+      if point.y + size.height >= rect.minY, point.y <= rect.maxY {
+        value.draw(
+          at: NSPoint(x: ruleThickness - size.width - 8, y: point.y),
+          withAttributes: attributes
+        )
+      }
+      if index + 1 == errorLine {
+        NSColor.systemRed.setFill()
+        NSRect(x: 0, y: point.y, width: 3, height: max(size.height, lineRect.height)).fill()
+      }
+
+      index += 1
     }
 
-    required init(coder: NSCoder) { die("LineNumberRulerView is never loaded from a nib") }
-
-    override var isFlipped: Bool { true }
-
-    /// Cache document line starts when text changes, then use binary search while scrolling. The
-    /// ruler used to rescan every line above the viewport for every draw, making a scroll near the
-    /// end of a long config O(total lines) per frame.
-    func refreshLineStarts() {
-        guard let textView else { return }
-        let string = textView.string as NSString
-        var starts = [0]
-        var location = 0
-        while location < string.length {
-            let next = NSMaxRange(string.lineRange(for: NSRange(location: location, length: 0)))
-            guard next > location else { break }
-            if next < string.length {
-                starts.append(next)
-            } else if next == string.length, string.length > 0 {
-                let last = string.character(at: string.length - 1)
-                if last == 10 || last == 13 { starts.append(next) }
-            }
-            location = next
-        }
-        lineStarts = starts
-        needsDisplay = true
-    }
-
-    private func lineIndex(containing character: Int) -> Int {
-        var lower = 0
-        var upper = lineStarts.count
-        while lower < upper {
-            let middle = (lower + upper) / 2
-            if lineStarts[middle] <= character {
-                lower = middle + 1
-            } else {
-                upper = middle
-            }
-        }
-        return max(0, lower - 1)
-    }
-
-    override func drawHashMarksAndLabels(in rect: NSRect) {
-        guard let textView,
-              let layoutManager = textView.layoutManager,
-              let textContainer = textView.textContainer
-        else { return }
-        NSColor.controlBackgroundColor.setFill()
-        rect.fill()
-
-        let string = textView.string as NSString
-        let normalAttributes: [NSAttributedString.Key: Any] = [
-            .font: NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .regular),
-            .foregroundColor: NSColor.tertiaryLabelColor,
-        ]
-        let errorAttributes: [NSAttributedString.Key: Any] = [
-            .font: NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .medium),
-            .foregroundColor: NSColor.systemRed,
-        ]
-        let visibleGlyphs = layoutManager.glyphRange(forBoundingRect: textView.visibleRect, in: textContainer)
-        let visibleCharacters = layoutManager.characterRange(forGlyphRange: visibleGlyphs, actualGlyphRange: nil)
-        var index = lineIndex(containing: visibleCharacters.location)
-        while index < lineStarts.count {
-            let location = lineStarts[index]
-            let glyph = location < string.length
-                ? layoutManager.glyphIndexForCharacter(at: location)
-                : layoutManager.numberOfGlyphs
-            let lineRect: NSRect = if glyph < layoutManager.numberOfGlyphs {
-                layoutManager.lineFragmentRect(forGlyphAt: glyph, effectiveRange: nil)
-            } else {
-                layoutManager.extraLineFragmentRect
-            }
-            let point = convert(
-                NSPoint(x: 0, y: lineRect.minY + textView.textContainerOrigin.y),
-                from: textView,
-            )
-            if point.y > rect.maxY { break }
-            let value = String(index + 1) as NSString
-            let attributes = index + 1 == errorLine ? errorAttributes : normalAttributes
-            let size = value.size(withAttributes: attributes)
-            if point.y + size.height >= rect.minY, point.y <= rect.maxY {
-                value.draw(
-                    at: NSPoint(x: ruleThickness - size.width - 8, y: point.y),
-                    withAttributes: attributes,
-                )
-            }
-            if index + 1 == errorLine {
-                NSColor.systemRed.setFill()
-                NSRect(x: 0, y: point.y, width: 3, height: max(size.height, lineRect.height)).fill()
-            }
-
-            index += 1
-        }
-
-        NSColor.separatorColor.setFill()
-        NSRect(x: ruleThickness - 1, y: rect.minY, width: 1, height: rect.height).fill()
-    }
+    NSColor.separatorColor.setFill()
+    NSRect(x: ruleThickness - 1, y: rect.minY, width: 1, height: rect.height).fill()
+  }
 }
 
 /// Deliberately restrained TOML highlighting: structure, keys, values, comments. It avoids a
 /// rainbow token palette and correctly ignores `#` inside quoted and multiline strings.
 @MainActor enum TomlSyntaxHighlighter {
-    private static let baseFont = NSFont.monospacedSystemFont(ofSize: 12, weight: .regular)
-    private static let emphasisFont = NSFont.monospacedSystemFont(ofSize: 12, weight: .medium)
+  private static let baseFont = NSFont.monospacedSystemFont(ofSize: 12, weight: .regular)
+  private static let emphasisFont = NSFont.monospacedSystemFont(ofSize: 12, weight: .medium)
 
-    static func apply(to textView: NSTextView) {
-        guard let storage = textView.textStorage else { return }
-        let string = storage.string as NSString
-        let whole = NSRange(location: 0, length: string.length)
-        let base: [NSAttributedString.Key: Any] = [
-            .font: baseFont,
-            .foregroundColor: NSColor.secondaryLabelColor,
-        ]
-        textView.typingAttributes = base
-        storage.beginEditing()
-        storage.setAttributes(base, range: whole)
+  static func apply(to textView: NSTextView) {
+    guard let storage = textView.textStorage else { return }
+    let string = storage.string as NSString
+    let whole = NSRange(location: 0, length: string.length)
+    let base: [NSAttributedString.Key: Any] = [
+      .font: baseFont,
+      .foregroundColor: NSColor.secondaryLabelColor
+    ]
+    textView.typingAttributes = base
+    storage.beginEditing()
+    storage.setAttributes(base, range: whole)
 
-        var location = 0
-        var multilineQuote: unichar?
-        repeat {
-            let lineRange = string.lineRange(for: NSRange(location: location, length: 0))
-            let contentsEnd = lineRange.location + lineRange.length
-                - trailingNewlineLength(in: string, range: lineRange)
-            let contentsRange = NSRange(
-                location: lineRange.location,
-                length: max(0, contentsEnd - lineRange.location),
-            )
-            let scan = scanLine(string, range: contentsRange, multilineQuote: &multilineQuote)
+    var location = 0
+    var multilineQuote: unichar?
+    repeat {
+      let lineRange = string.lineRange(for: NSRange(location: location, length: 0))
+      let contentsEnd = lineRange.location + lineRange.length
+        - trailingNewlineLength(in: string, range: lineRange)
+      let contentsRange = NSRange(
+        location: lineRange.location,
+        length: max(0, contentsEnd - lineRange.location)
+      )
+      let scan = scanLine(string, range: contentsRange, multilineQuote: &multilineQuote)
 
-            if scan.startedOutsideMultiline {
-                let codeEnd = scan.commentLocation ?? NSMaxRange(contentsRange)
-                let codeRange = NSRange(
-                    location: contentsRange.location,
-                    length: max(0, codeEnd - contentsRange.location),
-                )
-                let trimmed = trimWhitespace(in: string, range: codeRange)
-                if trimmed.length > 1,
-                   string.character(at: trimmed.location) == 91,
-                   string.character(at: NSMaxRange(trimmed) - 1) == 93
-                {
-                    storage.addAttributes([
-                        .font: emphasisFont,
-                        .foregroundColor: NSColor.controlAccentColor,
-                    ], range: trimmed)
-                } else if let equals = scan.equalsLocation {
-                    let key = trimWhitespace(
-                        in: string,
-                        range: NSRange(
-                            location: contentsRange.location,
-                            length: max(0, equals - contentsRange.location),
-                        ),
-                    )
-                    if key.length > 0 {
-                        storage.addAttributes([
-                            .font: emphasisFont,
-                            .foregroundColor: NSColor.labelColor,
-                        ], range: key)
-                    }
-                }
-            }
-            if let comment = scan.commentLocation {
-                storage.addAttribute(
-                    .foregroundColor,
-                    value: NSColor.tertiaryLabelColor,
-                    range: NSRange(location: comment, length: max(0, contentsEnd - comment)),
-                )
-            }
-
-            guard NSMaxRange(lineRange) > location else { break }
-            location = NSMaxRange(lineRange)
-        } while location < string.length
-
-        storage.endEditing()
-    }
-
-    private struct LineScan {
-        var commentLocation: Int?
-        var equalsLocation: Int?
-        var startedOutsideMultiline: Bool
-    }
-
-    private static func scanLine(
-        _ string: NSString,
-        range: NSRange,
-        multilineQuote: inout unichar?,
-    ) -> LineScan {
-        var index = range.location
-        let end = NSMaxRange(range)
-        let startedOutside = multilineQuote == nil
-        var quote: unichar?
-        var escaped = false
-        var equals: Int?
-
-        while index < end {
-            let character = string.character(at: index)
-            if let multiline = multilineQuote {
-                if character == multiline, hasTriple(character, at: index, before: end, in: string) {
-                    multilineQuote = nil
-                    index += 3
-                } else {
-                    index += 1
-                }
-                continue
-            }
-            if let activeQuote = quote {
-                if escaped {
-                    escaped = false
-                } else if activeQuote == 34, character == 92 {
-                    escaped = true
-                } else if character == activeQuote {
-                    quote = nil
-                }
-                index += 1
-                continue
-            }
-            if character == 34 || character == 39 {
-                if hasTriple(character, at: index, before: end, in: string) {
-                    multilineQuote = character
-                    index += 3
-                } else {
-                    quote = character
-                    index += 1
-                }
-                continue
-            }
-            if character == 35 {
-                return LineScan(
-                    commentLocation: index,
-                    equalsLocation: equals,
-                    startedOutsideMultiline: startedOutside,
-                )
-            }
-            if character == 61, equals == nil { equals = index }
-            index += 1
-        }
-        return LineScan(
-            commentLocation: nil,
-            equalsLocation: equals,
-            startedOutsideMultiline: startedOutside,
+      if scan.startedOutsideMultiline {
+        let codeEnd = scan.commentLocation ?? NSMaxRange(contentsRange)
+        let codeRange = NSRange(
+          location: contentsRange.location,
+          length: max(0, codeEnd - contentsRange.location)
         )
-    }
-
-    private static func hasTriple(
-        _ character: unichar,
-        at index: Int,
-        before end: Int,
-        in string: NSString,
-    ) -> Bool {
-        index + 2 < end
-            && string.character(at: index + 1) == character
-            && string.character(at: index + 2) == character
-    }
-
-    private static func trimWhitespace(in string: NSString, range: NSRange) -> NSRange {
-        var lower = range.location
-        var upper = NSMaxRange(range)
-        while lower < upper, isWhitespace(string.character(at: lower)) { lower += 1 }
-        while upper > lower, isWhitespace(string.character(at: upper - 1)) { upper -= 1 }
-        return NSRange(location: lower, length: upper - lower)
-    }
-
-    private static func isWhitespace(_ character: unichar) -> Bool {
-        character == 9 || character == 10 || character == 13 || character == 32
-    }
-
-    private static func trailingNewlineLength(in string: NSString, range: NSRange) -> Int {
-        guard range.length > 0 else { return 0 }
-        let last = string.character(at: NSMaxRange(range) - 1)
-        guard last == 10 || last == 13 else { return 0 }
-        if range.length > 1,
-           last == 10,
-           string.character(at: NSMaxRange(range) - 2) == 13
+        let trimmed = trimWhitespace(in: string, range: codeRange)
+        if trimmed.length > 1,
+           string.character(at: trimmed.location) == 91,
+           string.character(at: NSMaxRange(trimmed) - 1) == 93
         {
-            return 2
+          storage.addAttributes([
+            .font: emphasisFont,
+            .foregroundColor: NSColor.controlAccentColor
+          ], range: trimmed)
+        } else if let equals = scan.equalsLocation {
+          let key = trimWhitespace(
+            in: string,
+            range: NSRange(
+              location: contentsRange.location,
+              length: max(0, equals - contentsRange.location)
+            )
+          )
+          if key.length > 0 {
+            storage.addAttributes([
+              .font: emphasisFont,
+              .foregroundColor: NSColor.labelColor
+            ], range: key)
+          }
         }
-        return 1
+      }
+      if let comment = scan.commentLocation {
+        storage.addAttribute(
+          .foregroundColor,
+          value: NSColor.tertiaryLabelColor,
+          range: NSRange(location: comment, length: max(0, contentsEnd - comment))
+        )
+      }
+
+      guard NSMaxRange(lineRange) > location else { break }
+      location = NSMaxRange(lineRange)
+    } while location < string.length
+
+    storage.endEditing()
+  }
+
+  private struct LineScan {
+    var commentLocation: Int?
+    var equalsLocation: Int?
+    var startedOutsideMultiline: Bool
+  }
+
+  private static func scanLine(
+    _ string: NSString,
+    range: NSRange,
+    multilineQuote: inout unichar?
+  ) -> LineScan {
+    var index = range.location
+    let end = NSMaxRange(range)
+    let startedOutside = multilineQuote == nil
+    var quote: unichar?
+    var escaped = false
+    var equals: Int?
+
+    while index < end {
+      let character = string.character(at: index)
+      if let multiline = multilineQuote {
+        if character == multiline, hasTriple(character, at: index, before: end, in: string) {
+          multilineQuote = nil
+          index += 3
+        } else {
+          index += 1
+        }
+        continue
+      }
+      if let activeQuote = quote {
+        if escaped {
+          escaped = false
+        } else if activeQuote == 34, character == 92 {
+          escaped = true
+        } else if character == activeQuote {
+          quote = nil
+        }
+        index += 1
+        continue
+      }
+      if character == 34 || character == 39 {
+        if hasTriple(character, at: index, before: end, in: string) {
+          multilineQuote = character
+          index += 3
+        } else {
+          quote = character
+          index += 1
+        }
+        continue
+      }
+      if character == 35 {
+        return LineScan(
+          commentLocation: index,
+          equalsLocation: equals,
+          startedOutsideMultiline: startedOutside
+        )
+      }
+      if character == 61, equals == nil { equals = index }
+      index += 1
     }
+    return LineScan(
+      commentLocation: nil,
+      equalsLocation: equals,
+      startedOutsideMultiline: startedOutside
+    )
+  }
+
+  private static func hasTriple(
+    _ character: unichar,
+    at index: Int,
+    before end: Int,
+    in string: NSString
+  ) -> Bool {
+    index + 2 < end
+      && string.character(at: index + 1) == character
+      && string.character(at: index + 2) == character
+  }
+
+  private static func trimWhitespace(in string: NSString, range: NSRange) -> NSRange {
+    var lower = range.location
+    var upper = NSMaxRange(range)
+    while lower < upper, isWhitespace(string.character(at: lower)) { lower += 1 }
+    while upper > lower, isWhitespace(string.character(at: upper - 1)) { upper -= 1 }
+    return NSRange(location: lower, length: upper - lower)
+  }
+
+  private static func isWhitespace(_ character: unichar) -> Bool {
+    character == 9 || character == 10 || character == 13 || character == 32
+  }
+
+  private static func trailingNewlineLength(in string: NSString, range: NSRange) -> Int {
+    guard range.length > 0 else { return 0 }
+    let last = string.character(at: NSMaxRange(range) - 1)
+    guard last == 10 || last == 13 else { return 0 }
+    if range.length > 1,
+       last == 10,
+       string.character(at: NSMaxRange(range) - 2) == 13
+    {
+      return 2
+    }
+    return 1
+  }
 }
 
 /// The editor macOS would use for the config file. Blacklists Xcode: it is too heavy to open plain
@@ -912,54 +912,55 @@ fileprivate final class LineNumberRulerView: NSRulerView {
 @MainActor private var cachedTextEditor: URL? = nil
 
 @MainActor func getTextEditorToOpenConfig() -> URL {
-    if let cachedTextEditor { return cachedTextEditor }
-    let editor = NSWorkspace.shared.urlForApplication(toOpen: findCustomConfigUrl().urlOrNil ?? defaultConfigUrl)?
-        .takeIf { $0.lastPathComponent != "Xcode.app" }
-        ?? URL(filePath: "/System/Applications/TextEdit.app")
-    cachedTextEditor = editor
-    return editor
+  if let cachedTextEditor { return cachedTextEditor }
+  let editor = NSWorkspace.shared.urlForApplication(toOpen: findCustomConfigUrl().urlOrNil ?? defaultConfigUrl)?
+    .takeIf { $0.lastPathComponent != "Xcode.app" }
+    ?? URL(filePath: "/System/Applications/TextEdit.app")
+  cachedTextEditor = editor
+  return editor
 }
 
 /// Opens the user's config in that editor, creating it from the bundled default if it is missing.
 @MainActor func openConfigInExternalEditor() {
-    let editor = getTextEditorToOpenConfig()
-    let fallbackConfig = FileManager.default.homeDirectoryForCurrentUser.appending(path: configDotfileName)
-    switch findCustomConfigUrl() {
-        case .file(let url):
-            url.open(with: editor)
-        case .noCustomConfigExists:
-            _ = try? FileManager.default.copyItem(atPath: defaultConfigUrl.path, toPath: fallbackConfig.path)
-            // `ConfigFileWatcher.start()` bails when there is no user config to watch, and it ran at
-            // launch. Without re-arming here, the file we just created is not watched, so the edit
-            // the user is about to make in that editor would never be picked up.
-            ConfigFileWatcher.start()
-            fallbackConfig.open(with: editor)
-        case .ambiguousConfigError:
-            fallbackConfig.open(with: editor)
-    }
+  let editor = getTextEditorToOpenConfig()
+  let fallbackConfig = FileManager.default.homeDirectoryForCurrentUser.appending(path: configDotfileName)
+  switch findCustomConfigUrl() {
+    case .file(let url):
+      url.open(with: editor)
+    case .noCustomConfigExists:
+      _ = try? FileManager.default.copyItem(atPath: defaultConfigUrl.path, toPath: fallbackConfig.path)
+      // `ConfigFileWatcher.start()` bails when there is no user config to watch, and it ran at
+      // launch. Without re-arming here, the file we just created is not watched, so the edit
+      // the user is about to make in that editor would never be picked up.
+      ConfigFileWatcher.start()
+      fallbackConfig.open(with: editor)
+    case .ambiguousConfigError:
+      fallbackConfig.open(with: editor)
+  }
 }
 
 /// Small borderless "copy this string" button. Two tabs need it and they had two different ones.
 struct CopyButton: View {
-    let value: String
-    var help: String = "Copy to clipboard"
-    @State private var copied = false
+  let value: String
+  var help: String = "Copy to clipboard"
+  @State private var copied = false
 
-    var body: some View {
-        Button {
-            NSPasteboard.general.clearContents()
-            NSPasteboard.general.setString(value, forType: .string)
-            copied = true
-            Task { try? await Task.sleep(for: .seconds(1.4)); copied = false }
-        } label: {
-            Image(systemName: copied ? "checkmark" : "doc.on.doc")
-                .frame(width: 14)
-                // The colour change is the entire confirmation -- there is no toast anywhere in
-                // this app -- so the checkmark has to read as "done" and not just as a third icon.
-                .foregroundStyle(copied ? StatusLabel.Kind.ok.tint : Color.secondary)
-        }
-        .buttonStyle(.borderless)
-        .help(help)
-        .accessibilityLabel(copied ? "Copied" : help)
+  var body: some View {
+    Button {
+      NSPasteboard.general.clearContents()
+      NSPasteboard.general.setString(value, forType: .string)
+      copied = true
+      Task { try? await Task.sleep(for: .seconds(1.4))
+        copied = false }
+    } label: {
+      Image(systemName: copied ? "checkmark" : "doc.on.doc")
+        .frame(width: 14)
+        // The colour change is the entire confirmation -- there is no toast anywhere in
+        // this app -- so the checkmark has to read as "done" and not just as a third icon.
+        .foregroundStyle(copied ? StatusLabel.Kind.ok.tint : Color.secondary)
     }
+    .buttonStyle(.borderless)
+    .help(help)
+    .accessibilityLabel(copied ? "Copied" : help)
+  }
 }

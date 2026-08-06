@@ -1,5 +1,5 @@
 extension LazySequenceProtocol {
-    func filterNotNil<Unwrapped>() -> [Unwrapped] where Element == Unwrapped? {
-        compactMap { $0 }.map { $0 }
-    }
+  func filterNotNil<Unwrapped>() -> [Unwrapped] where Element == Unwrapped? {
+    compactMap { $0 }.map { $0 }
+  }
 }

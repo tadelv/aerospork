@@ -21,13 +21,13 @@ import Common
 /// Deliberately NOT `@MainActor` itself: every caller is a nonisolated notification or event
 /// handler, and the hop belongs inside, exactly as the `Task { @MainActor in … }` it replaces did.
 func runDetached(_ label: StaticString, _ operation: @escaping @MainActor () async throws -> ()) {
-    Task { @MainActor in
-        do {
-            try await operation()
-        } catch is CancellationError {
-            // Superseded by a newer session. Expected.
-        } catch {
-            AppLog.session.error("\(label, privacy: .public) failed: \(error.localizedDescription, privacy: .public)")
-        }
+  Task { @MainActor in
+    do {
+      try await operation()
+    } catch is CancellationError {
+      // Superseded by a newer session. Expected.
+    } catch {
+      AppLog.session.error("\(label, privacy: .public) failed: \(error.localizedDescription, privacy: .public)")
     }
+  }
 }

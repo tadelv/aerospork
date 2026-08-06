@@ -4,9 +4,9 @@ import XCTest
 
 @MainActor
 final class SummonWorkspaceCommandTest: XCTestCase {
-    override func setUp() async throws { setUpWorkspacesForTests() }
+  override func setUp() async throws { setUpWorkspacesForTests() }
 
-    func testParse() {
-        assertEquals(parseCommand("summon-workspace").errorOrNil, "ERROR: Argument '<workspace>' is mandatory")
-    }
+  func testParse() {
+    assertEquals(parseCommand("summon-workspace").errorOrNil, "ERROR: Argument '<workspace>' is mandatory")
+  }
 }

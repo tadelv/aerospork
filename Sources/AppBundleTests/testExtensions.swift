@@ -4,5 +4,5 @@ import Foundation
 import TOMLKit
 
 extension [TomlParseError] {
-    var descriptions: [String] { map(\.description) }
+  var descriptions: [String] { map(\.description) }
 }
