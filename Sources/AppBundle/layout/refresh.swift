@@ -2,9 +2,6 @@ import AppKit
 import Common
 
 @MainActor
-var activeRefreshTask: Task<(), any Error>? = nil // Made internal for RefreshDebouncer access
-
-@MainActor
 let refreshDebouncer = RefreshDebouncer()
 
 @MainActor
@@ -32,12 +29,11 @@ func runRefreshSession(
     runRefreshSessionDebounced(event, screenIsDefinitelyUnlocked: screenIsDefinitelyUnlocked, optimisticallyPreLayoutWorkspaces: optimisticallyPreLayoutWorkspaces)
   } else {
     // Immediate refresh for critical operations
-    if screenIsDefinitelyUnlocked { resetClosedWindowsCache() }
-    activeRefreshTask?.cancel()
-    activeRefreshTask = Task { @MainActor in
-      try checkCancellation()
-      try await runRefreshSessionBlocking(event, optimisticallyPreLayoutWorkspaces: optimisticallyPreLayoutWorkspaces)
-    }
+    refreshDebouncer.refreshImmediately(
+      event: event,
+      screenIsDefinitelyUnlocked: screenIsDefinitelyUnlocked,
+      optimisticallyPreLayoutWorkspaces: optimisticallyPreLayoutWorkspaces
+    )
   }
 }
 
@@ -95,8 +91,7 @@ func runSession<T>(
     let elapsed = Date().timeIntervalSince(startTime)*1000
     debugLog("SESSION: Completed in \(String(format: "%.1f", elapsed))ms")
   }
-  activeRefreshTask?.cancel() // Give priority to runSession
-  activeRefreshTask = nil
+  refreshDebouncer.cancelRunning() // Give priority to runSession
   return try await $refreshSessionEvent.withValue(event) {
     try await $_isStartup.withValue(event.isStartup) {
       resetClosedWindowsCache()
