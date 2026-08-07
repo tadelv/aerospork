@@ -8,7 +8,9 @@ class AxSubscription {
   let axThreadToken: AxAppThreadToken = axTaskLocalAppThreadToken ?? dieT("axTaskLocalAppThreadToken is not initialized")
   var notifKeys: Set<String> = []
 
-  private init(obs: AXObserver, ax: AXUIElement) {
+  // Not private: the headless tests construct subscriptions directly with a real AXObserver +
+  // AXUIElement (creation needs no Accessibility permission) to exercise the teardown paths.
+  init(obs: AXObserver, ax: AXUIElement) {
     axThreadToken.checkEquals(axTaskLocalAppThreadToken)
     self.obs = obs
     self.ax = ax
@@ -43,7 +45,22 @@ class AxSubscription {
   }
 
   deinit {
-    axThreadToken.checkEquals(axTaskLocalAppThreadToken)
+    // Normally we are released on the owning AX thread: `MacApp.destroy()`'s run-loop block
+    // calls `ThreadGuardedValue.destroy()`, dropping the last strong reference here, on this
+    // thread. But that block is submitted with `perform(...waitUntilDone: false)` and is
+    // silently dropped when the app's thread has already left its run loop -- exactly what
+    // happens when the observed app terminated. The wrapper is then released wherever the
+    // final reference happens to die (usually the main actor), so this deinit can run on a
+    // foreign thread.
+    //
+    // `CFRunLoopRemoveSource` is thread-bound, so tearing down from a foreign thread is not
+    // safe. Degrade instead of die, the same call `ThreadGuardedValue.deinit` made: log and
+    // leak the CF objects. Killing the window manager because the user quit an app at an
+    // awkward moment is a far bigger problem than a handful of leaked CF objects.
+    guard axThreadToken == axTaskLocalAppThreadToken else {
+      debugLog("AxSubscription deinited off its AX thread (owning run loop gone); CF objects intentionally leaked")
+      return
+    }
     CFRunLoopRemoveSource(CFRunLoopGetCurrent(), AXObserverGetRunLoopSource(obs), .defaultMode)
     for notifKey in notifKeys {
       AXObserverRemoveNotification(obs, ax, notifKey as CFString)
