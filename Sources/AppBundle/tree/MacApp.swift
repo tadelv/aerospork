@@ -238,12 +238,8 @@ final class MacApp: AbstractApp {
   func setAxFrame(_ windowId: UInt32, _ topLeft: CGPoint?, _ size: CGSize?) {
     setFrameJobs.removeValue(forKey: windowId)?.cancel()
     setFrameJobs[windowId] = withWindowAsync(windowId) { [axApp] window, job in
-      if isFrameSatisfied(window, topLeft, size) {
-        debugLog("FRAME: window \(windowId) already at target; no write")
-        return
-      }
+      if isFrameSatisfied(window, topLeft, size) { return }
       disableAnimations(app: axApp.threadGuarded) {
-        debugLog("FRAME: window \(windowId) set \(topLeft.map { "(\(Int($0.x)),\(Int($0.y))) " } ?? "")x \(size.map { "\(Int($0.width))x\(Int($0.height))" } ?? "?")")
         setFrame(window, topLeft, size)
       }
     }
