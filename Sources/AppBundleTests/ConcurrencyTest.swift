@@ -104,6 +104,28 @@ final class ConcurrencyMacAppRegistrationTest: XCTestCase {
     parked.cancel()
     await fulfillment(of: [unparked], timeout: 2)
   }
+
+  /// Churn regression: a failed registration used to stay cached until the pid succeeded or
+  /// macOS reused it, so short-lived apps that fail registration and exit accumulated stale
+  /// entries for the whole session. `pruneFailedPids` (called every refresh) must return the
+  /// cache to its live baseline.
+  func testFailedPidsPrunedForTerminatedProcesses() {
+    let livePids: Set<pid_t> = [11, 22, 33]
+    MacApp.failedPids = Dictionary(uniqueKeysWithValues: (1...100).map { pid in
+      (pid_t(pid), (nextAttempt: .now, backoff: 30, launchDate: nil))
+    })
+    defer { MacApp.failedPids = [:] }
+
+    MacApp.pruneFailedPids(livePids: livePids)
+
+    // Cache returns to the live baseline: exactly the live pids remain.
+    assertEquals(MacApp.failedPids.count, 3)
+    // Live failed apps keep their backoff schedule -- no reset to per-refresh probing.
+    assertEquals(MacApp.failedPids[11]?.backoff, 30)
+    // A dead pid is gone entirely, so a new process reusing it is eligible for immediate
+    // registration instead of inheriting the dead one's backoff.
+    assertNil(MacApp.failedPids[99])
+  }
 }
 
 @MainActor

@@ -56,7 +56,9 @@ final class MacApp: AbstractApp {
   /// app is tiled before the user notices), doubling to a 30s ceiling for apps that simply have
   /// no usable AX interface. At the ceiling that is ~1 probe/30s instead of ~20/s under the 50ms
   /// refresh debounce.
-  @MainActor private static var failedPids: [pid_t: (nextAttempt: Date, backoff: TimeInterval, launchDate: Date?)] = [:]
+  ///
+  /// Internal (not private) so the prune regression test can seed it -- same deal as `wipPids`.
+  @MainActor static var failedPids: [pid_t: (nextAttempt: Date, backoff: TimeInterval, launchDate: Date?)] = [:]
   private static let registrationRetryMinDelay: TimeInterval = 1
   private static let registrationRetryMaxDelay: TimeInterval = 30
 
@@ -389,8 +391,26 @@ final class MacApp: AbstractApp {
     }
   }
 
+  /// Drop failed-registration entries whose process is no longer running.
+  ///
+  /// A failed app never reaches `allAppsMap`, so the dead-app GC that iterates that map cannot
+  /// clean this cache, and nothing else revisits a dead pid until macOS happens to reuse it.
+  /// Pruning against the live process list once per refresh bounds the cache by real lifecycle
+  /// instead of by pid reuse: a failed app that exits leaves at most one entry, for at most one
+  /// refresh window (an in-flight retry may re-add it; the next refresh prunes it again).
+  ///
+  /// Live entries keep their backoff untouched -- a still-running failed app keeps probing at
+  /// its exponential schedule instead of returning to per-refresh attempts.
+  @MainActor
+  static func pruneFailedPids(livePids: Set<pid_t>) {
+    failedPids = failedPids.filter { livePids.contains($0.key) }
+  }
+
   @MainActor
   static func refreshAllAndGetAliveWindowIds(frontmostAppBundleId: String?) async throws -> [MacApp: [UInt32]] {
+    // GC the negative registration cache as well as live apps. A failed app that exits would
+    // otherwise stay cached until macOS reuses its pid.
+    pruneFailedPids(livePids: Set(NSWorkspace.shared.runningApplications.map(\.processIdentifier)))
     for (_, app) in MacApp.allAppsMap { // gc dead apps
       try checkCancellation()
       if app.nsApp.isTerminated {
