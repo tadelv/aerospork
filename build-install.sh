@@ -4,25 +4,27 @@
 #   ./build-install.sh                  # release: build + install
 #   ./build-install.sh debug            # debug:   build + install
 #   ./build-install.sh release --no-build --no-launch
-#   ./build-install.sh debug --cli
 #
 # Release installs through the local brew tap (app, CLI, completions, manpages) — see
 # install-from-sources.sh. Debug installs to /Applications/AeroSpork-Debug.app, a sibling of
 # the release app: separate bundle id (com.wbs.aerospork.debug), separate config
 # (~/.aerospork-debug.toml), separate CLI socket, so the two never conflict.
+#
+# The debug CLI is linked as `aerospork-debug`, never `aerospork`: the two builds bake different
+# sockets in, and the release CLI (`aerospork`, installed by brew) would otherwise shadow it on
+# PATH — or worse, `aerospork` would silently talk to the wrong app depending on which one is
+# running. Run `aerospork-debug …` while the debug app is running.
 set -euo pipefail
 cd "$(dirname "$0")"
 
 variant=release
 rebuild=1
 launch=1
-cli=0
 while test $# -gt 0; do
     case $1 in
         release|debug) variant=$1; shift ;;
         --no-build) rebuild=0; shift ;;
         --no-launch) launch=0; shift ;;
-        --cli) cli=1; shift ;; # debug only: link .debug/aerospork to ~/bin/aerospork
         *) echo "Unknown option $1" > /dev/stderr; exit 1 ;;
     esac
 done
@@ -55,10 +57,12 @@ cp -R .debug/AeroSpork-Debug.app "$app"
 xattr -dr com.apple.quarantine "$app" 2>/dev/null || true
 
 echo "Installed debug app to $app"
-if test $cli -eq 1; then
-    mkdir -p ~/bin
-    ln -sf "$(pwd)/.debug/aerospork" ~/bin/aerospork
-    echo "Linked debug CLI to ~/bin/aerospork (talks only to the debug app; shadows the release CLI if ~/bin precedes /opt/homebrew/bin on PATH)."
+# The debug CLI always gets linked, as `aerospork-debug`. Symlink (not copy) so a rebuild
+# of .debug/ is picked up without re-running the install.
+mkdir -p ~/bin
+ln -sf "$(pwd)/.debug/aerospork" ~/bin/aerospork-debug
+if ! echo ":$PATH:" | grep -q ":$HOME/bin:"; then
+    echo "NOTE: ~/bin is not on PATH; run the CLI as ~/bin/aerospork-debug or add ~/bin to PATH"
 fi
 if test $launch -eq 1; then
     open "$app"
