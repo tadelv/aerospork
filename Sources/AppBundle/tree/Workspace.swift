@@ -7,6 +7,21 @@ import Common
 @MainActor private var screenPointToVisibleWorkspace: [CGPoint: Workspace] = [:]
 @MainActor private var visibleWorkspaceToScreenPoint: [Workspace: CGPoint] = [:]
 
+/// Test seam: a real cold start begins with no monitor showing anything and no workspace
+/// materialized (`_focus` itself is initialized from the first stub selection).
+/// `setUpWorkspacesForTests` parks the focus workspace on the main monitor, and that leftover
+/// matches *some* screen through `workspaceMonitor`'s `monitorApproximation` fallback, so tests
+/// exercising the cold-start selection path (`rearrangeWorkspacesOnMonitors` →
+/// `getStubWorkspace`) clear both the visible state and the registry first.
+/// Callers must not read `focus` until the selection has run; `focus` re-materializes its
+/// workspace on demand.
+@MainActor func resetWorkspaceToScreenStateForTests() {
+  workspaceNameToWorkspace = [:]
+  screenPointToPrevVisibleWorkspace = [:]
+  screenPointToVisibleWorkspace = [:]
+  visibleWorkspaceToScreenPoint = [:]
+}
+
 // The returned workspace must be invisible and it must belong to the requested monitor
 @MainActor func getStubWorkspace(for monitor: Monitor) -> Workspace {
   getStubWorkspace(forPoint: monitor.rect.topLeftCorner)
@@ -30,25 +45,53 @@ private func getStubWorkspace(forPoint point: CGPoint) -> Workspace {
   // monitor they are looking at. Ordered by the same logical sort as `Workspace.all`, so "2"
   // comes before "10" and before "A".
   //
-  // Materializes lazily: the first suitable name wins, so this costs one or two objects rather
-  // than re-instantiating the whole keymap (the bloat `garbageCollectUnusedWorkspaces` removes).
-  let isSuitable = { (ws: Workspace) in
-    ws.isEffectivelyEmpty && !ws.isVisible && ws.forceAssignedMonitor == nil
-  }
-  if let bound = config.preservedWorkspaceNames
+  // A force-assigned configured workspace is NOT categorically rejected: one pinned to THIS
+  // monitor is the best candidate there is. Rejecting all of them is what made a config that
+  // assigns every bound workspace (say 1-9 across monitors) invent "10" on cold start, with
+  // startup windows laid out on a workspace the user never asked for.
+  //
+  // Priority: (1) a configured workspace explicitly assigned to this monitor, (2) a configured
+  // workspace with no assignment, (3) invent a name. A workspace pinned to a DIFFERENT monitor
+  // is never selected -- `setActiveWorkspace` would reject it anyway.
+  //
+  // Materializes lazily; `forceAssignedMonitor` (which sorts the live monitor list on every
+  // read) is resolved at most once per candidate -- the filter in pass 1 keeps names without an
+  // assignment entry away from the predicate entirely, so a config with no force assignments
+  // costs only dictionary lookups.
+  let sortedBoundNames = config.preservedWorkspaceNames
     .sorted(by: { $0.toLogicalSegments() < $1.toLogicalSegments() })
-    .lazy
-    .map({ Workspace.get(byName: $0) })
-    .first(where: isSuitable)
+
+  // (1) Explicitly assigned to this monitor.
+  if let assigned = (sortedBoundNames.lazy
+    .filter { config.workspaceToMonitorForceAssignment[$0] != nil }
+    .map { Workspace.get(byName: $0) }
+    .first(where: { ws in
+      guard ws.isEffectivelyEmpty, !ws.isVisible, let assignedMonitor = ws.forceAssignedMonitor else { return false }
+      return assignedMonitor.rect.topLeftCorner == point
+    }))
   {
-    return bound
+    return assigned
+  }
+  // (2) No (resolved) assignment. A workspace assigned to a monitor that is currently absent
+  // resolves to nil and lands here, exactly as it did before.
+  if let unassigned = (sortedBoundNames.lazy
+    .map { Workspace.get(byName: $0) }
+    .first(where: { $0.isEffectivelyEmpty && !$0.isVisible && $0.forceAssignedMonitor == nil }))
+  {
+    return unassigned
   }
   // Every bound name is taken (or the config binds none). Fall back to inventing one, skipping
   // preserved names so a stub never hijacks a name the user has bound to something else.
   let preservedNames = config.preservedWorkspaceNames.toSet()
   return (1...Int.max).lazy
     .map { Workspace.get(byName: String($0)) }
-    .first { isSuitable($0) && !preservedNames.contains($0.name) }
+    .first { ws in
+      guard ws.isEffectivelyEmpty, !ws.isVisible, !preservedNames.contains(ws.name) else { return false }
+      if let assignedMonitor = ws.forceAssignedMonitor {
+        return assignedMonitor.rect.topLeftCorner == point
+      }
+      return true
+    }
     .orDie("Can't create empty workspace")
 }
 
