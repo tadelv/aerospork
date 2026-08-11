@@ -1,4 +1,5 @@
 import AppKit
+import Common
 
 extension Workspace {
   @MainActor // todo can be dropped in future Swift versions?
@@ -48,8 +49,11 @@ extension TreeNode {
             window.layoutFullscreen(context)
           } else {
             lastAppliedLayoutPhysicalRect = physicalRect
+            debugLog("LAYOUT: window \(window.windowId) tile (\(Int(point.x)),\(Int(point.y)) \(Int(width))x\(Int(height)))")
             window.setAxFrame(point, CGSize(width: width, height: height))
           }
+        } else {
+          debugLog("LAYOUT: window \(window.windowId) skipped (mouse-manipulated)")
         }
       case .tilingContainer(let container):
         lastAppliedLayoutPhysicalRect = physicalRect
@@ -81,6 +85,7 @@ private struct LayoutContext {
 extension Window {
   @MainActor // todo can be dropped in future Swift versions?
   fileprivate func layoutFloatingWindow(_ context: LayoutContext) async throws {
+    debugLog("LAYOUT: window \(windowId) FLOATING (moved, not resized)")
     let workspace = context.workspace
     let currentMonitor = try await getCenter()?.monitorApproximation // Probably not idempotent
     if let currentMonitor, let windowTopLeftCorner = try await getAxTopLeftCorner(), workspace != currentMonitor.activeWorkspace {

@@ -32,6 +32,7 @@ final class MacWindow: Window {
         : focus.workspace,
       window: nil
     )
+    debugLog("REGISTER: window \(windowId) bound to workspace '\(data.parent.nodeWorkspace?.name ?? "none")' parent \(data.parent.kind)")
 
     // atomic synchronous section
     if let existing = allWindowsMap[windowId] { return existing }
