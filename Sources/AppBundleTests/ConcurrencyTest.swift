@@ -129,6 +129,39 @@ final class ConcurrencyMacAppRegistrationTest: XCTestCase {
 }
 
 @MainActor
+final class FrameJobsPruneTest: XCTestCase {
+  /// A window closed externally (not through AeroSpork's own close command) is garbage-collected
+  /// on the refresh path, which cancels and drops its geometry job. Repeated create/layout/close
+  /// cycles in one long-lived app must not leave one stale `RunLoopJob` per historical window.
+  func testFrameJobsReturnToBaselineAfterWindowChurn() {
+    var jobs: [UInt32: RunLoopJob] = [:]
+    for id in 1...300 { jobs[UInt32(id)] = RunLoopJob() }
+
+    for id in 1...300 where id.isMultiple(of: 3) {
+      MacApp.cancelAndRemoveFrameJob(UInt32(id), from: &jobs) // garbageCollect path
+    }
+
+    // Map size is proportional to live windows, not total historical ones.
+    assertEquals(jobs.count, 200)
+    assertNil(jobs[3])
+    assertNotNil(jobs[1])
+  }
+
+  /// Pending work for a dead window is cancelled, not just dropped -- a queued AX frame write
+  /// must not fire against a window that is already closed.
+  func testCancellingAFrameJobCancelsPendingWork() {
+    var jobs: [UInt32: RunLoopJob] = [:]
+    let pending = RunLoopJob()
+    jobs[7] = pending
+
+    MacApp.cancelAndRemoveFrameJob(7, from: &jobs)
+
+    assertNil(jobs[7])
+    assertTrue(pending.isCancelled)
+  }
+}
+
+@MainActor
 final class ConcurrencyFocusCallbacksTest: XCTestCase {
   override func setUp() async throws { setUpWorkspacesForTests() }
 

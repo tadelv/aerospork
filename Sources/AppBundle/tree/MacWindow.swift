@@ -80,6 +80,10 @@ final class MacWindow: Window {
     if MacWindow.allWindowsMap.removeValue(forKey: windowId) == nil {
       return
     }
+    // Windows closed externally are garbage-collected here on the refresh path. Without this,
+    // their geometry jobs stayed in setFrameJobs until the whole app exited -- one stale entry
+    // per historical window of a long-lived, window-churning app.
+    macApp.cancelAndRemoveFrameJob(windowId)
     if !skipClosedWindowsCache { cacheClosedWindowIfNeeded(window: self) }
     let parent = unbindFromParent().parent
     let deadWindowWorkspace = parent.nodeWorkspace

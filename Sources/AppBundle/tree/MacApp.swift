@@ -186,7 +186,7 @@ final class MacApp: AbstractApp {
 
   @MainActor
   func closeAndUnregisterAxWindow(_ windowId: UInt32) {
-    setFrameJobs.removeValue(forKey: windowId)?.cancel()
+    cancelAndRemoveFrameJob(windowId)
     _ = withWindowAsync(windowId) { [windows] window, job in
       guard let closeButton = window.get(Ax.closeButtonAttr) else { return }
       guard let castedCloseButton = closeButton.cast else { return }
@@ -194,6 +194,26 @@ final class MacApp: AbstractApp {
         windows.threadGuarded.removeValue(forKey: windowId)
       }
     }
+  }
+
+  /// Cancel and drop the per-window geometry/native-state job for `windowId`.
+  ///
+  /// Called from `MacWindow.garbageCollect` -- the centralized window-lifecycle teardown -- so
+  /// windows closed externally (not just through AeroSpork's own close command) stop
+  /// accumulating `setFrameJobs` entries for the life of the app. WindowServer window IDs are
+  /// unique within a session and never reused, so a cancelled job can never clobber a newer job
+  /// for the same ID.
+  ///
+  /// Takes the map as `inout` so the regression test can exercise the churn semantics without a
+  /// real `MacApp` (its init needs live AX subscriptions).
+  @MainActor
+  static func cancelAndRemoveFrameJob(_ windowId: UInt32, from jobs: inout [UInt32: RunLoopJob]) {
+    jobs.removeValue(forKey: windowId)?.cancel()
+  }
+
+  @MainActor
+  func cancelAndRemoveFrameJob(_ windowId: UInt32) {
+    Self.cancelAndRemoveFrameJob(windowId, from: &setFrameJobs)
   }
 
   @MainActor
