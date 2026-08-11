@@ -17,6 +17,19 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+# The debug and release apps are two independent window managers -- both running would fight
+# over windows, and a running bundle can't be cleanly replaced. Quit either before installing.
+quit_running_app() {
+    local bundle_id=$1 pattern=$2 name=$3
+    if osascript -e "quit app id \"$bundle_id\"" > /dev/null 2>&1; then
+        echo "Quit running $name"
+        for _ in $(seq 1 10); do
+            pgrep -f "$pattern" > /dev/null || break
+            sleep 0.5
+        done
+    fi
+}
+
 variant=release
 rebuild=1
 launch=1
@@ -30,6 +43,8 @@ while test $# -gt 0; do
 done
 
 if test "$variant" = release; then
+    quit_running_app com.wbs.aerospork.debug 'AeroSpork-Debug.app' 'debug app (AeroSpork-Debug)'
+    quit_running_app com.wbs.aerospork 'AeroSpork.app' 'release app (AeroSpork)'
     if test $rebuild -eq 1; then
         ./install-from-sources.sh
     else
@@ -44,13 +59,7 @@ if test $rebuild -eq 1; then
 fi
 
 app=/Applications/AeroSpork-Debug.app
-# A running bundle can't be cleanly replaced; quit first (no-op when not running).
-if osascript -e 'quit app id "com.wbs.aerospork.debug"' > /dev/null 2>&1; then
-    for _ in $(seq 1 10); do
-        pgrep -f 'AeroSpork-Debug.app' > /dev/null || break
-        sleep 0.5
-    done
-fi
+quit_running_app com.wbs.aerospork.debug 'AeroSpork-Debug.app' 'debug app (AeroSpork-Debug)'
 rm -rf "$app"
 cp -R .debug/AeroSpork-Debug.app "$app"
 # Debug builds are never notarized; drop any quarantine so Gatekeeper can't kill them.
