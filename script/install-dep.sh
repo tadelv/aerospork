@@ -29,6 +29,23 @@ create-marker() {
 }
 
 if test $all == 1 || test $bundler == 1; then
+    # Checked before the marker, which only guards `bundler install` -- build-docs.sh runs
+    # `bundler exec asciidoctor` on every build, marker or not.
+    #
+    # A Ruby upgrade can leave a gemspec in <gem-home>/specifications whose gem directory is gone
+    # (seen going 3.4 -> 4.0: the kept bundler-2.6.9.gemspec, the removed gems/bundler-2.6.9/).
+    # The binstub then activates a spec with no files and dies with a RubyGems LoadError naming an
+    # absolute path, which says nothing about the machine being the problem.
+    #
+    # The system bundler is the ONLY Ruby this build needs: BUNDLE_PATH in .bundle/config pulls
+    # everything else (bundler itself included) into ./.deps, so it works on any Ruby >= 3.0.
+    if ! bundler --version > /dev/null 2>&1; then
+        echo "bundler is not usable: '$(command -v bundler)' failed." > /dev/stderr
+        echo "A Ruby upgrade can leave a stale gemspec in <gem-home>/specifications/ whose gem" > /dev/stderr
+        echo "directory no longer exists. Remove that gemspec, or use rbenv with .ruby-version" > /dev/stderr
+        echo "(dev-docs/development.md section 1.4)." > /dev/stderr
+        exit 1
+    fi
     marker=$(get-marker bundler "$(cat ./Gemfile)" "$(cat ./.bundle/*)")
     if ! test -f "$marker"; then
         bundler install
