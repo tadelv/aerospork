@@ -525,7 +525,7 @@ struct KeyBindingsTab: View {
 }
 
 /// Click, then press a shortcut. Beats typing `alt-shift-h` by hand and guessing the notation.
-private struct KeyRecorderField: View {
+struct KeyRecorderField: View {
   @Binding var notation: String
   @Binding var isRecording: Bool
   /// Off for an existing row: clearing it would leave a binding with no key, which is not a
@@ -558,17 +558,23 @@ private struct KeyRecorderField: View {
       nsView.onCapture = { notation = $0
         isRecording = false }
       nsView.displayed = notation
-      nsView.needsDisplay = true
     }
   }
 
   final class RecorderView: NSView {
     var onCapture: ((String) -> Void)?
+    private let label = NSTextField(labelWithString: "")
     var displayed = "" {
-      didSet { setAccessibilityValue(displayed.isEmpty ? "" : KeyNotation.pretty(displayed)) }
+      didSet {
+        setAccessibilityValue(displayed.isEmpty ? "" : KeyNotation.pretty(displayed))
+        updateLabel()
+      }
     }
 
-    private var recording = false
+    private var recording = false {
+      didSet { updateLabel()
+        needsDisplay = true }
+    }
 
     /// A hand-drawn `NSView` is invisible to accessibility unless it says otherwise, and this
     /// one is the primary control of the tab.
@@ -578,16 +584,27 @@ private struct KeyRecorderField: View {
       setAccessibilityRole(.textField)
       setAccessibilityLabel("Shortcut recorder")
       setAccessibilityHelp("Click, then press the key combination you want to bind")
+      label.translatesAutoresizingMaskIntoConstraints = false
+      label.cell?.usesSingleLineMode = true
+      label.cell?.lineBreakMode = .byTruncatingTail
+      label.setAccessibilityElement(false) // The recorder already exposes its label and value.
+      addSubview(label)
+      NSLayoutConstraint.activate([
+        label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
+        label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -8),
+        label.centerYAnchor.constraint(equalTo: centerYAnchor)
+      ])
+      updateLabel()
     }
 
     required init?(coder: NSCoder) { die("RecorderView is never loaded from a nib") }
 
+    // Non-editable label clicks must still arm the recorder, not stop at its child control.
+    override func hitTest(_ point: NSPoint) -> NSView? { super.hitTest(point) == nil ? nil : self }
     override var acceptsFirstResponder: Bool { true }
     override func becomeFirstResponder() -> Bool { recording = true
-      needsDisplay = true
       return true }
     override func resignFirstResponder() -> Bool { recording = false
-      needsDisplay = true
       return true }
     override func mouseDown(with event: NSEvent) { window?.makeFirstResponder(self) }
 
@@ -607,6 +624,16 @@ private struct KeyRecorderField: View {
       window?.makeFirstResponder(nil)
     }
 
+    private func updateLabel() {
+      // NSString.size(withAttributes:) crashed inside CoreText during background redraws of
+      // the open Keys pane. Let AppKit own text layout rather than measuring/drawing it here.
+      label.stringValue = !displayed.isEmpty ? KeyNotation.pretty(displayed) : (recording ? "Press a shortcut…" : "Click to record")
+      label.font = displayed.isEmpty
+        ? NSFont.systemFont(ofSize: NSFont.systemFontSize)
+        : NSFont.monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular)
+      label.textColor = displayed.isEmpty ? NSColor.placeholderTextColor : NSColor.labelColor
+    }
+
     override func draw(_ dirtyRect: NSRect) {
       let path = NSBezierPath(roundedRect: bounds.insetBy(dx: 1, dy: 1), xRadius: 5, yRadius: 5)
       (recording ? NSColor.controlAccentColor.withAlphaComponent(0.14) : NSColor.textBackgroundColor).setFill()
@@ -614,35 +641,6 @@ private struct KeyRecorderField: View {
       (recording ? NSColor.controlAccentColor : NSColor.separatorColor).setStroke()
       path.lineWidth = recording ? 2 : 1
       path.stroke()
-
-      let text = !displayed.isEmpty ? KeyNotation.pretty(displayed) : (recording ? "Press a shortcut…" : "Click to record")
-      // Monospace is for the captured notation -- something the user could type into their
-      // config. The instructional placeholder is prose and takes the system face, the same
-      // split the colour below already makes.
-      let paragraph = NSMutableParagraphStyle()
-      paragraph.lineBreakMode = .byTruncatingTail
-      let attrs: [NSAttributedString.Key: Any] = [
-        .font: displayed.isEmpty
-          ? NSFont.systemFont(ofSize: NSFont.systemFontSize)
-          : NSFont.monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular),
-        .foregroundColor: displayed.isEmpty ? NSColor.placeholderTextColor : NSColor.labelColor,
-        .paragraphStyle: paragraph
-      ]
-      let size = (text as NSString).size(withAttributes: attrs)
-      let inset: CGFloat = 8
-      let rect = NSRect(x: inset, y: (bounds.height - size.height) / 2,
-                        width: max(0, bounds.width - inset*2), height: size.height)
-      // `draw(with:options:attributes:context:)`, not `draw(in:withAttributes:)`: the latter
-      // ignores `paragraph.lineBreakMode` entirely and hard-clips at the rect edge mid-glyph
-      // with no ellipsis, so a binding like `alt-shift-leftSquareBracket` sheared off instead
-      // of truncating. This overload honours the paragraph style. The 3-arg sibling without
-      // `context:` does too, but is in `NSStringDrawingDeprecated`.
-      (text as NSString).draw(
-        with: rect,
-        options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine],
-        attributes: attrs,
-        context: nil
-      )
     }
   }
 }
