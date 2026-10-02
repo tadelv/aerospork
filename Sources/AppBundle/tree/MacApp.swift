@@ -114,6 +114,16 @@ final class MacApp: AbstractApp {
   @MainActor
   @discardableResult
   static func getOrRegister(_ nsApp: NSRunningApplication) async throws -> MacApp? {
+    // Never manage our own windows.
+    //
+    // The Settings window and SwiftUI's MenuBarExtra panel are ordinary windows in our own process,
+    // so they show up in our own AX window list. Laying one out sends an AX write whose target is
+    // our own process, and AppKit serves that *in-process* -- on the app's AX thread rather than the
+    // main thread -- where `-[NSWMWindowCoordinator performTransactionUsingBlock:]` asserts "Must
+    // only be used from the main thread". SIGTRAP on the first layout pass that moves one of our own
+    // windows (it does not need to be visible), leaving the socket file behind, which is why the CLI
+    // then reports "Is AeroSpork.app running?" for an app that is simply gone.
+    if nsApp.processIdentifier == ProcessInfo.processInfo.processIdentifier { return nil }
     // Don't perceive any of the lock screen windows as real windows
     // Otherwise, false positive ax notifications might trigger that lead to gcWindows
     if nsApp.bundleIdentifier == lockScreenAppBundleId { return nil }
