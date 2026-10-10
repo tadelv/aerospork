@@ -176,6 +176,46 @@ and the kernel also *adjusts* `boottime` whenever the calendar clock is stepped.
 (`TerminalWindowRestoration`, `FinderWindow`), so identical windows are genuinely indistinguishable
 and a fuzzy key would permute them silently.
 
+**Native window tab groups**: A window with macOS tabs is several `AXWindow`s -- one per tab --
+and macOS exposes *nothing* that says they belong together. Measured on macOS 27: the windows of
+Safari, Finder and Ghostty have no `AXTabs` and no `AXTabGroup` attribute, and `AXIdentifier`
+names the window *class* (`TerminalWindowRestoration`), so it identifies neither an instance nor a
+tab group. What can be read is WindowServer's own view, and that is all the grouping uses
+(`tabGroups()` in `Sources/AppBundle/tree/MacApp.swift`): same-app windows at an identical
+rectangle are one window, and a window WindowServer is not drawing (`kCGWindowIsOnscreen` absent)
+may also match a *nearly* identical one.
+
+> **One window, one id, one frame.** The group is managed under a single id that outlives its own
+> tab (a tree node cannot change its `windowId`, so adopting a new one destroys and re-creates the
+> node -- the window jumping to another tile), AX reads and writes aim at the *drawn* tab (focusing
+> a background tab makes AppKit switch to it), and every frame write is mirrored onto the group's
+> other tabs. Drop the mirroring and the next layout pass separates the tabs -- the bug the grouping
+> exists to fix.
+
+Two shapes, both measured live. Safari kept all four tabs at one frame and composited all of them,
+so exact rectangles find the group. Finder and Ghostty composite only the selected tab; the rest
+keep whatever frame they were last given, so a pair that has already *split* cannot be repaired --
+nothing distinguishes them once their rectangles differ, and a tile each is what the user sees.
+Opening a tab produces a shared rectangle again, which is why this looks right when tabs are opened
+and only misbehaves under rapid tab churn (documented as a known limit in `tabGroups`).
+
+False positives are the risk, so the *nearly* identical allowance excludes two drawn, non-floating
+windows: `accordionPadding` is 30 by default, its deliberately overlapping children sit exactly
+that far apart, and that is also the scale of the frame drift being matched. A panel placed over its
+own window (`AXDialog`) and two windows AeroSpork itself parked in one corner (`hideInCorner` gives
+same-sized hidden windows one rect) are excluded for the same reason. `TabGroupsTest` covers all of
+these cases.
+
+To check it live: `aerospork list-windows` shows one row per *visual* window;
+`CGWindowListCopyWindowInfo` gives raw ids with bounds and `kCGWindowIsOnscreen`;
+`aerospork debug-windows --window-id <id>` dumps a window's AX attributes. **Deploy trap**:
+replacing the release binary invalidates its Accessibility approval, and a *stale-but-present* entry
+passes `AXIsProcessTrusted()` while every AX read fails -- the app runs and answers the CLI, but
+manages zero windows, and it never prompts, because it only re-prompts when the entry is *absent*
+(`resetAccessibility()`). Toggle AeroSpork in Privacy & Security -> **Device Controls and Data
+Access** (macOS 27's name for the Accessibility pane), or `tccutil reset Accessibility
+com.wbs.aerospork` plus a relaunch, to get the prompt back.
+
 **MRU Tracking**: Tree nodes track most-recently-used order for focus navigation.
 
 ## Design System
@@ -270,6 +310,7 @@ it is present.
 - `Sources/AppBundle/GlobalObserver.swift`: Entry point for window events
 - `Sources/AppBundle/tree/TreeNode.swift`: Core tree structure
 - `Sources/AppBundle/layout/layoutRecursive.swift`: Layout algorithm
+- `Sources/AppBundle/tree/MacApp.swift`: Per-app AX thread, subscriptions, native tab grouping (`tabGroups()`)
 - `Sources/AppBundle/server.swift`: CLI/app communication
 - `Sources/AppBundle/command/cmdManifest.swift`: Command registry
 - `Sources/AppBundle/config/parseConfig.swift`: Configuration parser
