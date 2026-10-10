@@ -20,7 +20,9 @@ class Window: TreeNode, Hashable {
   }
 
   @MainActor static func get(byId windowId: UInt32) -> Window? { // todo make non optional
-    isUnitTest
+    // The id may be a raw AX window id: a window with native tabs is one window with several of them.
+    let windowId = MacWindow.managedId(ofAxWindowId: windowId)
+    return isUnitTest
       ? Workspace.all.flatMap { $0.allLeafWindowsRecursive }.first(where: { $0.windowId == windowId })
       : MacWindow.allWindowsMap[windowId]
   }

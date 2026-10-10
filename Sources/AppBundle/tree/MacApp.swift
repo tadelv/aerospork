@@ -23,6 +23,10 @@ final class MacApp: AbstractApp {
   private let axApp: ThreadGuardedValue<AXUIElement>
   private let appAxSubscriptions: ThreadGuardedValue<[AxSubscription]> // keep subscriptions in memory
   private let windows: ThreadGuardedValue<[UInt32: AxWindow]> = .init([:])
+  /// AX window id -> the managed window it belongs to. See `tabGroups`.
+  private let tabOwner: ThreadGuardedValue<[UInt32: UInt32]> = .init([:])
+  /// The AX window id that represents a managed window right now. See `tabGroups`.
+  private let tabSelected: ThreadGuardedValue<[UInt32: UInt32]> = .init([:])
   private var thread: Thread?
   private var setFrameJobs: [UInt32: RunLoopJob] = [:]
   @MainActor private static var focusJob: RunLoopJob? = nil
@@ -236,13 +240,16 @@ final class MacApp: AbstractApp {
   // todo merge together with detectNewWindows
   @MainActor
   func getFocusedWindow() async throws -> Window? {
-    let windowId = try await thread?.runInLoop { [nsApp, axApp, windows] job in
+    let windowId = try await thread?.runInLoop { [nsApp, axApp, windows, tabOwner] job in
       let axWindow = try axApp.threadGuarded.get(Ax.focusedWindowAttr)
         .flatMap {
           guard let casted = $0.ax.cast else { return nil as AxWindow? }
           return try windows.threadGuarded.getOrRegisterAxWindow(windowId: $0.windowId, casted, nsApp, job)
         }
-      return axWindow?.windowId
+      // The focused AX window is a *tab* when the window has native tabs. Resolving it to the id
+      // AeroSpork manages is what keeps switching tabs from looking like a window that closed and
+      // another that opened -- the tree would drop one node, create another, and move focus.
+      return axWindow.map { tabOwner.threadGuarded[$0.windowId] ?? $0.windowId }
     }
     guard let windowId else { return nil }
     return try await MacWindow.getOrRegister(windowId: windowId, macApp: self)
@@ -269,7 +276,10 @@ final class MacApp: AbstractApp {
 
   func setAxFrame(_ windowId: UInt32, _ topLeft: CGPoint?, _ size: CGSize?) {
     setFrameJobs.removeValue(forKey: windowId)?.cancel()
-    setFrameJobs[windowId] = withWindowAsync(windowId) { [axApp] window, job in
+    setFrameJobs[windowId] = withWindowAsync(windowId) { [axApp, windows, tabOwner] window, job in
+      // Sync before the no-op check: the selected tab can already be at the target frame while the
+      // rest of the group is not. See `spreadFrameToTabMembers`.
+      spreadFrameToTabMembers(windowId, windows, tabOwner, topLeft, size)
       if isFrameSatisfied(window, topLeft, size) { return }
       disableAnimations(app: axApp.threadGuarded) {
         setFrame(window, topLeft, size)
@@ -281,7 +291,8 @@ final class MacApp: AbstractApp {
   func setAxFrameBlocking(_ windowId: UInt32, _ topLeft: CGPoint?, _ size: CGSize?) async throws {
     setFrameJobs.removeValue(forKey: windowId)?.cancel()
     setFrameJobs[windowId] = nil
-    try await withWindow(windowId) { [axApp] window, job in
+    try await withWindow(windowId) { [axApp, windows, tabOwner] window, job in
+      spreadFrameToTabMembers(windowId, windows, tabOwner, topLeft, size)
       if isFrameSatisfied(window, topLeft, size) { return }
       disableAnimations(app: axApp.threadGuarded) {
         setFrame(window, topLeft, size)
@@ -300,7 +311,8 @@ final class MacApp: AbstractApp {
 
   func setAxTopLeftCorner(_ windowId: UInt32, _ point: CGPoint) {
     setFrameJobs.removeValue(forKey: windowId)?.cancel()
-    setFrameJobs[windowId] = withWindowAsync(windowId) { [axApp] window, job in
+    setFrameJobs[windowId] = withWindowAsync(windowId) { [axApp, windows, tabOwner] window, job in
+      spreadFrameToTabMembers(windowId, windows, tabOwner, point, nil)
       // Same no-op guard as setAxFrame. This one matters because hideInCorner calls it for
       // every window of every invisible workspace on every refresh -- previously an
       // unconditional AX position write per hidden window, forever.
@@ -436,8 +448,11 @@ final class MacApp: AbstractApp {
     failedPids = failedPids.filter { livePids.contains($0.key) }
   }
 
+  /// Refreshes every app and returns, per app, one entry per window the user can see -- plus the
+  /// mapping from the raw AX window ids of a native tab group to the single id AeroSpork manages for
+  /// it. See `tabGroups`.
   @MainActor
-  static func refreshAllAndGetAliveWindowIds(frontmostAppBundleId: String?) async throws -> [MacApp: [UInt32]] {
+  static func refreshAllAndGetAliveWindowIds(frontmostAppBundleId: String?) async throws -> [MacApp: TabGroups] {
     // GC the negative registration cache as well as live apps. A failed app that exits would
     // otherwise stay cached until macOS reuses its pid.
     pruneFailedPids(livePids: Set(NSWorkspace.shared.runningApplications.map(\.processIdentifier)))
@@ -447,11 +462,26 @@ final class MacApp: AbstractApp {
         app.destroy()
       }
     }
-    return try await withThrowingTaskGroup(of: (pid_t, [UInt32]).self, returning: [MacApp: [UInt32]].self) { group in
+    // Read once per refresh, not once per app, and read before anything is garbage collected:
+    // these only steer how a tab group is recognised. See `tabGroups`.
+    let tabInput = TabGroupInputs(
+      windowServerRects: windowServerRects(),
+      // An id the last refresh managed. Preferring it keeps the group's tree node alive across tab
+      // switches, new tabs and closed siblings.
+      alreadyManaged: Set(MacWindow.allWindowsMap.keys),
+      // Windows AeroSpork parked itself: same-sized windows of one app land on the same corner
+      // rect on purpose, which is not the same thing as a tab group. See `tabGroups`.
+      parkedInCorner: Set(MacWindow.allWindows.lazy.filter { $0.isHiddenInCorner }.map(\.windowId)),
+      // A floating window's size is its own; see `tabGroups`.
+      floatingWindowIds: Set(MacWindow.allWindows.lazy.filter { $0.isFloating }.map(\.windowId)),
+      // Read before this refresh rebuilds it: a group must keep the id it had last time.
+      previousOwner: MacWindow.tabOwners
+    )
+    return try await withThrowingTaskGroup(of: (pid_t, TabGroups).self, returning: [MacApp: TabGroups].self) { group in
       func refreshTheApp(_ nsApp: NSRunningApplication) {
         group.addTask { @Sendable @MainActor in
-          guard let app = try await getOrRegister(nsApp) else { return (nsApp.processIdentifier, []) }
-          return (nsApp.processIdentifier, try await app.refreshAndGetAliveWindowIds(frontmostAppBundleId: frontmostAppBundleId))
+          guard let app = try await getOrRegister(nsApp) else { return (nsApp.processIdentifier, TabGroups()) }
+          return (nsApp.processIdentifier, try await app.refreshAndGetAliveWindowIds(frontmostAppBundleId: frontmostAppBundleId, tabInput: tabInput))
         }
       }
       // Register new apps
@@ -470,10 +500,10 @@ final class MacApp: AbstractApp {
           refreshTheApp(app.nsApp)
         }
       }
-      var result: [MacApp: [UInt32]] = [:]
-      for try await (pid, windowIds) in group {
+      var result: [MacApp: TabGroups] = [:]
+      for try await (pid, groups) in group {
         if let app = allAppsMap[pid] {
-          result[app] = windowIds
+          result[app] = groups
         }
       }
       return result
@@ -481,13 +511,13 @@ final class MacApp: AbstractApp {
   }
 
   @MainActor
-  private func refreshAndGetAliveWindowIds(frontmostAppBundleId: String?) async throws -> [UInt32] {
+  private func refreshAndGetAliveWindowIds(frontmostAppBundleId: String?, tabInput: TabGroupInputs) async throws -> TabGroups {
     if nsApp.isTerminated {
       destroy()
-      return []
+      return TabGroups()
     }
-    guard let thread else { return [] }
-    return try await thread.runInLoop { [nsApp, windows, axApp] (job) -> [UInt32] in
+    guard let thread else { return TabGroups() }
+    return try await thread.runInLoop { [nsApp, windows, axApp, tabOwner, tabSelected] (job) -> TabGroups in
       var result: [UInt32: AxWindow] = windows.threadGuarded
       // Second line of defence against lock screen. See the first line of defence: closedWindowsCache
       // Second and third lines of defence are technically needed only to avoid potential flickering
@@ -504,7 +534,12 @@ final class MacApp: AbstractApp {
       }
 
       windows.threadGuarded = result
-      return Array(result.keys)
+      // One id per window the user sees. The tab maps are rebuilt from scratch every refresh, so a
+      // closed tab drops out of them without any extra bookkeeping.
+      let groups = tabGroups(of: result.mapValues { $0.ax }, in: tabInput)
+      tabOwner.threadGuarded = groups.owner
+      tabSelected.threadGuarded = groups.selected
+      return groups
     }
   }
 
@@ -515,9 +550,11 @@ final class MacApp: AbstractApp {
       job.cancel()
     }
     setFrameJobs = [:]
-    thread?.runInLoopAsync { [windows, appAxSubscriptions, axApp] job in
+    thread?.runInLoopAsync { [windows, appAxSubscriptions, axApp, tabOwner, tabSelected] job in
       appAxSubscriptions.destroy() // Destroy AX objects in reverse order of their creation
       windows.destroy()
+      tabOwner.destroy()
+      tabSelected.destroy()
       axApp.destroy()
       CFRunLoopStop(CFRunLoopGetCurrent())
     }
@@ -525,16 +562,19 @@ final class MacApp: AbstractApp {
   }
 
   @MainActor
+  // Both of these route an id AeroSpork manages to the AX window that represents it *now*: for a
+  // window with native tabs that is the visible tab, because AppKit makes a window key when it is
+  // focused, so writing to a background tab would switch the user's tab.
   private func withWindow<T>(_ windowId: UInt32, _ body: @Sendable @escaping (AXUIElement, RunLoopJob) throws -> T?) async throws -> T? {
-    try await thread?.runInLoop { [windows] job in
-      guard let window = windows.threadGuarded[windowId] else { return nil }
+    try await thread?.runInLoop { [windows, tabSelected] job in
+      guard let window = windows.threadGuarded[tabSelected.threadGuarded[windowId] ?? windowId] else { return nil }
       return try body(window.ax, job)
     }
   }
 
   private func withWindowAsync(_ windowId: UInt32, _ body: @Sendable @escaping (AXUIElement, RunLoopJob) -> ()) -> RunLoopJob {
-    thread?.runInLoopAsync { [windows] job in
-      guard let window = windows.threadGuarded[windowId] else { return }
+    thread?.runInLoopAsync { [windows, tabSelected] job in
+      guard let window = windows.threadGuarded[tabSelected.threadGuarded[windowId] ?? windowId] else { return }
       body(window.ax, job)
     } ?? .cancelled
   }
@@ -579,6 +619,187 @@ extension [UInt32: AxWindow] {
     } else {
       return nil
     }
+  }
+}
+
+/// Everything tab-group detection needs from outside the app's AX thread.
+///
+/// The top level owns the tree -- which windows AeroSpork manages, which ones it parked off screen
+/// -- while the AX thread only ever sees ids and rectangles. So it is handed that state as data.
+struct TabGroupInputs: Sendable {
+  /// Every window WindowServer composites, front to back. See `windowServerRects`.
+  var windowServerRects: [(windowId: UInt32, rect: WindowServerRect, isDrawn: Bool)] = []
+  /// Ids the previous refresh managed. See `tabGroups`.
+  var alreadyManaged: Set<UInt32> = []
+  /// Ids AeroSpork parked in a corner because their workspace is hidden. See `tabGroups`.
+  var parkedInCorner: Set<UInt32> = []
+  /// Ids bound directly to their workspace instead of to a container. See `tabGroups`.
+  var floatingWindowIds: Set<UInt32> = []
+  /// The previous refresh's tab id -> managed id mapping. See `tabGroups`.
+  var previousOwner: [UInt32: UInt32] = [:]
+}
+
+/// A window rectangle exactly as WindowServer reports it.
+///
+/// Only ever compared for equality, so the coordinate space (Quartz, top-left origin) never has to
+/// be converted. It is not `CGRect`: that is not `Hashable` before macOS 15, and this app supports
+/// macOS 13.
+struct WindowServerRect: Hashable {
+  var x: CGFloat
+  var y: CGFloat
+  var width: CGFloat
+  var height: CGFloat
+
+  init(_ rect: CGRect) {
+    x = rect.minX
+    y = rect.minY
+    width = rect.width
+    height = rect.height
+  }
+}
+
+/// The AX window ids AeroSpork manages: one per window the user can see. See `tabGroups`.
+struct TabGroups {
+  var managed: [UInt32] = []
+  /// Tab -> the managed window it belongs to. Absent for a window that is not a tab.
+  var owner: [UInt32: UInt32] = [:]
+  /// Managed window -> the AX window id that represents it right now.
+  var selected: [UInt32: UInt32] = [:]
+}
+
+/// Every window WindowServer composites, front to back.
+///
+/// "Which AX windows does the user see in one place" is geometry, and WindowServer is the authority
+/// on it: one query, against two AX round trips per window to read frames. It also answers two
+/// questions AX cannot: whether a window is *drawn* at all -- every tab of a *native* tab group
+/// except the selected one is not composited -- and, by order, which of several windows is in front.
+func windowServerRects() -> [(windowId: UInt32, rect: WindowServerRect, isDrawn: Bool)] {
+  let list = CGWindowListCopyWindowInfo([.optionAll], kCGNullWindowID) as? [[String: Any]] ?? []
+  return list.compactMap { info in
+    guard let windowId = (info[kCGWindowNumber as String] as? Int).flatMap({ UInt32(exactly: $0) }),
+          let bounds = info[kCGWindowBounds as String] as? [String: CGFloat],
+          let x = bounds["X"], let y = bounds["Y"], let width = bounds["Width"], let height = bounds["Height"],
+          // A window WindowServer reports without a real rect shares that non-rect with every other
+          // such window, which would read as "all in one place" and merge unrelated windows.
+          width > 0, height > 0
+    else { return nil }
+    return (
+      windowId,
+      WindowServerRect(CGRect(x: x, y: y, width: width, height: height)),
+      (info[kCGWindowIsOnscreen as String] as? Bool) == true
+    )
+  }
+}
+
+/// Collapse the AX windows that are really one window with native tabs.
+///
+/// macOS reports a window with native tabs as one AX window per tab. Every tab carries the group's
+/// frame, so they are indistinguishable from N windows stacked exactly on top of each other, and
+/// only the selected one is visible. Managing them all lays a window out against itself: the tabs
+/// fight over one rectangle, and the window the user is looking at ends up the size of a single tile
+/// instead of the size of its workspace.
+///
+/// A window may also match a *nearly* identical rectangle instead of an exactly identical one, but
+/// only when either side is not drawn -- the signature of a *native* tab group, where just the
+/// selected tab is composited -- or when both are floating, since a floating window's size belongs
+/// to the window and not to the layout, so a duplicate node left behind by this very bug can carry a
+/// slightly different frame than its twin. Two *drawn*, non-floating windows get no such allowance:
+/// a container lays its children out itself and an accordion deliberately overlaps them, so nearly
+/// identical tiled rectangles really are two windows.
+///
+/// So AX windows of one app at an identical WindowServer rectangle are one window -- unless
+///   - they are not all ordinary windows. A panel is *placed* exactly over its own window on
+///     purpose (`AXDialog` and friends), and that is not a tab; or
+///   - more than one of them is a window AeroSpork itself parked in a corner. `hideInCorner` gives
+///     same-sized hidden windows of one app the very same rect, and merging those would drop a
+///     window out of the layout.
+///
+/// Known limit: creating or closing tabs faster than a refresh can observe them can leave a tab as
+/// its own node -- it is recognised by a rectangle it shares with the group, and a burst of tab
+/// churn moves the windows between refreshes. The next tab event puts them back on one rectangle.
+///
+/// The managed id outlives the tab it was taken from. A tree node cannot change the `windowId` it
+/// was created with, so if closing a tab made the group adopt a different id, every layout would
+/// destroy and re-create the node -- which is a window that jumps to another tile and its workspace
+/// re-flowing around it, the very symptom this grouping exists to remove. So a group keeps the id
+/// the previous refresh managed (that is how a *closed* tab's id survives: the surviving tabs still
+/// point at it, and AX reads and writes reach the drawn one through `selected`). Only a brand new
+/// group picks a member: the tab furthest from the front, since `Cmd+W` closes the visible one.
+/// What AX reads and writes target is the opposite end -- the tab that is drawn, i.e. the one the
+/// user is looking at.
+func tabGroups(of windows: [UInt32: any AxUiElementMock], in inputs: TabGroupInputs) -> TabGroups {
+  var drawn: [UInt32: Bool] = [:]
+  var buckets: [[UInt32]] = []
+  var bucketRects: [WindowServerRect] = []
+  for (windowId, rect, isDrawn) in inputs.windowServerRects where windows[windowId] != nil {
+    drawn[windowId] = isDrawn
+    if let index = bucketRects.firstIndex(of: rect) {
+      buckets[index].append(windowId) // front to back within the bucket
+      continue
+    }
+    // See the doc comment: an undrawn window or a floating window may match a nearly identical rect.
+    let allowsLooseMatch = { (index: Int) -> Bool in
+      if isDrawn != true || buckets[index].contains(where: { drawn[$0] != true }) { return true }
+      return inputs.floatingWindowIds.contains(windowId) && buckets[index].allSatisfy { inputs.floatingWindowIds.contains($0) }
+    }
+    if let index = bucketRects.firstIndex(where: { isNearlyTheSameRect($0, rect) }), allowsLooseMatch(index) {
+      buckets[index].append(windowId)
+      continue
+    }
+    buckets.append([windowId])
+    bucketRects.append(rect)
+  }
+  var result = TabGroups()
+  var tabs: Set<UInt32> = []
+  for tabsInGroup in buckets where tabsInGroup.count > 1 {
+    if tabsInGroup.count(where: { inputs.parkedInCorner.contains($0) }) > 1 { continue }
+    guard tabsInGroup.allSatisfy({ windows[$0]?.get(Ax.subroleAttr) == kAXStandardWindowSubrole }) else { continue }
+    let managed = tabsInGroup.lazy.compactMap { inputs.previousOwner[$0] }.first
+      ?? tabsInGroup.first { inputs.alreadyManaged.contains($0) } // a duplicate node: keep the node that exists
+      ?? tabsInGroup.last.orDie()
+    if !inputs.alreadyManaged.contains(managed) { // a group is logged once, when it is first recognised
+      debugLog("TAB GROUP: collapsed \(tabsInGroup.count) AX windows into \(managed); visible tab \(tabsInGroup.first.orDie())")
+    }
+    tabs.formUnion(tabsInGroup)
+    result.managed.append(managed)
+    // AX reads and writes follow the tab the user is looking at: the one WindowServer draws, else
+    // the one in front.
+    result.selected[managed] = tabsInGroup.first(where: { drawn[$0] == true }) ?? tabsInGroup.first.orDie()
+    for id in tabsInGroup { result.owner[id] = managed }
+  }
+  for id in windows.keys where !tabs.contains(id) {
+    result.managed.append(id)
+    result.selected[id] = id
+  }
+  return result
+}
+
+/// True when two rectangles cover nearly the same area -- within 10% of the smaller one. See
+/// `tabGroups` for when that is allowed to mean "the same window".
+func isNearlyTheSameRect(_ a: WindowServerRect, _ b: WindowServerRect) -> Bool {
+  let overlapWidth = min(a.x + a.width, b.x + b.width) - max(a.x, b.x)
+  let overlapHeight = min(a.y + a.height, b.y + b.height) - max(a.y, b.y)
+  guard overlapWidth > 0, overlapHeight > 0 else { return false }
+  return overlapWidth*overlapHeight >= min(a.width*a.height, b.width*b.height)*0.9
+}
+
+/// Writes the frame to the rest of a window's native tabs. See `tabGroups`.
+///
+/// Without this the very next layout pass takes the group apart again: the tile goes to the selected
+/// tab alone, the other tabs keep the frames they had, and the next refresh sees windows that no
+/// longer share a rectangle -- which is one tree node per tab, the bug this whole change fixes. It is
+/// also what stops switching tabs from moving the window: every tab already holds the group's frame.
+/// Call on the app's AX thread.
+private func spreadFrameToTabMembers(
+  _ owner: UInt32,
+  _ windows: ThreadGuardedValue<[UInt32: AxWindow]>,
+  _ tabOwner: ThreadGuardedValue<[UInt32: UInt32]>,
+  _ topLeft: CGPoint?,
+  _ size: CGSize?
+) {
+  for (id, member) in windows.threadGuarded where id != owner && tabOwner.threadGuarded[id] == owner {
+    if isFrameSatisfied(member.ax, topLeft, size) { continue }
+    setFrame(member.ax, topLeft, size)
   }
 }
 

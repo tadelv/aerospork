@@ -14,6 +14,24 @@ final class MacWindow: Window {
   @MainActor static var allWindowsMap: [UInt32: MacWindow] = [:]
   @MainActor static var allWindows: [MacWindow] { Array(allWindowsMap.values) }
 
+  /// Raw AX window id -> the managed id of the window it belongs to, for windows with native tabs.
+  ///
+  /// This is the same grouping as `MacApp.tabOwner`, projected for the other side of the process:
+  /// that one is written on the app's AX thread and answers ids the *app* reports, while this one
+  /// answers ids that come from WindowServer -- a mouse notification, or `--window-id`.
+  @MainActor private static var axWindowOwners: [UInt32: UInt32] = [:]
+
+  /// Read-only view for the grouping, which must see the *previous* refresh's mapping. See `tabGroups`.
+  @MainActor static var tabOwners: [UInt32: UInt32] { axWindowOwners }
+
+  @MainActor static func managedId(ofAxWindowId id: UInt32) -> UInt32 { axWindowOwners[id] ?? id }
+
+  @MainActor static func setTabOwners(_ mapping: [MacApp: TabGroups]) {
+    axWindowOwners = mapping.values.reduce(into: [:]) { owners, groups in
+      owners.merge(groups.owner) { _, ownerFromOtherApp in ownerFromOtherApp } // ids are unique per process
+    }
+  }
+
   @MainActor
   @discardableResult
   static func getOrRegister(windowId: UInt32, macApp: MacApp) async throws -> MacWindow {
