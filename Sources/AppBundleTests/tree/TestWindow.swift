@@ -3,6 +3,8 @@ import AppKit
 
 final class TestWindow: Window, CustomStringConvertible {
   private var _rect: Rect?
+  var isHiddenInCornerForTest = false
+  override var isHiddenInCorner: Bool { isHiddenInCornerForTest }
 
   @MainActor
   private init(_ id: UInt32, _ parent: NonLeafTreeNodeObject, _ adaptiveWeight: CGFloat, _ rect: Rect?) {

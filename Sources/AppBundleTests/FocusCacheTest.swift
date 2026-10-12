@@ -21,6 +21,18 @@ final class FocusCacheTest: XCTestCase {
   /// PREVIOUS frontmost window as focused. If that window lives on another workspace, adopting it
   /// undoes the switch. Only reproducible when both workspaces hold windows of the same app,
   /// which is why it looked intermittent rather than broken.
+  func testHiddenWindowDoesNotUndoFocusOnAnEmptyWorkspace() {
+    let hidden = TestWindow.new(id: 1, parent: Workspace.get(byName: "source").rootTilingContainer)
+    let target = Workspace.get(byName: "empty")
+    hidden.isHiddenInCornerForTest = true
+
+    XCTAssertTrue(target.focusWorkspace())
+    updateFocusCache(hidden)
+
+    assertEquals(focus.workspace.name, "empty")
+    XCTAssertNil(focus.windowOrNil)
+  }
+
   func testAnAppEchoingItsOldWindowDoesNotUndoAWorkspaceSwitch() {
     let target = TestWindow.new(id: 1, parent: Workspace.get(byName: "target").rootTilingContainer)
     let stale = TestWindow.new(id: 2, parent: Workspace.get(byName: "elsewhere").rootTilingContainer)

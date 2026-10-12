@@ -29,6 +29,9 @@ private let nativeFocusGrace: TimeInterval = 1.0
 ///                      (from nativeFocused to lastKnownNativeFocusedWindowId)
 /// Alternative names: takeFocusFromMacOs, syncFocusFromMacOs
 @MainActor func updateFocusCache(_ nativeFocused: Window?) {
+  // An empty workspace has no native window to focus. macOS can keep reporting the old window
+  // after AeroSpork parks it offscreen; adopting it would immediately switch back.
+  if focus.windowOrNil == nil, nativeFocused?.isHiddenInCorner == true { return }
   // A focus request we issued is still in flight. `MacApp.nativeFocus` raises the target window
   // and then calls `nsApp.activate`, both asynchronously on the app's thread; `runSession` starts
   // another refresh immediately afterwards. In that window an app can report a DIFFERENT window
