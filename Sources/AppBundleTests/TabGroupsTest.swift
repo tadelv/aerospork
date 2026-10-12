@@ -35,6 +35,48 @@ final class TabGroupsTest: XCTestCase {
     assertEquals(groups.selected, [4: 4])
   }
 
+  /// Frames are read before layout writes them, so a group's members disagree for exactly one
+  /// refresh when its workspace moves to another monitor, or when the screen wakes. Geometry alone
+  /// split them there and nothing reunited them afterwards: a window that became its own node is no
+  /// longer a tab, so the next refresh could not tell it ever was one.
+  func testTabsStayOneWindowWhileTheirFramesDisagree() {
+    let windows: [UInt32: any AxUiElementMock] = [1: window(), 2: window(), 3: window()]
+    let groups = tabGroups(of: windows, in: inputs(
+      [(1, sameRect), (2, elsewhere), (3, anotherRect)],
+      alreadyManaged: [1],
+      undrawn: [2, 3],
+      previousOwner: [1: 1, 2: 1, 3: 1]
+    ))
+    assertEquals(groups.managed, [1])
+    assertEquals(groups.selected, [1: 1])
+    assertEquals(groups.owner, [1: 1, 2: 1, 3: 1])
+  }
+
+  /// ...but a tab the user dragged out into a window of its own is drawn at a rectangle of its own,
+  /// and it is meant to keep it. Undrawn siblings are what gets reunited, not a second visible window.
+  func testATabDraggedOutIntoItsOwnWindowIsNotReunited() {
+    let windows: [UInt32: any AxUiElementMock] = [1: window(), 2: window()]
+    let groups = tabGroups(of: windows, in: inputs(
+      [(1, sameRect), (2, elsewhere)],
+      alreadyManaged: [1, 2],
+      previousOwner: [1: 1, 2: 1]
+    ))
+    assertEquals(Set(groups.managed), Set([1, 2]))
+    assertEquals(groups.owner, [:])
+  }
+
+  /// Two windows that were never one group cannot be merged into one, whatever the previous
+  /// refresh's map holds for a window of some other app's group.
+  func testTwoSeparateWindowsAreNeverReunited() {
+    let windows: [UInt32: any AxUiElementMock] = [1: window(), 2: window()]
+    let groups = tabGroups(of: windows, in: inputs(
+      [(1, sameRect), (2, elsewhere)],
+      alreadyManaged: [1, 2],
+      previousOwner: [1: 1, 2: 2]
+    ))
+    assertEquals(Set(groups.managed), Set([1, 2]))
+  }
+
   func testWindowsAtDistinctRectsAreSeparateWindows() {
     let windows: [UInt32: any AxUiElementMock] = [1: window(), 2: window()]
     let groups = tabGroups(of: windows, in: inputs([(1, sameRect), (2, elsewhere)]))
@@ -129,6 +171,8 @@ final class TabGroupsTest: XCTestCase {
   /// Same origin, 30 points shorter: the slack one tab member can hold over another.
   private let aBitShorter = WindowServerRect(CGRect(x: 100, y: 200, width: 800, height: 570))
   private let halfOverlapping = WindowServerRect(CGRect(x: 500, y: 200, width: 800, height: 600))
+  /// A third place entirely: where a tab sits while its sibling has already been laid out elsewhere.
+  private let anotherRect = WindowServerRect(CGRect(x: 100, y: 900, width: 800, height: 600))
 
   private func window(_ subrole: String = kAXStandardWindowSubrole) -> [String: Json] {
     ["AXSubrole": .string(subrole)]

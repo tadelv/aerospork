@@ -714,6 +714,15 @@ func windowServerRects() -> [(windowId: UInt32, rect: WindowServerRect, isDrawn:
 ///     same-sized hidden windows of one app the very same rect, and merging those would drop a
 ///     window out of the layout.
 ///
+/// Rectangles are read at the START of a refresh, but frames are written at the END of it, so the
+/// members of a group legitimately disagree for exactly one refresh: moving a workspace to another
+/// monitor lays the visible tab out at its new frame while its siblings are still where the old one
+/// left them, and a screen wake reports them wherever they were. Geometry alone therefore takes such
+/// a group apart, and nothing puts it back -- a window that has become a node of its own is no
+/// longer a tab, so the next refresh cannot tell it ever was one. What survives that refresh is the
+/// membership the previous refresh already knew, which is what `retainingKnownTabGroups` reunites
+/// on.
+///
 /// Known limit: creating or closing tabs faster than a refresh can observe them can leave a tab as
 /// its own node -- it is recognised by a rectangle it shares with the group, and a burst of tab
 /// churn moves the windows between refreshes. The next tab event puts them back on one rectangle.
@@ -749,6 +758,8 @@ func tabGroups(of windows: [UInt32: any AxUiElementMock], in inputs: TabGroupInp
     buckets.append([windowId])
     bucketRects.append(rect)
   }
+  // Geometry finds a group, membership keeps it. See `retainingKnownTabGroups`.
+  buckets = retainingKnownTabGroups(buckets, drawn, inputs.previousOwner)
   var result = TabGroups()
   var tabs: Set<UInt32> = []
   for tabsInGroup in buckets where tabsInGroup.count > 1 {
@@ -772,6 +783,40 @@ func tabGroups(of windows: [UInt32: any AxUiElementMock], in inputs: TabGroupInp
     result.selected[id] = id
   }
   return result
+}
+
+/// Reunites the buckets of a group the previous refresh already recognised, whatever their
+/// rectangles say now. See `tabGroups` for why geometry alone cannot hold a group together.
+///
+/// The merge key is the managed id the previous refresh assigned, so this can only put back a group
+/// that existed -- two different windows cannot be merged into one, however they are placed.
+/// The case it must not undo is a tab the user dragged out into a window of its own: that window is
+/// drawn at a rectangle of its own, and it is meant to have one. So only a bucket with no drawn
+/// member is reunited with a drawn one.
+///
+/// Takes the geometric buckets, each in WindowServer's front-to-back order.
+private func retainingKnownTabGroups(
+  _ buckets: [[UInt32]],
+  _ drawn: [UInt32: Bool],
+  _ previousOwner: [UInt32: UInt32]
+) -> [[UInt32]] {
+  var groupOfOwner: [UInt32: Int] = [:]
+  var groups: [[UInt32]] = []
+  var groupIsDrawn: [Bool] = []
+  for bucket in buckets {
+    let owners = bucket.compactMap { previousOwner[$0] }
+    let isDrawn = bucket.contains { drawn[$0] == true }
+    if let index = owners.lazy.compactMap({ groupOfOwner[$0] }).first(where: { !(isDrawn && groupIsDrawn[$0]) }) {
+      groups[index] += bucket
+      groupIsDrawn[index] = groupIsDrawn[index] || isDrawn
+      for owner in owners { groupOfOwner[owner] = index }
+    } else {
+      groups.append(bucket)
+      groupIsDrawn.append(isDrawn)
+      for owner in owners { groupOfOwner[owner] = groups.count - 1 }
+    }
+  }
+  return groups
 }
 
 /// True when two rectangles cover nearly the same area -- within 10% of the smaller one. See
