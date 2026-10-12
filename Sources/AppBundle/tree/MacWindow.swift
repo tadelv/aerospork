@@ -24,12 +24,22 @@ final class MacWindow: Window {
   /// Read-only view for the grouping, which must see the *previous* refresh's mapping. See `tabGroups`.
   @MainActor static var tabOwners: [UInt32: UInt32] { axWindowOwners }
 
+  /// Tabs the app has stopped reporting, and the window they belonged to. See `tabGroups`: a native
+  /// tab group's windows reach the AX layer intermittently, and a refresh that cannot see them must
+  /// not be allowed to forget them.
+  @MainActor private static var rememberedOwners: [UInt32: UInt32] = [:]
+
+  /// Read-only view for the grouping. See `tabGroups`.
+  @MainActor static var rememberedTabOwners: [UInt32: UInt32] { rememberedOwners }
+
   @MainActor static func managedId(ofAxWindowId id: UInt32) -> UInt32 { axWindowOwners[id] ?? id }
 
-  @MainActor static func setTabOwners(_ mapping: [MacApp: TabGroups]) {
-    axWindowOwners = mapping.values.reduce(into: [:]) { owners, groups in
+  @MainActor static func setTabOwners(_ mapping: [MacApp: TabGroups], aliveWindowIds: Set<UInt32>) {
+    let fresh = mapping.values.reduce(into: [UInt32: UInt32]()) { owners, groups in
       owners.merge(groups.owner) { _, ownerFromOtherApp in ownerFromOtherApp } // ids are unique per process
     }
+    axWindowOwners = fresh
+    rememberedOwners = rememberedOwnersAfterRefresh(fresh, rememberedOwners, aliveWindowIds: aliveWindowIds)
   }
 
   @MainActor

@@ -475,7 +475,8 @@ final class MacApp: AbstractApp {
       // A floating window's size is its own; see `tabGroups`.
       floatingWindowIds: Set(MacWindow.allWindows.lazy.filter { $0.isFloating }.map(\.windowId)),
       // Read before this refresh rebuilds it: a group must keep the id it had last time.
-      previousOwner: MacWindow.tabOwners
+      previousOwner: MacWindow.tabOwners,
+      rememberedOwner: MacWindow.rememberedTabOwners
     )
     return try await withThrowingTaskGroup(of: (pid_t, TabGroups).self, returning: [MacApp: TabGroups].self) { group in
       func refreshTheApp(_ nsApp: NSRunningApplication) {
@@ -637,6 +638,8 @@ struct TabGroupInputs: Sendable {
   var floatingWindowIds: Set<UInt32> = []
   /// The previous refresh's tab id -> managed id mapping. See `tabGroups`.
   var previousOwner: [UInt32: UInt32] = [:]
+  /// Ids earlier refreshes saw as tabs, which this one did not see at all. See `tabGroups`.
+  var rememberedOwner: [UInt32: UInt32] = [:]
 }
 
 /// A window rectangle exactly as WindowServer reports it.
@@ -759,7 +762,7 @@ func tabGroups(of windows: [UInt32: any AxUiElementMock], in inputs: TabGroupInp
     bucketRects.append(rect)
   }
   // Geometry finds a group, membership keeps it. See `retainingKnownTabGroups`.
-  buckets = retainingKnownTabGroups(buckets, drawn, inputs.previousOwner)
+  buckets = retainingKnownTabGroups(buckets, drawn, inputs.previousOwner, inputs.rememberedOwner)
   var result = TabGroups()
   var tabs: Set<UInt32> = []
   for tabsInGroup in buckets where tabsInGroup.count > 1 {
@@ -785,6 +788,19 @@ func tabGroups(of windows: [UInt32: any AxUiElementMock], in inputs: TabGroupInp
   return result
 }
 
+/// What the next refresh should still remember about the ids this one did not see. See `tabGroups`.
+///
+/// An id that is a window of its own now is not a tab any more -- that is a tab dragged out of its
+/// group, and it is meant to keep the rectangle of its own -- so it is forgotten rather than pulled
+/// back into the group it came from. Ids the app reported not at all are exactly the ones worth
+/// keeping: an interrupted AX report, not a closed window, is what drops them.
+func rememberedOwnersAfterRefresh(
+  _ fresh: [UInt32: UInt32],
+  _ remembered: [UInt32: UInt32],
+  aliveWindowIds: Set<UInt32>
+) -> [UInt32: UInt32] {
+  fresh.merging(remembered.filter { !aliveWindowIds.contains($0.key) }) { new, _ in new }
+}
 /// Reunites the buckets of a group the previous refresh already recognised, whatever their
 /// rectangles say now. See `tabGroups` for why geometry alone cannot hold a group together.
 ///
@@ -798,13 +814,14 @@ func tabGroups(of windows: [UInt32: any AxUiElementMock], in inputs: TabGroupInp
 private func retainingKnownTabGroups(
   _ buckets: [[UInt32]],
   _ drawn: [UInt32: Bool],
-  _ previousOwner: [UInt32: UInt32]
+  _ previousOwner: [UInt32: UInt32],
+  _ rememberedOwner: [UInt32: UInt32]
 ) -> [[UInt32]] {
   var groupOfOwner: [UInt32: Int] = [:]
   var groups: [[UInt32]] = []
   var groupIsDrawn: [Bool] = []
   for bucket in buckets {
-    let owners = bucket.compactMap { previousOwner[$0] }
+    let owners = bucket.compactMap { previousOwner[$0] ?? rememberedOwner[$0] }
     let isDrawn = bucket.contains { drawn[$0] == true }
     if let index = owners.lazy.compactMap({ groupOfOwner[$0] }).first(where: { !(isDrawn && groupIsDrawn[$0]) }) {
       groups[index] += bucket

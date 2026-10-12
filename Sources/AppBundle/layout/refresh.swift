@@ -155,11 +155,11 @@ func refreshModel() {
 @MainActor
 private func refresh() async throws {
   let mapping = try await MacApp.refreshAllAndGetAliveWindowIds(frontmostAppBundleId: NSWorkspace.shared.frontmostApplication?.bundleIdentifier)
-  // A window with native tabs is one entry here, not one per tab, so keep its other AX window ids
-  // resolvable: mouse notifications and `--window-id` arrive holding whichever id the app chose.
-  MacWindow.setTabOwners(mapping)
   // Set, not Array: this is membership-tested once per window below, so an Array made it O(W^2).
   let aliveWindowIds = Set(mapping.values.flatMap { $0.managed })
+  // A window with native tabs is one entry here, not one per tab, so keep its other AX window ids
+  // resolvable: mouse notifications and `--window-id` arrive holding whichever id the app chose.
+  MacWindow.setTabOwners(mapping, aliveWindowIds: aliveWindowIds)
 
   for window in MacWindow.allWindows {
     if !aliveWindowIds.contains(window.windowId) {

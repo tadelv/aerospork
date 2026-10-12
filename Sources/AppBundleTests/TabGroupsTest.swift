@@ -52,6 +52,41 @@ final class TabGroupsTest: XCTestCase {
     assertEquals(groups.owner, [1: 1, 2: 1, 3: 1])
   }
 
+  /// Native tab windows reach the AX layer intermittently: Ghostty reports its visible tab alone for
+  /// long stretches and every tab while it is reconfiguring, so the refresh that finally sees them
+  /// again is not the one after the last one that did. Geometry then compares rectangles that a wake
+  /// or a monitor change left disagreeing, and a refresh that had forgotten the group takes it apart.
+  func testTabsAreReunitedAfterARefreshThatDidNotSeeThem() {
+    let windows: [UInt32: any AxUiElementMock] = [1: window(), 2: window(), 3: window()]
+    let groups = tabGroups(of: windows, in: inputs(
+      [(1, sameRect), (2, elsewhere), (3, anotherRect)],
+      alreadyManaged: [1],
+      undrawn: [2, 3],
+      rememberedOwner: [1: 1, 2: 1, 3: 1]
+    ))
+    assertEquals(groups.managed, [1])
+    assertEquals(groups.owner, [1: 1, 2: 1, 3: 1])
+  }
+
+  /// The memory is still only a memory: a second drawn window is never pulled back into a group, so a
+  /// tab dragged out into a window of its own keeps its rectangle.
+  func testRememberedTabsDoNotReabsorbAWindowThatBecameItsOwn() {
+    let windows: [UInt32: any AxUiElementMock] = [1: window(), 2: window()]
+    let groups = tabGroups(of: windows, in: inputs(
+      [(1, sameRect), (2, elsewhere)],
+      alreadyManaged: [1, 2],
+      rememberedOwner: [1: 1, 2: 1]
+    ))
+    assertEquals(Set(groups.managed), Set([1, 2]))
+  }
+
+  /// What the next refresh keeps: an id that has become a window of its own is dropped, and one the
+  /// app reported not at all is kept -- that gap is what this memory exists for.
+  func testOnlyTheIdsTheAppStoppedReportingAreRemembered() {
+    let remembered = rememberedOwnersAfterRefresh([1: 1], [1: 1, 2: 1, 3: 1], aliveWindowIds: [1, 2])
+    assertEquals(remembered, [1: 1, 3: 1])
+  }
+
   /// ...but a tab the user dragged out into a window of its own is drawn at a rectangle of its own,
   /// and it is meant to keep it. Undrawn siblings are what gets reunited, not a second visible window.
   func testATabDraggedOutIntoItsOwnWindowIsNotReunited() {
@@ -184,14 +219,16 @@ final class TabGroupsTest: XCTestCase {
     parkedInCorner: Set<UInt32> = [],
     floatingWindowIds: Set<UInt32> = [],
     undrawn: Set<UInt32> = [],
-    previousOwner: [UInt32: UInt32] = [:]
+    previousOwner: [UInt32: UInt32] = [:],
+    rememberedOwner: [UInt32: UInt32] = [:]
   ) -> TabGroupInputs {
     TabGroupInputs(
       windowServerRects: windowServerRects.map { (windowId: $0.0, rect: $0.1, isDrawn: !undrawn.contains($0.0)) },
       alreadyManaged: alreadyManaged,
       parkedInCorner: parkedInCorner,
       floatingWindowIds: floatingWindowIds,
-      previousOwner: previousOwner
+      previousOwner: previousOwner,
+      rememberedOwner: rememberedOwner
     )
   }
 }
