@@ -80,11 +80,38 @@ final class TabGroupsTest: XCTestCase {
     assertEquals(Set(groups.managed), Set([1, 2]))
   }
 
-  /// What the next refresh keeps: an id that has become a window of its own is dropped, and one the
-  /// app reported not at all is kept -- that gap is what this memory exists for.
-  func testOnlyTheIdsTheAppStoppedReportingAreRemembered() {
-    let remembered = rememberedOwnersAfterRefresh([1: 1], [1: 1, 2: 1, 3: 1], aliveWindowIds: [1, 2])
-    assertEquals(remembered, [1: 1, 3: 1])
+  /// The memory only ever grows, and what the app reports now always wins.
+  func testTheMemoryIsAdditive() {
+    assertEquals(keepingRememberedTabs([1: 1], [2: 1, 3: 1]), [1: 1, 2: 1, 3: 1])
+    assertEquals(keepingRememberedTabs([1: 5], [1: 1]), [1: 5], additionalMsg: "what the app says now wins")
+  }
+
+  /// A group a bad refresh did take apart is put back together by the next one. The split leaves two
+  /// windows of ours where there was one, and the user sees exactly what the grouping exists to
+  /// remove: a window laid out as if it were several. Healing has to come from what was known before
+  /// the split, because that is the last moment the tabs were one window.
+  func testASplitGroupIsReunitedOnTheNextRefresh() {
+    let windows: [UInt32: any AxUiElementMock] = [1: window(), 2: window()]
+    // Both tabs reported as drawn, at rectangles a wake left disagreeing: this refresh cannot group
+    // them whatever it remembers, and it leaves two windows of ours where there was one.
+    let split = tabGroups(of: windows, in: inputs(
+      [(1, sameRect), (2, elsewhere)],
+      alreadyManaged: [1, 2],
+      rememberedOwner: [1: 1, 2: 1]
+    ))
+    assertEquals(Set(split.managed), Set([1, 2]))
+
+    // The unselected tab is undrawn again, which is its normal state, and the memory still says which
+    // window it belongs to -- nothing the split reported was allowed to take that away.
+    let healed = tabGroups(of: windows, in: inputs(
+      [(1, sameRect), (2, elsewhere)],
+      alreadyManaged: Set(split.managed),
+      undrawn: [2],
+      previousOwner: split.owner,
+      rememberedOwner: keepingRememberedTabs(split.owner, [1: 1, 2: 1])
+    ))
+    assertEquals(healed.managed, [1], additionalMsg: "the split was not healed")
+    assertEquals(healed.owner, [1: 1, 2: 1])
   }
 
   /// ...but a tab the user dragged out into a window of its own is drawn at a rectangle of its own,

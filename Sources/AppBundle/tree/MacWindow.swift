@@ -34,12 +34,12 @@ final class MacWindow: Window {
 
   @MainActor static func managedId(ofAxWindowId id: UInt32) -> UInt32 { axWindowOwners[id] ?? id }
 
-  @MainActor static func setTabOwners(_ mapping: [MacApp: TabGroups], aliveWindowIds: Set<UInt32>) {
+  @MainActor static func setTabOwners(_ mapping: [MacApp: TabGroups]) {
     let fresh = mapping.values.reduce(into: [UInt32: UInt32]()) { owners, groups in
       owners.merge(groups.owner) { _, ownerFromOtherApp in ownerFromOtherApp } // ids are unique per process
     }
     axWindowOwners = fresh
-    rememberedOwners = rememberedOwnersAfterRefresh(fresh, rememberedOwners, aliveWindowIds: aliveWindowIds)
+    rememberedOwners = keepingRememberedTabs(fresh, rememberedOwners)
   }
 
   @MainActor

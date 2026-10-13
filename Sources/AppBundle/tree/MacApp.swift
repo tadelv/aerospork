@@ -788,18 +788,22 @@ func tabGroups(of windows: [UInt32: any AxUiElementMock], in inputs: TabGroupInp
   return result
 }
 
-/// What the next refresh should still remember about the ids this one did not see. See `tabGroups`.
+/// What the next refresh should still remember about the tabs it has seen. See `tabGroups`.
 ///
-/// An id that is a window of its own now is not a tab any more -- that is a tab dragged out of its
-/// group, and it is meant to keep the rectangle of its own -- so it is forgotten rather than pulled
-/// back into the group it came from. Ids the app reported not at all are exactly the ones worth
-/// keeping: an interrupted AX report, not a closed window, is what drops them.
-func rememberedOwnersAfterRefresh(
-  _ fresh: [UInt32: UInt32],
-  _ remembered: [UInt32: UInt32],
-  aliveWindowIds: Set<UInt32>
-) -> [UInt32: UInt32] {
-  fresh.merging(remembered.filter { !aliveWindowIds.contains($0.key) }) { new, _ in new }
+/// Additive, and only ever additive. Entries were once dropped for ids a refresh had made windows of
+/// their own, to be sure a tab dragged out of a group could not be pulled back in -- and that removed
+/// exactly the memory that heals a split, because the refresh that splits a group is the one whose
+/// report calls every tab a window. The split was then permanent until some later refresh happened to
+/// see one rectangle again, which is what the user sees as a window laid out as if it were several.
+/// A second *drawn* window is what must not be reunited, and refusing that belongs in the reunion
+/// itself: see `retainingKnownTabGroups`.
+///
+/// Nothing stale can come of keeping ids: WindowServer never hands out an id twice, so an entry for a
+/// closed tab is never consulted. Known limit: a window that left a group and then stopped being
+/// drawn (minimised, say) has no rectangle of its own to protect it, so it can still be reunited with
+/// the group it came from.
+func keepingRememberedTabs(_ fresh: [UInt32: UInt32], _ previous: [UInt32: UInt32]) -> [UInt32: UInt32] {
+  fresh.merging(previous) { new, _ in new }
 }
 /// Reunites the buckets of a group the previous refresh already recognised, whatever their
 /// rectangles say now. See `tabGroups` for why geometry alone cannot hold a group together.
