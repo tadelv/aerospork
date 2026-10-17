@@ -147,6 +147,33 @@ final class TabGroupsTest: XCTestCase {
     assertEquals(groups.owner, [:])
   }
 
+  /// Switching between two workspaces laid out the same way puts one window of each on the identical
+  /// rectangle: the arriving workspace is laid out before the leaving one is parked in a corner, so
+  /// both are drawn at that rect until the app applies the corner move. Merging them hands the
+  /// leaving workspace's window to the arriving one -- a window that changes workspace by itself.
+  func testWindowsOfDifferentWorkspacesOnOneRectAreNotTabs() {
+    let windows: [UInt32: any AxUiElementMock] = [1: window(), 2: window()]
+    let groups = tabGroups(of: windows, in: inputs(
+      [(1, sameRect), (2, sameRect)],
+      alreadyManaged: [1, 2],
+      workspaceNames: [1: "5", 2: "6"]
+    ))
+    assertEquals(Set(groups.managed), Set([1, 2]))
+    assertEquals(groups.owner, [:])
+  }
+
+  func testWindowsOfOneWorkspaceOnOneRectAreOneWindow() {
+    // The guard above is about the workspace, not about the tab group's other shapes.
+    let windows: [UInt32: any AxUiElementMock] = [1: window(), 2: window()]
+    let groups = tabGroups(of: windows, in: inputs(
+      [(1, sameRect), (2, sameRect)],
+      alreadyManaged: [1, 2],
+      workspaceNames: [1: "5", 2: "5"]
+    ))
+    assertEquals(groups.managed, [1])
+    assertEquals(groups.owner, [1: 1, 2: 1])
+  }
+
   func testWindowsAeroSporkParkedInTheSameCornerAreNotTabs() {
     // hideInCorner parks same-sized hidden windows of one app on the same rect on purpose. Merging
     // those would drop a window out of the layout.
@@ -245,6 +272,7 @@ final class TabGroupsTest: XCTestCase {
     alreadyManaged: Set<UInt32> = [],
     parkedInCorner: Set<UInt32> = [],
     floatingWindowIds: Set<UInt32> = [],
+    workspaceNames: [UInt32: String] = [:],
     undrawn: Set<UInt32> = [],
     previousOwner: [UInt32: UInt32] = [:],
     rememberedOwner: [UInt32: UInt32] = [:]
@@ -254,6 +282,7 @@ final class TabGroupsTest: XCTestCase {
       alreadyManaged: alreadyManaged,
       parkedInCorner: parkedInCorner,
       floatingWindowIds: floatingWindowIds,
+      workspaceNames: workspaceNames,
       previousOwner: previousOwner,
       rememberedOwner: rememberedOwner
     )

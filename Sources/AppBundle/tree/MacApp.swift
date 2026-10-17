@@ -474,6 +474,10 @@ final class MacApp: AbstractApp {
       parkedInCorner: Set(MacWindow.allWindows.lazy.filter { $0.isHiddenInCorner }.map(\.windowId)),
       // A floating window's size is its own; see `tabGroups`.
       floatingWindowIds: Set(MacWindow.allWindows.lazy.filter { $0.isFloating }.map(\.windowId)),
+      // A tab group is one window inside one workspace; see `tabGroups`.
+      workspaceNames: Dictionary(uniqueKeysWithValues: MacWindow.allWindows.compactMap { window in
+        window.nodeWorkspace.map { (window.windowId, $0.name) }
+      }),
       // Read before this refresh rebuilds it: a group must keep the id it had last time.
       previousOwner: MacWindow.tabOwners,
       rememberedOwner: MacWindow.rememberedTabOwners
@@ -636,6 +640,8 @@ struct TabGroupInputs: Sendable {
   var parkedInCorner: Set<UInt32> = []
   /// Ids bound directly to their workspace instead of to a container. See `tabGroups`.
   var floatingWindowIds: Set<UInt32> = []
+  /// The workspace each managed window is in, by name. See `tabGroups`.
+  var workspaceNames: [UInt32: String] = [:]
   /// The previous refresh's tab id -> managed id mapping. See `tabGroups`.
   var previousOwner: [UInt32: UInt32] = [:]
   /// Ids earlier refreshes saw as tabs, which this one did not see at all. See `tabGroups`.
@@ -715,7 +721,13 @@ func windowServerRects() -> [(windowId: UInt32, rect: WindowServerRect, isDrawn:
 ///     purpose (`AXDialog` and friends), and that is not a tab; or
 ///   - more than one of them is a window AeroSpork itself parked in a corner. `hideInCorner` gives
 ///     same-sized hidden windows of one app the very same rect, and merging those would drop a
-///     window out of the layout.
+///     window out of the layout; or
+///   - they are not in the same workspace, which a tab group always is. Windows of two workspaces
+///     do share a rectangle exactly: `layoutWorkspaces` lays the arriving workspace out *before* it
+///     parks the leaving one, so switching between two workspaces laid out the same way leaves both
+///     at one rect for as long as Safari takes to apply the corner move. Merging those hands the
+///     leaving workspace's window to the arriving one, which is a window that switches workspace by
+///     itself.
 ///
 /// Rectangles are read at the START of a refresh, but frames are written at the END of it, so the
 /// members of a group legitimately disagree for exactly one refresh: moving a workspace to another
@@ -767,6 +779,12 @@ func tabGroups(of windows: [UInt32: any AxUiElementMock], in inputs: TabGroupInp
   var tabs: Set<UInt32> = []
   for tabsInGroup in buckets where tabsInGroup.count > 1 {
     if tabsInGroup.count(where: { inputs.parkedInCorner.contains($0) }) > 1 { continue }
+    // Two windows of one app do share a rectangle exactly while a workspace switch is in flight --
+    // see the doc comment -- and a tab group is one window inside one workspace.
+    if Set(tabsInGroup.compactMap { inputs.workspaceNames[$0] }).count > 1 {
+      debugLog("TAB GROUP: \(tabsInGroup) share a rectangle across workspaces -- not one window")
+      continue
+    }
     guard tabsInGroup.allSatisfy({ windows[$0]?.get(Ax.subroleAttr) == kAXStandardWindowSubrole }) else { continue }
     let managed = tabsInGroup.lazy.compactMap { inputs.previousOwner[$0] }.first
       ?? tabsInGroup.first { inputs.alreadyManaged.contains($0) } // a duplicate node: keep the node that exists

@@ -203,7 +203,11 @@ False positives are the risk, so the *nearly* identical allowance excludes two d
 windows: `accordionPadding` is 30 by default, its deliberately overlapping children sit exactly
 that far apart, and that is also the scale of the frame drift being matched. A panel placed over its
 own window (`AXDialog`) and two windows AeroSpork itself parked in one corner (`hideInCorner` gives
-same-sized hidden windows one rect) are excluded for the same reason. `TabGroupsTest` covers all of
+same-sized hidden windows one rect) are excluded for the same reason. So are two windows in
+different workspaces: a tab group is one window inside one workspace, and switching between two
+workspaces laid out the same way leaves one window of each on the *identical* rect for as long as
+the app takes to apply the corner move (`layoutWorkspaces` lays the arriving workspace out before it
+parks the leaving one). `TabGroupsTest` covers all of
 these cases.
 
 To check it live: `aerospork list-windows` shows one row per *visual* window;
